@@ -1,6 +1,6 @@
 # arch.ts.create
 
-Creates a software architecture technical specification document for a TypeScript-based system or module.
+Creates a software architecture technical specification document for a system, module, layer, or integration.
 
 ## Usage
 
@@ -12,7 +12,7 @@ Creates a software architecture technical specification document for a TypeScrip
 
 ## Instructions
 
-You are a pragmatic software architect. Your task is to produce a thorough architecture tech spec document for a TypeScript-based system or module.
+You are a pragmatic software architect. Your task is to produce a thorough architecture tech spec document.
 
 **Input:** $ARGUMENTS
 
@@ -54,7 +54,7 @@ Include a brief description of the business or technical context.
 - List quality attributes being optimized (e.g., maintainability, scalability, testability)
 
 **Constraints:**
-- Technology constraints (must use TypeScript, Node.js version, etc.)
+- Technology or platform constraints
 - Team or organizational constraints
 - Non-functional requirements (performance SLAs, security requirements)
 
@@ -73,13 +73,13 @@ graph TD
   B --> C[Component C]
 ```
 
-#### 4.2 Module Boundaries
-Define the main modules/packages and their responsibilities:
+#### 4.2 Component Boundaries
+Define the main components and their responsibilities:
 
-| Module | Responsibility | Public Interface |
-|--------|---------------|-----------------|
-| `module-a` | ... | `ModuleAService` |
-| `module-b` | ... | `ModuleBRepository` |
+| Component | Responsibility | Public Interface |
+|-----------|---------------|-----------------|
+| `component-a` | ... | `ServiceA` |
+| `component-b` | ... | `RepositoryB` |
 
 ### 5. Key Design Decisions
 
@@ -95,43 +95,30 @@ Document significant architectural decisions using the ADR (Architecture Decisio
 #### Decision 2: [Short title]
 *(repeat as needed)*
 
-### 6. TypeScript Architecture Patterns
+### 6. Architecture Patterns & Conventions
 
-Describe the TypeScript-specific patterns and conventions adopted:
+Describe the patterns and conventions adopted in this architecture:
 
-#### 6.1 Module Structure
-Describe the standard file layout for modules in this system:
-
-```
-<module-name>/
-├── index.ts                    # Barrel — public API only
-├── <module-name>.types.ts      # Domain types, interfaces, enums
-├── <module-name>.service.ts    # Business logic
-├── <module-name>.repository.ts # Data access (if applicable)
-└── __tests__/
-    └── <module-name>.service.test.ts
-```
+#### 6.1 Component Structure
+Describe the standard layout and organization for components in this system.
 
 #### 6.2 Dependency Direction
-Define allowed dependency flow between layers (e.g., Domain ← Application ← Infrastructure).
+Define the allowed dependency flow between layers or components (e.g., Domain ← Application ← Infrastructure).
 
-#### 6.3 Type Strategy
-- How are shared types managed (shared package, module-local, generated)?
-- Naming conventions for interfaces, types, enums
-- Policy on use of `any`, `unknown`, type assertions
+#### 6.3 Communication Style
+How do components communicate? (e.g., direct calls, events, message queues, REST, gRPC)
 
 #### 6.4 Error Handling Strategy
-- How errors propagate (exceptions, Result types, discriminated unions)
-- Typed error classes or error codes
+How errors propagate across boundaries and how they are surfaced to consumers.
 
 ### 7. Data Flow
 
 Describe how data moves through the system for the primary use cases:
 
 ```
-Request → Controller → Service → Repository → Database
-                             ↓
-                         Domain Events → Event Bus → ...
+Request → [Component A] → [Component B] → [Storage]
+                       ↓
+               [Event Bus] → [Component C] → ...
 ```
 
 Narrate 1–3 key flows with enough detail to understand the runtime behavior.
@@ -147,8 +134,8 @@ Narrate 1–3 key flows with enough detail to understand the runtime behavior.
 
 | Attribute | Requirement | Strategy |
 |-----------|------------|---------|
-| Testability | Unit-testable business logic | Dependency injection, pure functions |
-| Maintainability | Low coupling between modules | Barrel exports, typed interfaces |
+| Testability | Business logic must be unit-testable | Dependency inversion, pure functions |
+| Maintainability | Low coupling between components | Defined interfaces, bounded contexts |
 | Performance | < 200ms p95 response time | [TODO: define strategy] |
 
 ### 10. Open Questions

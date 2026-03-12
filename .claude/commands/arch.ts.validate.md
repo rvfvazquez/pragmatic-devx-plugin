@@ -1,6 +1,6 @@
 # arch.ts.validate
 
-Validates a TypeScript software architecture tech spec for completeness, consistency, and architectural soundness.
+Validates a software architecture tech spec for completeness, consistency, and architectural soundness.
 
 ## Usage
 
@@ -10,7 +10,7 @@ Validates a TypeScript software architecture tech spec for completeness, consist
 
 ## Instructions
 
-You are a pragmatic software architecture reviewer. Your task is to validate an architecture technical specification document for a TypeScript-based system.
+You are a pragmatic software architecture reviewer. Your task is to validate an architecture technical specification document.
 
 **Input:** $ARGUMENTS
 
@@ -31,31 +31,31 @@ Evaluate the spec against the following criteria. For each check, report **PASS*
 - [ ] **Constraints listed** — Technology or organizational constraints are documented
 - [ ] **Non-goals defined** — Explicitly states what is out of scope
 - [ ] **High-level design present** — Describes main components and their relationships
-- [ ] **Module boundaries defined** — Lists modules with responsibilities and public interfaces
+- [ ] **Component boundaries defined** — Lists components with responsibilities and public interfaces
 - [ ] **At least one ADR** — At least one key design decision is documented in ADR format
-- [ ] **TypeScript patterns described** — Module structure, dependency direction, and type strategy are defined
+- [ ] **Architecture patterns described** — Component structure, dependency direction, and communication style are defined
 - [ ] **Data flow described** — At least one primary data flow is described
 - [ ] **No unresolved TODOs** — No `[TODO: ...]` placeholders remain (WARN if present)
 
 #### B. Architectural Soundness Checks
-- [ ] **Single Responsibility per module** — Each module/component has one clear responsibility
+- [ ] **Single Responsibility per component** — Each component has one clear responsibility
 - [ ] **Dependency direction is explicit** — The allowed direction of dependencies between layers is stated and consistent
-- [ ] **No bidirectional dependencies** — No two modules are described as depending on each other (circular coupling)
-- [ ] **Public interfaces are typed** — Module boundaries expose typed contracts, not implementation details
-- [ ] **Error strategy is defined** — How errors propagate is described
+- [ ] **No bidirectional dependencies** — No two components are described as mutually depending on each other
+- [ ] **Public interfaces are defined** — Component boundaries expose explicit contracts, not implementation details
+- [ ] **Error strategy is defined** — How errors propagate across boundaries is described
 
 #### C. Clarity Checks
 - [ ] **Unambiguous language** — No vague terms (e.g., "fast", "scalable") without measurable definitions
 - [ ] **Diagrams present** — At least one diagram (ASCII or Mermaid) illustrates the structure
-- [ ] **Consistent terminology** — Key terms (module, service, layer, etc.) are used consistently
+- [ ] **Consistent terminology** — Key terms (component, service, layer, etc.) are used consistently throughout
 - [ ] **ADRs include rationale** — Each decision explains why that option was chosen over alternatives
 - [ ] **Consequences are honest** — Trade-offs and downsides are acknowledged, not only benefits
 
-#### D. TypeScript-Specific Checks
-- [ ] **Module structure is canonical** — A standard file layout for modules is defined
-- [ ] **`any` policy stated** — The spec explicitly addresses the use of `any` / `unknown`
-- [ ] **Type sharing strategy defined** — Describes how shared types are managed across modules
-- [ ] **Testability strategy present** — Describes how the architecture supports unit and integration testing
+#### D. Design Quality Checks
+- [ ] **Component structure defined** — A standard layout or organization for components is described
+- [ ] **Communication style stated** — How components interact is explicit (sync/async, events, direct calls, etc.)
+- [ ] **Testability strategy present** — Describes how the architecture supports testing
+- [ ] **External dependencies documented** — Integrations and external systems are listed with their purpose
 
 ### Step 3 — Generate Validation Report
 
@@ -79,7 +79,7 @@ Must be addressed before approval:
 1. **[No ADR]** Section 5 (Key Design Decisions) is missing
    - Add at least one ADR describing a significant architectural decision
 
-2. **[Circular dependency]** Modules A and B are described as mutually dependent
+2. **[Circular dependency]** Components A and B are described as mutually dependent
    - Introduce a shared abstraction or invert one dependency
 
 ### Warnings (WARN)

@@ -1,0 +1,28 @@
+{
+  "marketplace": {
+    "enabled": true,
+    "plugin": "pragmatic-devx-plugin"
+  },
+  "skills": {
+    "spec.create": {
+      "enabled": true,
+      "description": "Creates a structured technical specification document"
+    },
+    "spec.update": {
+      "enabled": true,
+      "description": "Updates an existing specification"
+    },
+    "spec.validate": {
+      "enabled": true,
+      "description": "Validates a specification for completeness and consistency"
+    },
+    "arch.ts.create": {
+      "enabled": true,
+      "description": "Creates a TypeScript architecture scaffold"
+    },
+    "arch.ts.validate": {
+      "enabled": true,
+      "description": "Validates TypeScript code against architecture guidelines"
+    }
+  }
+}

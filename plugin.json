@@ -1,0 +1,43 @@
+{
+  "name": "pragmatic-devx-plugin",
+  "version": "0.1.0",
+  "description": "Claude Code plugin focused in Developer Experience — specs, architecture, and TypeScript patterns.",
+  "author": "rvfvazquez",
+  "license": "MIT",
+  "marketplace": {
+    "category": "developer-experience",
+    "tags": ["spec", "architecture", "typescript", "dx", "pragmatic"]
+  },
+  "skills": [
+    {
+      "name": "spec.create",
+      "command": "spec.create",
+      "description": "Creates a structured technical specification document for a feature or story",
+      "file": ".claude/commands/spec.create.md"
+    },
+    {
+      "name": "spec.update",
+      "command": "spec.update",
+      "description": "Updates an existing specification with new requirements or corrections",
+      "file": ".claude/commands/spec.update.md"
+    },
+    {
+      "name": "spec.validate",
+      "command": "spec.validate",
+      "description": "Validates a specification for completeness, clarity, and consistency",
+      "file": ".claude/commands/spec.validate.md"
+    },
+    {
+      "name": "arch.ts.create",
+      "command": "arch.ts.create",
+      "description": "Creates a TypeScript architecture scaffold following pragmatic design patterns",
+      "file": ".claude/commands/arch.ts.create.md"
+    },
+    {
+      "name": "arch.ts.validate",
+      "command": "arch.ts.validate",
+      "description": "Validates TypeScript code against architecture guidelines and best practices",
+      "file": ".claude/commands/arch.ts.validate.md"
+    }
+  ]
+}

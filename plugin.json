@@ -30,13 +30,13 @@
     {
       "name": "arch.ts.create",
       "command": "arch.ts.create",
-      "description": "Creates a TypeScript architecture scaffold following pragmatic design patterns",
+      "description": "Creates a software architecture tech spec document for a TypeScript-based system or module",
       "file": ".claude/commands/arch.ts.create.md"
     },
     {
       "name": "arch.ts.validate",
       "command": "arch.ts.validate",
-      "description": "Validates TypeScript code against architecture guidelines and best practices",
+      "description": "Validates a TypeScript architecture tech spec for completeness, consistency, and architectural soundness",
       "file": ".claude/commands/arch.ts.validate.md"
     }
   ]

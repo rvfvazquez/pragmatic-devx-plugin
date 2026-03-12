@@ -18,11 +18,11 @@
     },
     "arch.ts.create": {
       "enabled": true,
-      "description": "Creates a TypeScript architecture scaffold"
+      "description": "Creates a software architecture tech spec document for a TypeScript-based system or module"
     },
     "arch.ts.validate": {
       "enabled": true,
-      "description": "Validates TypeScript code against architecture guidelines"
+      "description": "Validates a TypeScript architecture tech spec for completeness, consistency, and soundness"
     }
   }
 }

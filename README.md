@@ -42,26 +42,26 @@ Runs structured checks across completeness, clarity, consistency, and technical 
 ---
 
 ### `arch.ts.create`
-Creates a TypeScript architecture scaffold following pragmatic design patterns.
+Creates a software architecture technical specification document for a TypeScript-based system or module.
 
 ```
-/arch.ts.create <module-name> [module-type]
+/arch.ts.create <system-or-module-name> [scope]
 ```
 
-**Module types:** `service` | `repository` | `controller` | `hook` | `util` | `module`
+**Scope:** `system` | `module` | `layer` | `integration`
 
-Generates a full module structure with types, service, tests, and barrel exports — following the conventions already present in the codebase.
+Generates a full architecture tech spec at `docs/arch/<name>.arch.md` covering context, design decisions (ADRs), module boundaries, TypeScript patterns, dependency direction, data flow, and non-functional requirements.
 
 ---
 
 ### `arch.ts.validate`
-Validates TypeScript code against architecture guidelines and best practices.
+Validates a TypeScript architecture tech spec for completeness, consistency, and architectural soundness.
 
 ```
-/arch.ts.validate [path]
+/arch.ts.validate <arch-spec-file-path>
 ```
 
-Checks module structure, TypeScript strictness (no `any`, no `@ts-ignore`), dependency rules, separation of concerns, code quality patterns, and test coverage presence. Outputs a structured report grouped by severity.
+Checks completeness (goals, ADRs, module boundaries, data flow), architectural soundness (single responsibility, dependency direction, no circular coupling), clarity (diagrams, unambiguous language), and TypeScript-specific conventions. Outputs a structured PASS/WARN/FAIL report.
 
 ---
 

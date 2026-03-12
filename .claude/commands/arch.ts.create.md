@@ -1,159 +1,166 @@
 # arch.ts.create
 
-Creates a TypeScript architecture scaffold following pragmatic design patterns and clean code principles.
+Creates a software architecture technical specification document for a TypeScript-based system or module.
 
 ## Usage
 
 ```
-/arch.ts.create <module-name> [module-type]
+/arch.ts.create <system-or-module-name> [scope]
 ```
 
-**Module types:** `service` | `repository` | `controller` | `hook` | `util` | `module` (default: `module`)
+**Scope:** `system` | `module` | `layer` | `integration` (default: `module`)
 
 ## Instructions
 
-You are a pragmatic TypeScript architect. Your task is to scaffold a well-structured TypeScript module.
+You are a pragmatic software architect. Your task is to produce a thorough architecture tech spec document for a TypeScript-based system or module.
 
 **Input:** $ARGUMENTS
 
-### Step 1 — Parse the Input
+### Step 1 — Understand the Context
 
 From the arguments, determine:
-- **Module name**: convert to `kebab-case` for files and `PascalCase` for types/classes
-- **Module type**: one of `service`, `repository`, `controller`, `hook`, `util`, or `module`
-- **Target directory**: look for existing `src/` structure and match conventions; default to `src/<module-type>s/`
+- **Name**: the system, module, or layer being documented
+- **Scope**: how broad the architecture document should be:
+  - `system` — full application or bounded context
+  - `module` — a single feature module or domain
+  - `layer` — a horizontal layer (e.g., data access, presentation)
+  - `integration` — an external integration or adapter
 
-### Step 2 — Identify Project Conventions
+Before writing, scan the codebase for any existing code, README files, or prior specs that reveal current decisions and constraints.
 
-Before generating code:
-1. Scan `src/` for existing files to understand naming conventions
-2. Check for `tsconfig.json` to understand path aliases and target settings
-3. Check `package.json` for relevant dependencies (e.g., testing framework, HTTP lib)
-4. Match the style and patterns already present in the codebase
+### Step 2 — Generate the Architecture Tech Spec
 
-### Step 3 — Generate the Architecture
+Create the file at `docs/arch/<name>.arch.md` using the template below.
 
-Create the following files based on the module type:
+---
 
-#### For `module` (default)
+## Architecture Tech Spec Template
+
+### 1. Overview
+- **Name**: System / module name
+- **Scope**: system | module | layer | integration
+- **Status**: Draft | Review | Approved
+- **Author**: (infer from git config or leave blank)
+- **Created**: (today's date)
+- **Version**: 1.0.0
+
+### 2. Context & Motivation
+Why does this architecture exist? What problem does it solve? What drove the design decisions?
+Include a brief description of the business or technical context.
+
+### 3. Goals & Constraints
+
+**Architectural Goals:**
+- List quality attributes being optimized (e.g., maintainability, scalability, testability)
+
+**Constraints:**
+- Technology constraints (must use TypeScript, Node.js version, etc.)
+- Team or organizational constraints
+- Non-functional requirements (performance SLAs, security requirements)
+
+**Non-Goals:**
+- What this architecture intentionally does not address
+
+### 4. High-Level Design
+
+Describe the overall structure in prose. Explain the main building blocks and how they relate.
+
+#### 4.1 Component Diagram (ASCII or Mermaid)
+
+```mermaid
+graph TD
+  A[Component A] --> B[Component B]
+  B --> C[Component C]
 ```
-src/<module-name>/
-├── index.ts                    # Public API / barrel export
-├── <module-name>.types.ts      # Interfaces, types, enums
+
+#### 4.2 Module Boundaries
+Define the main modules/packages and their responsibilities:
+
+| Module | Responsibility | Public Interface |
+|--------|---------------|-----------------|
+| `module-a` | ... | `ModuleAService` |
+| `module-b` | ... | `ModuleBRepository` |
+
+### 5. Key Design Decisions
+
+Document significant architectural decisions using the ADR (Architecture Decision Record) format:
+
+#### Decision 1: [Short title]
+- **Status**: Accepted | Proposed | Deprecated
+- **Context**: Why was this decision needed?
+- **Decision**: What was decided?
+- **Rationale**: Why this option over alternatives?
+- **Consequences**: What are the trade-offs and implications?
+
+#### Decision 2: [Short title]
+*(repeat as needed)*
+
+### 6. TypeScript Architecture Patterns
+
+Describe the TypeScript-specific patterns and conventions adopted:
+
+#### 6.1 Module Structure
+Describe the standard file layout for modules in this system:
+
+```
+<module-name>/
+├── index.ts                    # Barrel — public API only
+├── <module-name>.types.ts      # Domain types, interfaces, enums
 ├── <module-name>.service.ts    # Business logic
 ├── <module-name>.repository.ts # Data access (if applicable)
 └── __tests__/
     └── <module-name>.service.test.ts
 ```
 
-#### For `service`
-```
-src/services/<module-name>/
-├── index.ts
-├── <module-name>.service.ts
-├── <module-name>.types.ts
-└── __tests__/
-    └── <module-name>.service.test.ts
-```
+#### 6.2 Dependency Direction
+Define allowed dependency flow between layers (e.g., Domain ← Application ← Infrastructure).
 
-#### For `repository`
-```
-src/repositories/
-├── <module-name>.repository.ts
-├── <module-name>.repository.types.ts
-└── __tests__/
-    └── <module-name>.repository.test.ts
-```
+#### 6.3 Type Strategy
+- How are shared types managed (shared package, module-local, generated)?
+- Naming conventions for interfaces, types, enums
+- Policy on use of `any`, `unknown`, type assertions
 
-#### For `hook` (React)
+#### 6.4 Error Handling Strategy
+- How errors propagate (exceptions, Result types, discriminated unions)
+- Typed error classes or error codes
+
+### 7. Data Flow
+
+Describe how data moves through the system for the primary use cases:
+
 ```
-src/hooks/
-├── use-<module-name>.ts
-├── use-<module-name>.types.ts
-└── __tests__/
-    └── use-<module-name>.test.ts
+Request → Controller → Service → Repository → Database
+                             ↓
+                         Domain Events → Event Bus → ...
 ```
 
-#### For `util`
-```
-src/utils/
-├── <module-name>.util.ts
-└── __tests__/
-    └── <module-name>.util.test.ts
-```
+Narrate 1–3 key flows with enough detail to understand the runtime behavior.
 
-### Step 4 — Code Generation Standards
+### 8. External Integrations & Dependencies
 
-When writing TypeScript files, follow these principles:
+| Dependency | Type | Purpose | Owned by |
+|-----------|------|---------|---------|
+| PostgreSQL | Infrastructure | Primary data store | Platform team |
+| Auth Service | External API | Token validation | Identity team |
 
-**Types file (`*.types.ts`)**
-```typescript
-// Always export named interfaces, not inline types
-export interface <ModuleName>Options {
-  // fields with JSDoc when non-obvious
-}
+### 9. Non-Functional Requirements & Strategies
 
-export interface <ModuleName>Result {
-  // ...
-}
+| Attribute | Requirement | Strategy |
+|-----------|------------|---------|
+| Testability | Unit-testable business logic | Dependency injection, pure functions |
+| Maintainability | Low coupling between modules | Barrel exports, typed interfaces |
+| Performance | < 200ms p95 response time | [TODO: define strategy] |
 
-// Use const enums for closed sets of values
-export const enum <ModuleName>Status {
-  Active = 'active',
-  Inactive = 'inactive',
-}
-```
+### 10. Open Questions
+List architectural decisions still pending or requiring input:
 
-**Service file (`*.service.ts`)**
-```typescript
-import type { <ModuleName>Options, <ModuleName>Result } from './<module-name>.types';
+- [ ] [TODO: question]
 
-export class <ModuleName>Service {
-  // Inject dependencies via constructor
-  constructor(private readonly dep: DepType) {}
+---
 
-  async doSomething(options: <ModuleName>Options): Promise<<ModuleName>Result> {
-    // Implementation
-  }
-}
+### Step 3 — Output Instructions
 
-// Also export a factory function for functional style
-export function create<ModuleName>Service(dep: DepType): <ModuleName>Service {
-  return new <ModuleName>Service(dep);
-}
-```
-
-**Test file (`*.test.ts`)**
-```typescript
-import { describe, it, expect, beforeEach } from 'vitest'; // or jest
-
-describe('<ModuleName>Service', () => {
-  let service: <ModuleName>Service;
-
-  beforeEach(() => {
-    service = new <ModuleName>Service(/* mock deps */);
-  });
-
-  describe('doSomething', () => {
-    it('should ...', async () => {
-      // Arrange
-      // Act
-      // Assert
-    });
-  });
-});
-```
-
-**Barrel export (`index.ts`)**
-```typescript
-// Only export the public API — never export internals
-export type { <ModuleName>Options, <ModuleName>Result } from './<module-name>.types';
-export { <ModuleName>Service, create<ModuleName>Service } from './<module-name>.service';
-```
-
-### Step 5 — Output Instructions
-
-1. Create all files with production-ready boilerplate (not just empty stubs)
-2. Add `// TODO:` comments where business logic needs to be filled in
-3. Report the list of files created with their purpose
-4. Suggest the next steps for implementing the module
+1. Create the file at `docs/arch/<name>.arch.md`
+2. Fill all sections with concrete content based on the input and codebase context
+3. Use `[TODO: ...]` for sections where information is unavailable
+4. After creating the file, summarize the key architectural decisions documented and list open questions

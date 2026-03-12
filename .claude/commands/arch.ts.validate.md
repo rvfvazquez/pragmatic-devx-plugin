@@ -1,114 +1,112 @@
 # arch.ts.validate
 
-Validates TypeScript code against architecture guidelines, best practices, and project conventions.
+Validates a TypeScript software architecture tech spec for completeness, consistency, and architectural soundness.
 
 ## Usage
 
 ```
-/arch.ts.validate [path]
+/arch.ts.validate <arch-spec-file-path>
 ```
-
-**Path:** file, directory, or glob pattern (default: `src/`)
 
 ## Instructions
 
-You are a pragmatic TypeScript code reviewer focused on architecture quality. Your task is to validate TypeScript code structure and patterns.
+You are a pragmatic software architecture reviewer. Your task is to validate an architecture technical specification document for a TypeScript-based system.
 
 **Input:** $ARGUMENTS
 
-### Step 1 — Determine Scope
+### Step 1 — Locate and Read the Spec
 
-From the arguments, identify what to validate:
-- Specific file: validate that file
-- Directory: validate all `.ts` / `.tsx` files within it
-- No argument: validate the entire `src/` directory
+Find and read the architecture spec file. Common locations:
+- `docs/arch/`
+- Any `.arch.md` or `.md` file matching the provided path or name
 
-Also read `tsconfig.json` to understand compiler settings and `package.json` for dependencies.
+### Step 2 — Run Validation Checks
 
-### Step 2 — Run Architecture Checks
+Evaluate the spec against the following criteria. For each check, report **PASS**, **WARN**, or **FAIL** with a short explanation.
 
-For each file/module in scope, evaluate the following categories:
+#### A. Completeness Checks
+- [ ] **Title & Status** — Has a clear name and defined status (Draft/Review/Approved)
+- [ ] **Context & Motivation** — Explains why this architecture exists and what problem it solves
+- [ ] **Goals defined** — At least one architectural goal is stated (quality attributes)
+- [ ] **Constraints listed** — Technology or organizational constraints are documented
+- [ ] **Non-goals defined** — Explicitly states what is out of scope
+- [ ] **High-level design present** — Describes main components and their relationships
+- [ ] **Module boundaries defined** — Lists modules with responsibilities and public interfaces
+- [ ] **At least one ADR** — At least one key design decision is documented in ADR format
+- [ ] **TypeScript patterns described** — Module structure, dependency direction, and type strategy are defined
+- [ ] **Data flow described** — At least one primary data flow is described
+- [ ] **No unresolved TODOs** — No `[TODO: ...]` placeholders remain (WARN if present)
 
-#### A. Module Structure
-- [ ] Each module has a clear single responsibility
-- [ ] Public API is exported through a barrel `index.ts`
-- [ ] Internal implementation details are not exported from the barrel
-- [ ] File naming follows consistent conventions (kebab-case)
+#### B. Architectural Soundness Checks
+- [ ] **Single Responsibility per module** — Each module/component has one clear responsibility
+- [ ] **Dependency direction is explicit** — The allowed direction of dependencies between layers is stated and consistent
+- [ ] **No bidirectional dependencies** — No two modules are described as depending on each other (circular coupling)
+- [ ] **Public interfaces are typed** — Module boundaries expose typed contracts, not implementation details
+- [ ] **Error strategy is defined** — How errors propagate is described
 
-#### B. TypeScript Strictness
-- [ ] No use of `any` type (FAIL) — suggest specific types or `unknown`
-- [ ] No implicit `any` from missing type annotations on function parameters
-- [ ] No `@ts-ignore` or `@ts-nocheck` comments without explanation
-- [ ] Type assertions (`as Type`) are minimized and justified
+#### C. Clarity Checks
+- [ ] **Unambiguous language** — No vague terms (e.g., "fast", "scalable") without measurable definitions
+- [ ] **Diagrams present** — At least one diagram (ASCII or Mermaid) illustrates the structure
+- [ ] **Consistent terminology** — Key terms (module, service, layer, etc.) are used consistently
+- [ ] **ADRs include rationale** — Each decision explains why that option was chosen over alternatives
+- [ ] **Consequences are honest** — Trade-offs and downsides are acknowledged, not only benefits
 
-#### C. Dependency & Import Rules
-- [ ] No circular dependencies between modules
-- [ ] Imports use path aliases (e.g., `@/`) when configured in `tsconfig.json`
-- [ ] No deep relative imports (`../../../`) — max 2 levels (`../../`)
-- [ ] External dependencies are only imported at module boundaries, not deeply nested
+#### D. TypeScript-Specific Checks
+- [ ] **Module structure is canonical** — A standard file layout for modules is defined
+- [ ] **`any` policy stated** — The spec explicitly addresses the use of `any` / `unknown`
+- [ ] **Type sharing strategy defined** — Describes how shared types are managed across modules
+- [ ] **Testability strategy present** — Describes how the architecture supports unit and integration testing
 
-#### D. Separation of Concerns
-- [ ] Business logic lives in services, not in controllers/routes/components
-- [ ] Data access is encapsulated in repositories or data-access layers
-- [ ] Types/interfaces are defined in dedicated `.types.ts` files, not inline in implementation files
-- [ ] Side effects are isolated and not scattered across modules
+### Step 3 — Generate Validation Report
 
-#### E. Code Quality Patterns
-- [ ] No "magic numbers" or hardcoded strings — use named constants or enums
-- [ ] Error handling is explicit — no silent catches (`catch {}` or `catch (e) {}` with no action)
-- [ ] Async functions consistently use `async/await` (not mixed with `.then()` chains)
-- [ ] Functions have a single level of abstraction
-
-#### F. Test Coverage Presence
-- [ ] Each `*.service.ts` has a corresponding `*.service.test.ts`
-- [ ] Each `*.util.ts` has a corresponding `*.util.test.ts`
-- [ ] Test files are co-located in `__tests__/` or with the source file
-
-### Step 3 — Generate Architecture Report
-
-Produce a structured report:
+Produce a structured report in this format:
 
 ```
-## TypeScript Architecture Validation Report
-**Scope:** <path validated>
+## Architecture Tech Spec Validation Report
+**File:** <file path>
+**System/Module:** <name from spec>
 **Date:** <today>
 **Overall Status:** PASS | WARN | FAIL
 
 ### Summary
-- Files analyzed: X
-- Issues found: X (Y critical, Z warnings)
+- Passed:   X checks
+- Warnings: X checks
+- Failed:   X checks
 
-### Critical Issues (FAIL)
-These must be fixed before merging:
+### Failed Checks (FAIL)
+Must be addressed before approval:
 
-1. **[any type]** `src/services/user.service.ts:42`
-   - Found: `function process(data: any)`
-   - Fix: Define a specific type `UserData` and use it
+1. **[No ADR]** Section 5 (Key Design Decisions) is missing
+   - Add at least one ADR describing a significant architectural decision
+
+2. **[Circular dependency]** Modules A and B are described as mutually dependent
+   - Introduce a shared abstraction or invert one dependency
 
 ### Warnings (WARN)
-These should be addressed but are not blocking:
+Should be addressed but not blocking:
 
-1. **[deep import]** `src/components/Form.tsx:3`
-   - Found: `import { helper } from '../../../utils/helper'`
-   - Fix: Use path alias `@/utils/helper`
+1. **[Unresolved TODO]** Section 9 — Performance strategy is `[TODO: define strategy]`
+   - Define the performance approach before moving to Approved status
+
+2. **[No diagram]** No visual representation of the component structure
+   - Add a Mermaid or ASCII diagram to Section 4.1
 
 ### Suggestions (INFO)
-Optional improvements for better architecture:
+Optional improvements:
 
-1. ...
+1. Consider documenting the deployment topology if the system has infrastructure dependencies
 
-### Files with No Issues
-- src/utils/format.util.ts ✓
-- src/services/auth.service.ts ✓
+### Checks Passed
+- Title & Status ✓
+- Context & Motivation ✓
+- Goals defined ✓
+- ...
 ```
 
 ### Step 4 — Output Instructions
 
-1. Print the full report in the terminal
-2. Do **not** modify any source files — only report findings
-3. Group issues by severity: FAIL → WARN → INFO
-4. For each issue, provide:
-   - File path and line number (when determinable)
-   - What was found
-   - Concrete suggestion for how to fix it
-5. If everything passes, provide a brief summary of architectural strengths observed
+1. Print the full validation report in the terminal
+2. Do **not** modify the architecture spec file — only report findings
+3. Group findings by severity: FAIL → WARN → INFO → PASS
+4. For each FAIL or WARN, provide a concrete, actionable suggestion
+5. If the spec passes all checks, summarize its architectural strengths and confirm it is ready for approval

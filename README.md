@@ -1,2 +1,2 @@
 # pragmatic-devx-plugin
-Claude code plugin focused in Develiper Experience
+Claude code plugin focused in Developer Experience

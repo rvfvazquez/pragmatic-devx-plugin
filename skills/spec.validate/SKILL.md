@@ -1,7 +1,6 @@
 ---
 name: spec.validate
 description: This skill should be used when the user asks to "validate a spec", "check if this spec is complete", "review the spec for completeness", "is this spec good?", "check the spec quality", "review this specification", "audit the spec", or wants a structured quality review of an existing specification document.
-version: 0.1.0
 ---
 
 # spec.validate
@@ -49,6 +48,12 @@ Evaluate each criterion below. Report **PASS**, **WARN**, or **FAIL** with a sho
 - **Criteria are testable** — Each acceptance criterion can be objectively verified
 - **Interface matches design** — If APIs/interfaces are defined, they align with the described behavior
 - **No contradictions** — Goals do not contradict the proposed solution or acceptance criteria
+
+#### Technology Decisions
+- **Technology Decisions section present** — Spec contains an explicit Technology Decisions table or equivalent section
+- **No implicit technology assumptions** — Mentions of databases, queues, caches, or frameworks are backed by an explicit decision, not just assumed
+- **Undecided items flagged** — Any `[TODO: decide — options: ...]` items are listed in Open Questions so they are visible and actionable
+- **Rationale captured** — Each technology decision includes at least a brief reason (or references team convention / existing stack)
 
 #### Technical
 - **Dependencies identified** — External dependencies and integrations are listed

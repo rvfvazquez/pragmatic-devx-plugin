@@ -1,0 +1,8 @@
+{
+  "name": "pragmatic-devx-plugin",
+  "description": "Claude Code plugin focused on Developer Experience — structured specs, architecture documentation, and pragmatic engineering patterns.",
+  "author": {
+    "name": "rvfvazquez",
+    "email": "rvfvazquez@gmail.com"
+  }
+}

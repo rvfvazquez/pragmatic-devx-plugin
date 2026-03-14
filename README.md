@@ -151,8 +151,8 @@ None.
 
 ```
 pragmatic-devx-plugin/
-├── .claude/
-│   └── settings.json              # Marketplace & plugin configuration
+├── .claude-plugin/
+│   └── plugin.json                # Plugin manifest (name, description, author)
 ├── skills/
 │   ├── spec.create/
 │   │   ├── SKILL.md               # Skill definition & trigger logic
@@ -168,7 +168,6 @@ pragmatic-devx-plugin/
 │   │       └── template.md        # Architecture tech spec template
 │   └── arch.ts.validate/
 │       └── SKILL.md
-├── plugin.json                    # Plugin manifest
 ├── LICENSE
 └── README.md
 ```

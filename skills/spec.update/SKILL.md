@@ -1,7 +1,6 @@
 ---
 name: spec.update
 description: This skill should be used when the user asks to "update a spec", "update this specification", "revise the spec", "add requirements to the spec", "change the spec", "fill in the TODOs in the spec", "correct the spec", or wants to apply new decisions, corrections, or requirements to an existing specification document.
-version: 0.1.0
 ---
 
 # spec.update
@@ -36,8 +35,34 @@ Read the full file and understand its current content and structure.
 
 Analyze what needs to change:
 - If a description is provided, apply those changes to the relevant sections
-- If no description is given, scan for `[TODO: ...]` placeholders and ask the user to fill them in
+- If no description is given, scan for `[TODO: ...]` placeholders
 - Identify all sections affected by the change (a change to the data model may also affect the API and acceptance criteria)
+
+### Step 2.5 — Resolve Technology TODOs via Interview
+
+**Before writing any changes**, check if any open `[TODO: decide — options: ...]` items exist in the Technology Decisions section or elsewhere in the spec.
+
+If yes, use `AskUserQuestion` to ask the user to decide each one. Present the options explicitly so the user can choose:
+
+```
+This spec has some unresolved technology decisions. Let's lock them in:
+
+**[TODO item 1 — e.g. Data storage]**
+Options: A, B, C
+Which do you want to go with, or should it stay open?
+
+**[TODO item 2 — e.g. Async processing]**
+Options: SQS, background job, synchronous
+Which do you prefer?
+```
+
+Do not assume a default. If the user says "undecided" or "keep open", leave the `[TODO]` in place.
+
+Also ask about technology choices implied by new requirements that the user described but didn't specify:
+- If a new caching requirement is added, ask: "What cache backend? Options: Redis, Memcached, in-process, CloudFront"
+- If a new queue is needed, ask: "Which queue? Options: SQS, RabbitMQ, existing queue, other"
+
+Only skip this step if the update is purely textual (wording corrections, status changes) with no new technical decisions.
 
 ### Step 3 — Apply the Changes
 

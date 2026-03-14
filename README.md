@@ -4,10 +4,16 @@ Claude Code plugin focused on Developer Experience — structured specs, archite
 
 ## Installation
 
-Add the plugin via the Claude Code marketplace:
+**1. Add the marketplace:**
 
 ```bash
-claude plugin add rvfvazquez/pragmatic-devx-plugin
+claude plugin marketplace add https://github.com/rvfvazquez/pragmatic-devx-plugin.git
+```
+
+**2. Install the plugin:**
+
+```bash
+claude plugin install pragmatic-devx-plugin@pragmatic-devx-plugin
 ```
 
 After installation, the skills activate automatically. No configuration needed — Claude detects your intent from the conversation and loads the right skill.
@@ -152,7 +158,8 @@ None.
 ```
 pragmatic-devx-plugin/
 ├── .claude-plugin/
-│   └── plugin.json                # Plugin manifest (name, description, author)
+│   ├── plugin.json                # Plugin manifest (name, description, author)
+│   └── marketplace.json           # Marketplace registry (lists this plugin)
 ├── skills/
 │   ├── spec.create/
 │   │   ├── SKILL.md               # Skill definition & trigger logic

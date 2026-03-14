@@ -1,43 +1,38 @@
 {
   "name": "pragmatic-devx-plugin",
-  "version": "0.1.0",
-  "description": "Claude Code plugin focused in Developer Experience — specs, architecture, and TypeScript patterns.",
+  "version": "0.2.0",
+  "description": "Claude Code plugin focused in Developer Experience — specs, architecture, and pragmatic engineering patterns.",
   "author": "rvfvazquez",
   "license": "MIT",
   "marketplace": {
     "category": "developer-experience",
-    "tags": ["spec", "architecture", "typescript", "dx", "pragmatic"]
+    "tags": ["spec", "architecture", "dx", "pragmatic"]
   },
   "skills": [
     {
       "name": "spec.create",
-      "command": "spec.create",
       "description": "Creates a structured technical specification document for a feature or story",
-      "file": ".claude/commands/spec.create.md"
+      "file": "skills/spec.create/SKILL.md"
     },
     {
       "name": "spec.update",
-      "command": "spec.update",
       "description": "Updates an existing specification with new requirements or corrections",
-      "file": ".claude/commands/spec.update.md"
+      "file": "skills/spec.update/SKILL.md"
     },
     {
       "name": "spec.validate",
-      "command": "spec.validate",
       "description": "Validates a specification for completeness, clarity, and consistency",
-      "file": ".claude/commands/spec.validate.md"
+      "file": "skills/spec.validate/SKILL.md"
     },
     {
       "name": "arch.ts.create",
-      "command": "arch.ts.create",
       "description": "Creates a software architecture tech spec document for a system, module, layer, or integration",
-      "file": ".claude/commands/arch.ts.create.md"
+      "file": "skills/arch.ts.create/SKILL.md"
     },
     {
       "name": "arch.ts.validate",
-      "command": "arch.ts.validate",
       "description": "Validates an architecture tech spec for completeness, consistency, and architectural soundness",
-      "file": ".claude/commands/arch.ts.validate.md"
+      "file": "skills/arch.ts.validate/SKILL.md"
     }
   ]
 }

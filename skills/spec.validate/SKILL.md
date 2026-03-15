@@ -22,6 +22,21 @@ Apply when a spec exists and the user wants to know if it's ready:
 
 ## How to Validate a Spec
 
+### Step 0 — Language Selection
+
+**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the validation report generated in:
+
+```
+In which language would you like the validation report to be generated?
+
+1. pt-BR — Portuguese (Brazil)
+2. es-ES — Spanish (Spain)
+3. en-US — English (United States)
+4. Other — specify which language
+```
+
+Record the chosen language and use it for **all report content** — section headings, check descriptions, notes, and recommended actions. Do not proceed to the next step until the language is confirmed.
+
 ### Step 1 — Locate and Read the Spec
 
 Find the spec file. Common locations: `docs/specs/`, `specs/`, or the path provided. Read the full document before running any checks.

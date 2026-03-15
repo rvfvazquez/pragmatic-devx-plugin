@@ -22,6 +22,21 @@ Apply whenever a spec already exists and needs to change:
 
 ## How to Update a Spec
 
+### Step 0 — Language Selection
+
+**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the updated content to be written in:
+
+```
+In which language would you like the spec updates to be written?
+
+1. pt-BR — Portuguese (Brazil)
+2. es-ES — Spanish (Spain)
+3. en-US — English (United States)
+4. Other — specify which language
+```
+
+Record the chosen language and apply it consistently to **all new or modified content** — section text, changelog entries, TODO comments, and any new acceptance criteria. Existing content that is not being changed should remain in its original language. Do not proceed to the next step until the language is confirmed.
+
 ### Step 1 — Locate the Spec
 
 Find the spec file from the user's context. Common locations:
@@ -34,11 +49,58 @@ Read the full file and understand its current content and structure.
 ### Step 2 — Understand the Change
 
 Analyze what needs to change:
-- If a description is provided, apply those changes to the relevant sections
+- If a description is provided, identify the relevant sections
 - If no description is given, scan for `[TODO: ...]` placeholders
-- Identify all sections affected by the change (a change to the data model may also affect the API and acceptance criteria)
+- Map which sections are directly affected and which may be indirectly impacted (a change to the data model may also affect the API and acceptance criteria)
 
-### Step 2.5 — Resolve Technology TODOs via Interview
+### Step 2.5 — Confirm Scope and Intent Before Proceeding
+
+**This is a mandatory step.** Do not apply any changes until the full scope and intent of the update is clear.
+
+After analyzing the spec and the requested change, use `AskUserQuestion` to confirm your understanding with the user. The goal is to have a complete picture of what is changing, why, and what should remain untouched — before writing anything.
+
+Ask only what is genuinely unclear. Adapt the questions to the specific update.
+
+**`multiSelect` rules for this step — always follow these:**
+- **Sections in scope**: `multiSelect: true` — multiple spec sections may need updating
+- **Related sections to cascade**: `multiSelect: true` — changes often ripple across multiple sections
+- **Expected outcomes**: `multiSelect: true` — the update may achieve several things at once
+
+Example format:
+
+```
+Before I apply any changes, let me confirm my understanding of this update:
+
+**What I understood**
+- [Restate the change as you interpreted it — ask the user to confirm or correct]
+
+**Scope of the Update** → multiSelect: true
+- Which sections of the spec are explicitly in scope for this change?
+  Options: Problem Statement, Goals/Non-Goals, Proposed Solution, Technology Decisions,
+           API/Interface, Data Model, Behavior & Logic, Acceptance Criteria, Open Questions
+
+**Related Sections to Cascade** → multiSelect: true
+- Are there related sections that should also be updated as a result?
+  (e.g., if the API changes → should Acceptance Criteria also change?)
+
+**Motivation**
+- What triggered this change? (new requirement, correction, new decision, implementation feedback)
+- Does this change deprecate or supersede any existing decision in the spec?
+
+**Expected Outcome** → multiSelect: true
+- After this update, what should the spec reflect that it doesn't today? (select all that apply)
+  Options: new requirement captured, TODO resolved, incorrect info corrected,
+           acceptance criteria updated, status/version bumped
+
+Answer what you know — for anything undecided, I'll leave it as an open item.
+```
+
+Do **not** proceed to Step 2.6 until:
+- The exact scope of the change is confirmed
+- The motivation is understood
+- Sections to preserve vs. modify are clear
+
+### Step 2.6 — Resolve Technology TODOs via Interview
 
 **Before writing any changes**, check if any open `[TODO: decide — options: ...]` items exist in the Technology Decisions section or elsewhere in the spec.
 

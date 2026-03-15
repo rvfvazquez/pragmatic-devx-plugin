@@ -22,12 +22,71 @@ Apply this skill whenever a user describes a feature, story, or module that need
 
 ## How to Create a Spec
 
+### Step 0 — Language Selection
+
+**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the spec document generated in:
+
+```
+In which language would you like the spec document to be generated?
+
+1. pt-BR — Portuguese (Brazil)
+2. es-ES — Spanish (Spain)
+3. en-US — English (United States)
+4. Other — specify which language
+```
+
+Record the chosen language and use it consistently for **all content** in the generated document — section headings, descriptions, acceptance criteria, TODO comments, and the changelog. Do not proceed to the next step until the language is confirmed.
+
 ### Step 1 — Understand the Input
 
 Extract from the user's message or conversation context:
 - **Feature name or slug** — used for the filename (`docs/specs/<feature-slug>.md`)
 - **Problem or goal** — what this feature solves
 - **Scope hints** — any details about APIs, data models, behaviors already mentioned
+
+### Step 1.5 — Confirm Full Picture Before Proceeding
+
+**This is a mandatory step.** Do not proceed until you have a complete understanding of the need.
+
+After extracting the initial input, use `AskUserQuestion` to actively validate and deepen your understanding. The goal is to arrive at a "visão do todo" — a full picture of the problem, the context, and the expected outcome — before touching the codebase or asking technology questions.
+
+Ask only what is genuinely unclear or missing. Adapt the questions to the specific feature.
+
+**`multiSelect` rules for this step — always follow these:**
+- **Goals**: `multiSelect: true` — the user may have multiple objectives
+- **Non-Goals / Out of scope**: `multiSelect: true` — multiple items can be out of scope simultaneously
+- **Success factors / Acceptance criteria hints**: `multiSelect: true` — multiple success signals can apply at once
+- **Consumers / Constraints**: `multiSelect: true` when multiple selections are possible
+
+Example format:
+
+```
+Before I scan the codebase and ask about technology choices, let me confirm my understanding:
+
+**Problem & Goal**
+- [Restate what you understood the feature to solve — ask the user to confirm or correct]
+- Who are the main users or consumers of this feature? → multiSelect: true
+
+**Goals** → multiSelect: true
+- What are the main objectives of this feature? (select all that apply)
+
+**Non-Goals / Out of Scope** → multiSelect: true
+- What is explicitly out of scope? (select all that apply)
+
+**Constraints & Non-Negotiables** → multiSelect: true
+- Are there any hard constraints? (deadlines, compliance, existing contracts, performance targets)
+
+**Success Definition** → multiSelect: true
+- How will we know this feature is working correctly? (select all that apply)
+  Options: e2e flows passing, performance SLA met, staging approval, acceptance tests passing, etc.
+
+Answer what you know — for anything undecided, just say so and we'll handle it as an open item.
+```
+
+Do **not** proceed to Step 2 until:
+- The problem and goal are clearly understood
+- The scope boundaries are defined
+- Any hard constraints are captured
 
 ### Step 2 — Scan Existing Codebase
 

@@ -1,7 +1,7 @@
 ---
 name: arch.ts.check
 description: This skill should be used when the user asks to "check if the code conforms to the architecture spec", "verify architecture conformance", "does the code follow the arch spec?", "check if the project respects the architecture", "validate architecture rules in the codebase", "run an architecture check", "arch conformance check", or wants to verify that the actual project structure and code comply with documented architecture technical specifications.
-version: 0.1.0
+version: 0.2.0
 ---
 
 # arch.ts.check
@@ -135,10 +135,15 @@ Code diverges from the spec — must be addressed:
    - Found: <what exists in the code>
    - Expected: <what the spec declares>
    - Location: <file path or directory>
-   - How to fix:
-     - **Action:** <concrete step — e.g., move file, rename module, remove import, extract interface>
-     - **Where:** <specific file(s) or directory to change>
-     - **Outcome:** <what the code should look like after the fix — describe the target state>
+   - How to resolve:
+     - **Option A — Fix the code** (if the spec reflects the intended architecture):
+       - **Action:** <concrete step — e.g., move file, rename module, remove import, extract interface>
+       - **Where:** <specific file(s) or directory to change>
+       - **Outcome:** <what the code should look like after the fix — describe the target state>
+     - **Option B — Update the spec** (if the code reflects an intentional architectural evolution):
+       - **Action:** update the relevant section of the spec to reflect the decision
+       - **Where:** <spec file path and section to update>
+       - **Outcome:** the divergence becomes a documented, intentional decision
 
 ---
 
@@ -169,7 +174,7 @@ Notable patterns — not violations, but worth noting.
 - Print the full report; do **not** modify any source or spec file
 - Every violation and warning must reference the exact section of the spec it was derived from
 - Every violation must include the file path or directory where the divergence was observed
-- **Every violation must include a "How to fix" block** — never leave a violation without a concrete, actionable correction. The correction must describe: what to do, where, and what the result should look like
+- **Every violation must include a "How to resolve" block** with two options: fix the code to match the spec, or update the spec to reflect an intentional architectural evolution. Never leave a violation without both paths described
 - **Every warning must include a "How to address" block** with two options: fix the code to match the spec, or update the spec to reflect an intentional deviation
 - Group findings: NON-CONFORMANT → PARTIAL → INFO → CONFORMANT
 - If all checks pass, summarize the architectural strengths observed and confirm conformance

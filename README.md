@@ -116,6 +116,42 @@ Claude will scan the codebase for existing patterns, then generate `docs/arch/no
 
 ---
 
+### `arch.ts.check`
+
+Verifies whether the actual project code and structure conform to the rules declared in one or more architecture tech spec documents.
+
+Language-agnostic — works with any codebase. Uses static analysis (file structure, imports, naming, dependency direction) to check conformance against the spec. Outputs a CONFORMANT/PARTIAL/NON-CONFORMANT report. Each violation includes a mandatory **How to Fix** block with the action, location, and expected outcome.
+
+**Triggers when you say things like:**
+- "Check if the code conforms to the architecture spec"
+- "Does our project follow the arch spec?"
+- "Run an architecture conformance check"
+- "Are there any architecture violations in the codebase?"
+
+**Example:**
+
+> You: "Check if the payments module conforms to its architecture spec."
+
+Claude will ask which spec(s) to check and which part of the project to scan, then compare the codebase against the declared components, boundaries, dependency direction, integrations, and patterns — and produce a full conformance report:
+
+```
+## Architecture Conformance Report
+Overall Status: PARTIAL
+
+### Violations (NON-CONFORMANT)
+[Dependency Direction — Section 6] domain/OrderService imports infra/Database directly
+  - How to fix:
+    - Action: Introduce a repository interface in domain/ and move DB access to infra/
+    - Where: src/domain/OrderService.ts, src/infra/OrderRepository.ts
+    - Outcome: domain/ depends only on the interface; infra/ implements it
+
+### Conformant Checks
+- All documented components present ✓
+- Naming conventions followed ✓
+```
+
+---
+
 ### `arch.ts.validate`
 
 Validates an architecture tech spec for completeness, consistency, and architectural soundness.
@@ -173,7 +209,9 @@ pragmatic-devx-plugin/
 │   │   ├── SKILL.md
 │   │   └── references/
 │   │       └── template.md        # Architecture tech spec template
-│   └── arch.ts.validate/
+│   ├── arch.ts.validate/
+│   │   └── SKILL.md
+│   └── arch.ts.check/
 │       └── SKILL.md
 ├── LICENSE
 └── README.md

@@ -7,7 +7,7 @@
     {
       "name": "pragmatic-devx-plugin",
       "source": {
-        "source": "git",
+        "source": "url",
         "url": "https://github.com/rvfvazquez/pragmatic-devx-plugin.git"
       },
       "description": "Claude Code plugin focused on Developer Experience — structured specs, architecture documentation, and pragmatic engineering patterns.",

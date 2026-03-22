@@ -23,13 +23,16 @@ Use this skill after `arch.ts.validate` confirms the spec is sound. Run it perio
 
 ## When This Skill Applies
 
-Apply when architecture spec(s) exist and the user wants to know if the code follows them:
+Use this skill when an arch spec **and** a codebase both exist, and the user wants to verify whether the code follows the spec.
 
-- "Check if the code conforms to the payments architecture spec"
-- "Does our project follow the arch spec?"
-- "Run an architecture conformance check"
-- "Verify that the auth module respects its architecture document"
-- "Are there any architecture violations in the codebase?"
+**Do not use when:**
+- No arch spec exists yet → use `arch.ts.create` first
+- The user wants to check the quality of the spec document itself (not the code) → use `arch.ts.validate`
+- The user wants to update the spec to reflect new decisions → use `arch.ts.update`
+
+**Prerequisite:** the arch spec should pass `arch.ts.validate` before running this check. If the spec has unresolved `[TODO]` items or missing sections, conformance results will be unreliable.
+
+**Key distinction from `arch.ts.validate`:** `arch.ts.validate` reviews the spec document; `arch.ts.check` scans the actual codebase against the spec.
 
 ## How to Check Architecture Conformance
 
@@ -118,71 +121,10 @@ Use Glob and Grep to gather evidence from the codebase within the defined scope.
 
 ### Step 4 — Generate Conformance Report
 
-Produce the report in this format:
+Produce the report using the format and output rules defined in `references/report-format.md`.
 
-```
-## Architecture Conformance Report
+## Additional Resources
 
-**Spec(s):** <file path(s)>
-**Scope:** <full project | specific path>
-**Date:** <today>
-**Overall Status:** CONFORMANT | PARTIAL | NON-CONFORMANT
+### Reference Files
 
-### Summary
-- Conformant: X checks
-- Warnings:   X checks
-- Violations: X checks
-
----
-
-### Violations (NON-CONFORMANT)
-Code diverges from the spec — must be addressed:
-
-1. **[Rule from spec — section reference]**
-   - Found: <what exists in the code>
-   - Expected: <what the spec declares>
-   - Location: <file path or directory>
-   - How to resolve:
-     - **Option A — Fix the code** (if the spec reflects the intended architecture):
-       - **Action:** <concrete step — e.g., move file, rename module, remove import, extract interface>
-       - **Where:** <specific file(s) or directory to change>
-       - **Outcome:** <what the code should look like after the fix — describe the target state>
-     - **Option B — Update the spec** (if the code reflects an intentional architectural evolution):
-       - **Action:** update the relevant section of the spec to reflect the decision
-       - **Where:** <spec file path and section to update>
-       - **Outcome:** the divergence becomes a documented, intentional decision
-
----
-
-### Warnings (PARTIAL)
-Potential divergence — requires human review:
-
-1. **[Rule from spec — section reference]**
-   - Observation: <what was found>
-   - Why it may be a problem: <rationale>
-   - How to address:
-     - **Option A:** <preferred correction if the spec intent should be preserved>
-     - **Option B:** <alternative if the spec should be updated to reflect an intentional decision>
-
----
-
-### Observations (INFO)
-Notable patterns — not violations, but worth noting.
-
----
-
-### Conformant Checks
-- [Rule] ✓ — brief note on evidence found
-- ...
-```
-
-### Output Rules
-
-- Print the full report; do **not** modify any source or spec file
-- Every violation and warning must reference the exact section of the spec it was derived from
-- Every violation must include the file path or directory where the divergence was observed
-- **Every violation must include a "How to resolve" block** with two options: fix the code to match the spec, or update the spec to reflect an intentional architectural evolution. Never leave a violation without both paths described
-- **Every warning must include a "How to address" block** with two options: fix the code to match the spec, or update the spec to reflect an intentional deviation
-- Group findings: NON-CONFORMANT → PARTIAL → INFO → CONFORMANT
-- If all checks pass, summarize the architectural strengths observed and confirm conformance
-- Be explicit about what could **not** be verified through static analysis (e.g., runtime behavior, performance NFRs) and flag those as outside the scope of this check
+- **`references/report-format.md`** — Full conformance report format, field definitions, and output rules

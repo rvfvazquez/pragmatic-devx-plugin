@@ -13,12 +13,13 @@ Evolve a spec document safely — preserving existing content, versioning change
 
 ## When This Skill Applies
 
-Apply whenever a spec already exists and needs to change:
+Use this skill when a spec **already exists** and needs to evolve — new requirements, corrections, resolved TODOs, or decisions made after the spec was written.
 
-- "The spec for X needs to include the new caching layer"
-- "Update docs/specs/auth.md — the token expiry is now 24h"
-- "Fill in the TODO items in the payment spec"
-- "The acceptance criteria changed, update the spec"
+**Do not use when:**
+- No spec exists yet → use `spec.create`
+- The user only wants a quality assessment without changes → use `spec.validate`
+
+**Edge case:** if the user wants to "completely rewrite" an existing spec, clarify whether they want section-by-section updates (`spec.update`) or a full replacement starting from scratch (`spec.create` over the existing file).
 
 ## How to Update a Spec
 

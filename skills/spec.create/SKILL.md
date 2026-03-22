@@ -13,12 +13,13 @@ Produce a complete, pragmatic spec document that defines the problem, proposed s
 
 ## When This Skill Applies
 
-Apply this skill whenever a user describes a feature, story, or module that needs to be formally documented before or during implementation. Common triggers:
+Use this skill when **no spec exists yet** and the user wants to formally document a feature, story, or module.
 
-- "Create a spec for the authentication module"
-- "I need a spec for this payment feature"
-- "Document this story as a spec"
-- "Write up the technical spec for X"
+**Do not use when:**
+- A spec already exists and the user wants to modify it → use `spec.update`
+- A spec already exists and the user wants a quality review → use `spec.validate`
+
+**Edge case:** if the user says "improve" or "rewrite" an existing spec, clarify whether they want targeted updates to specific sections (`spec.update`) or to replace the entire document (`spec.create` with a fresh pass).
 
 ## How to Create a Spec
 
@@ -152,3 +153,7 @@ docs/specs/<feature-slug>.md
 ### Reference Files
 
 - **`references/template.md`** — Full spec template with all sections and formatting guidance
+
+### Example Files
+
+- **`examples/example-auth-spec.md`** — Complete example of a filled-in spec (JWT authentication feature). Use as a calibration target for output structure, level of detail, and writing style

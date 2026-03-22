@@ -13,12 +13,13 @@ Run a structured review of a spec document and produce a PASS/WARN/FAIL report. 
 
 ## When This Skill Applies
 
-Apply when a spec exists and the user wants to know if it's ready:
+Use this skill when a spec **already exists** and the user wants a quality assessment without modifying it.
 
-- "Validate docs/specs/auth.md"
-- "Is this spec ready for review?"
-- "Check the payment spec for completeness"
-- "Run a quality check on this specification"
+**Do not use when:**
+- No spec exists yet → use `spec.create`
+- The user wants to apply changes to an existing spec → use `spec.update`
+
+**Edge case:** if the user says "review the spec" but also wants edits applied, clarify intent before proceeding: "Do you want a quality report only, or should I apply fixes as well?"
 
 ## How to Validate a Spec
 

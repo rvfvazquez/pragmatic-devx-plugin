@@ -1,7 +1,6 @@
 ---
 name: arch.ts.update
 description: This skill should be used when the user asks to "update an architecture spec", "revise the arch spec", "update this architecture document", "add a new ADR", "change the component boundaries", "fill in the TODOs in the arch spec", "correct the architecture spec", or wants to apply new decisions, corrections, or intentional deviations to an existing architecture technical specification document.
-version: 0.1.0
 ---
 
 # arch.ts.update
@@ -14,14 +13,13 @@ Evolve an arch spec safely — preserving existing ADRs, versioning changes, and
 
 ## When This Skill Applies
 
-Apply whenever an arch spec already exists and needs to change:
+Use this skill when an arch spec **already exists** and needs to capture new decisions, corrections, or intentional deviations — including when `arch.ts.check` produces a violation resolved via **Option B** (the code reflects an intentional evolution the spec hasn't captured yet).
 
-- "The payments arch spec needs to reflect the new event-driven boundary"
-- "We decided to use the anti-corruption layer — update the arch spec"
-- "The auth module no longer depends on the user service directly, update the spec"
-- "Add an ADR for the caching decision we made"
-- "Fill in the TODOs in the notification arch spec"
-- Option B was chosen after running `arch.ts.check`
+**Do not use when:**
+- No arch spec exists yet → use `arch.ts.create`
+- The user only wants a quality review of the spec document without making changes → use `arch.ts.validate`
+
+**Key distinction from `arch.ts.check`:** `arch.ts.check` is read-only diagnosis. This skill is the write operation triggered by its findings (Option B) or by any new architectural decision that must be formally recorded.
 
 ## Lifecycle Position
 

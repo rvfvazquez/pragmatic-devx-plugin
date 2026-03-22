@@ -22,12 +22,13 @@ Default scope when not specified: `module`.
 
 ## When This Skill Applies
 
-Apply when a system, module, or integration needs to be formally documented:
+Use this skill when **no arch spec exists yet** for the system, module, or integration being documented.
 
-- "Create an arch spec for the payments module"
-- "Document the architecture of the notification service"
-- "Write an architecture document for the auth layer"
-- "I need an ADR for the messaging integration"
+**Do not use when:**
+- An arch spec already exists and the user wants to modify it → use `arch.ts.update`
+- An arch spec already exists and the user wants a quality review → use `arch.ts.validate`
+
+**Edge case:** if the user asks to "document the actual architecture" of an existing codebase (reverse-engineering decisions from code), scan the codebase thoroughly in Step 1 before the discovery interview — the code is the source of truth for what was actually built.
 
 ## How to Create an Architecture Spec
 
@@ -143,3 +144,7 @@ docs/arch/<name>.arch.md
 ### Reference Files
 
 - **`references/template.md`** — Full architecture tech spec template with all sections, ADR format, and component table structure
+
+### Example Files
+
+- **`examples/example-payments-arch.md`** — Complete example of a filled-in architecture spec (payments module). Use as a calibration target for output structure, ADR depth, component boundary detail, and writing style

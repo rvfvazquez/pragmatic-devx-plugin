@@ -1,6 +1,6 @@
 ---
 name: arch.ts.validate
-description: This skill should be used when the user asks to "validate an architecture spec", "check the arch spec", "review this architecture document", "is this arch spec complete?", "audit the architecture spec", "check architecture quality", "validate the ADRs", or wants a structured quality review of an existing architecture technical specification document.
+description: This skill should be used when the user asks to "validate an architecture spec", "check the arch spec", "review this architecture document", "is this arch spec complete?", "audit the architecture spec", "check architecture quality", "validate the ADRs", "is this arch spec ready for approval?", "is the architecture document ready to use?", or wants a structured quality review of an existing architecture technical specification document.
 ---
 
 # arch.ts.validate
@@ -21,12 +21,14 @@ Use this skill immediately after `arch.ts.create` to verify the spec is ready, o
 
 ## When This Skill Applies
 
-Apply when an architecture spec exists and the user wants to know if it's ready:
+Use this skill when an arch spec **already exists** and the user wants to assess its quality, completeness, or soundness — without touching the codebase.
 
-- "Validate docs/arch/payments.arch.md"
-- "Is the auth architecture spec ready for approval?"
-- "Check the notification module arch spec"
-- "Review this architecture document for soundness"
+**Do not use when:**
+- The user wants to verify that the **code** conforms to the spec → use `arch.ts.check`
+- No arch spec exists yet → use `arch.ts.create`
+- The user wants to apply changes to the spec → use `arch.ts.update`
+
+**Key distinction from `arch.ts.check`:** this skill reviews the spec document in isolation; `arch.ts.check` compares the spec against the actual codebase. If the user says "check the arch spec" without further context, clarify: "Check the spec document for completeness, or check if the code follows the spec?"
 
 ## How to Validate an Architecture Spec
 

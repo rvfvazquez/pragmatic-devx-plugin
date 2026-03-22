@@ -1,7 +1,6 @@
 ---
 name: arch.ts.validate
 description: This skill should be used when the user asks to "validate an architecture spec", "check the arch spec", "review this architecture document", "is this arch spec complete?", "audit the architecture spec", "check architecture quality", "validate the ADRs", or wants a structured quality review of an existing architecture technical specification document.
-version: 0.1.0
 ---
 
 # arch.ts.validate
@@ -11,6 +10,14 @@ Validate a software architecture tech spec for completeness, consistency, and ar
 ## Purpose
 
 Run a structured review of an architecture spec and produce a PASS/WARN/FAIL report grouped by severity. Do not modify the spec — only report findings with actionable suggestions.
+
+## Lifecycle Position
+
+```
+arch.ts.create → [arch.ts.validate] → arch.ts.check → arch.ts.update
+```
+
+Use this skill immediately after `arch.ts.create` to verify the spec is ready, or at any point when the spec needs a quality review before being used as reference for `arch.ts.check`.
 
 ## When This Skill Applies
 
@@ -79,6 +86,12 @@ Evaluate each criterion below. Report **PASS**, **WARN**, or **FAIL** with a sho
 - **Testability strategy present** — Describes how the architecture supports testing
 - **External dependencies documented** — Integrations and external systems are listed with their purpose
 
+#### E. Checkability
+- **Rules are concrete and verifiable** — Each architectural rule can be statically verified in code (file structure, imports, naming, dependency direction). Vague rules like "components should be loosely coupled" without concrete criteria are not checkable
+- **Component names are canonical** — The names used in component boundaries match the expected directory or module names in the codebase
+- **Dependency rules are explicit** — Forbidden and allowed dependencies are named, not implied
+- **Naming conventions are precise** — Naming patterns (e.g., `*Service`, `*Repository`) are specific enough to be matched against actual file names
+
 ### Step 3 — Generate Validation Report
 
 Produce the report in this format:
@@ -99,7 +112,11 @@ Produce the report in this format:
 Must be addressed before approval:
 
 1. **[Check name]** — explanation
-   - Concrete suggestion to fix
+   - How to resolve:
+     - **Option A — Fix the spec** (if the check criterion is valid and the spec is incomplete):
+       - Concrete suggestion to address the gap in the spec
+     - **Option B — Reconsider the criterion** (if the spec reflects a deliberate, documented decision that makes this check inapplicable):
+       - Explain why the criterion does not apply, and add a note in the spec's Constraints or ADR section to make the intent explicit
 
 ### Warnings (WARN)
 Should be addressed but not blocking:
@@ -119,5 +136,7 @@ Optional improvements.
 
 - Print the full report; do **not** modify the spec file
 - Group findings: FAIL → WARN → INFO → PASS
-- For each FAIL or WARN, provide a concrete, actionable suggestion
+- **Every FAIL must include a "How to resolve" block** with two options: fix the spec to satisfy the criterion, or reconsider the criterion if a deliberate decision makes it inapplicable
+- For each WARN, provide a concrete, actionable suggestion
 - If all checks pass, summarize architectural strengths and confirm readiness for approval
+- **Next step after PASS:** run `arch.ts.check` to verify the codebase conforms to this spec

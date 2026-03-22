@@ -130,6 +130,8 @@ After creating the file:
 2. Summarize the key architectural decisions documented
 3. List any `[TODO: ...]` items that remain open
 
+**Next step:** run `arch.ts.validate` to verify the spec is complete and sound before using it as a reference for conformance checks.
+
 ## Output Location
 
 ```

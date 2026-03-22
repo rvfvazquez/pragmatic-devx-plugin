@@ -189,6 +189,26 @@ None.
 
 ---
 
+### `arch.ts.update`
+
+Updates an existing architecture tech spec with new architectural decisions, corrections, or intentional deviations.
+
+Preserves existing ADRs, increments the version semantically (patch/minor/major), deprecates superseded decisions without deleting history, and appends a changelog entry. This is the natural next step when `arch.ts.check` identifies a violation resolved via **Option B** — the code reflects an intentional evolution the spec has not yet captured.
+
+**Triggers when you say things like:**
+- "Update the payments arch spec — we adopted the anti-corruption layer"
+- "Add an ADR for the caching decision we made"
+- "The auth module no longer depends on the user service directly, update the spec"
+- "Fill in the TODOs in the notification arch spec"
+
+**Example:**
+
+> You: "Update the notification service arch spec — we decided to use EventBridge instead of direct SQS calls."
+
+Claude will confirm the scope of the change, capture the decision as a new ADR (with options considered, rationale, and consequences), deprecate any superseded ADR, bump the version, and append a changelog entry.
+
+---
+
 ## Project Structure
 
 ```
@@ -211,7 +231,9 @@ pragmatic-devx-plugin/
 │   │       └── template.md        # Architecture tech spec template
 │   ├── arch.ts.validate/
 │   │   └── SKILL.md
-│   └── arch.ts.check/
+│   ├── arch.ts.check/
+│   │   └── SKILL.md
+│   └── arch.ts.update/
 │       └── SKILL.md
 ├── LICENSE
 └── README.md

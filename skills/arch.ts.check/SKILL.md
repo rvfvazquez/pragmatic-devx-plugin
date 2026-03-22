@@ -1,7 +1,6 @@
 ---
 name: arch.ts.check
 description: This skill should be used when the user asks to "check if the code conforms to the architecture spec", "verify architecture conformance", "does the code follow the arch spec?", "check if the project respects the architecture", "validate architecture rules in the codebase", "run an architecture check", "arch conformance check", or wants to verify that the actual project structure and code comply with documented architecture technical specifications.
-version: 0.2.0
 ---
 
 # arch.ts.check
@@ -13,6 +12,14 @@ Verify whether the actual project code and structure conform to the rules and de
 Bridge the gap between the documented architecture and the implemented code. Scan the codebase using static analysis (file structure, imports, naming, dependency direction) and compare it against the architectural rules extracted from the spec(s). Produce a CONFORMANT/PARTIAL/NON-CONFORMANT report grouped by severity. Do not modify any file — only report findings with actionable suggestions.
 
 This skill is language-agnostic: it applies to any codebase regardless of programming language.
+
+## Lifecycle Position
+
+```
+arch.ts.create → arch.ts.validate → [arch.ts.check] → arch.ts.update → arch.ts.check
+```
+
+Use this skill after `arch.ts.validate` confirms the spec is sound. Run it periodically to detect drift between code and spec. When Option B is chosen for a violation (the code reflects an intentional evolution), use `arch.ts.update` to capture the decision in the spec, then re-run this check.
 
 ## When This Skill Applies
 

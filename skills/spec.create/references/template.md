@@ -48,16 +48,23 @@ Explicit record of technology choices made for this feature. Every row must have
 
 Define public interfaces, function signatures, or API contracts.
 
-```typescript
+```go
 // Interface definitions go here
+type ServiceName interface {
+    MethodName(ctx context.Context, input InputType) (OutputType, error)
+}
 ```
 
 ### 6.2 Data Model
 
 Describe any new or modified data structures, schemas, or types.
 
-```typescript
+```go
 // Type definitions go here
+type EntityName struct {
+    ID        string    `json:"id"`
+    CreatedAt time.Time `json:"created_at"`
+}
 ```
 
 ### 6.3 Behavior & Logic

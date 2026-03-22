@@ -142,7 +142,7 @@ Overall Status: PARTIAL
 [Dependency Direction — Section 6] domain/OrderService imports infra/Database directly
   - How to fix:
     - Action: Introduce a repository interface in domain/ and move DB access to infra/
-    - Where: src/domain/OrderService.ts, src/infra/OrderRepository.ts
+    - Where: src/domain/order_service.go, src/infra/order_repository.go
     - Outcome: domain/ depends only on the interface; infra/ implements it
 
 ### Conformant Checks

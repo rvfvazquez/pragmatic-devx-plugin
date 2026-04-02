@@ -23,9 +23,12 @@ Use this skill when a spec **already exists** and needs to evolve — new requir
 
 ## How to Update a Spec
 
-### Step 0 — Language Selection
+### Step 0 — Language Detection
 
-**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the updated content to be written in:
+Infer the output language from the existing spec:
+1. If the spec contains a `Language:` metadata field, use it
+2. Otherwise, infer from the majority language of prose content in sections 2, 3, and 4 (Problem Statement, Goals, Proposed Solution) — if ≥80% of prose words are attributable to a single language, use that language
+3. If the spec contains no prose (only tables and code blocks), or if no single language reaches the 80% threshold, treat as ambiguous and use `AskUserQuestion`:
 
 ```
 In which language would you like the spec updates to be written?
@@ -36,7 +39,7 @@ In which language would you like the spec updates to be written?
 4. Other — specify which language
 ```
 
-Record the chosen language and apply it consistently to **all new or modified content** — section text, changelog entries, TODO comments, and any new acceptance criteria. Existing content that is not being changed should remain in its original language. Do not proceed to the next step until the language is confirmed.
+Record the chosen language and apply it consistently to **all new or modified content** — section text, changelog entries, TODO comments, and any new acceptance criteria. Existing content that is not being changed should remain in its original language.
 
 ### Step 1 — Locate the Spec
 
@@ -54,13 +57,11 @@ Analyze what needs to change:
 - If no description is given, scan for `[TODO: ...]` placeholders
 - Map which sections are directly affected and which may be indirectly impacted (a change to the data model may also affect the API and acceptance criteria)
 
-### Step 2.5 — Confirm Scope and Intent Before Proceeding
+### Step 3 — Confirm Scope, Intent, and Technology Decisions
 
-**This is a mandatory step.** Do not apply any changes until the full scope and intent of the update is clear.
+**This is a mandatory step.** Do not apply any changes until the full scope, intent, and open technology decisions are confirmed.
 
-After analyzing the spec and the requested change, use `AskUserQuestion` to confirm your understanding with the user. The goal is to have a complete picture of what is changing, why, and what should remain untouched — before writing anything.
-
-Ask only what is genuinely unclear. Adapt the questions to the specific update.
+After analyzing the spec and the requested change, use `AskUserQuestion` to confirm your understanding with the user. Cover scope, motivation, and technology decisions in a single round.
 
 **`multiSelect` rules for this step — always follow these:**
 - **Sections in scope**: `multiSelect: true` — multiple spec sections may need updating
@@ -93,41 +94,25 @@ Before I apply any changes, let me confirm my understanding of this update:
   Options: new requirement captured, TODO resolved, incorrect info corrected,
            acceptance criteria updated, status/version bumped
 
+[Include the following block only if the spec has open [TODO: decide — ...] items OR if the
+ requested change introduces new technology decisions. Omit for purely textual updates.]
+
+**Technology Decisions**
+- This spec has unresolved technology decisions. Let's lock them in:
+  [TODO item 1 — e.g. Data storage] Options: A, B, C — which do you want, or keep open?
+  [TODO item 2 — e.g. Async processing] Options: SQS, background job, synchronous — which?
+- [If the requested change implies new tech choices, ask about them here]
+
 Answer what you know — for anything undecided, I'll leave it as an open item.
 ```
 
-Do **not** proceed to Step 2.6 until:
+Do not proceed to Step 4 until:
 - The exact scope of the change is confirmed
 - The motivation is understood
 - Sections to preserve vs. modify are clear
+- All technology decisions that can be resolved have been addressed
 
-### Step 2.6 — Resolve Technology TODOs via Interview
-
-**Before writing any changes**, check if any open `[TODO: decide — options: ...]` items exist in the Technology Decisions section or elsewhere in the spec.
-
-If yes, use `AskUserQuestion` to ask the user to decide each one. Present the options explicitly so the user can choose:
-
-```
-This spec has some unresolved technology decisions. Let's lock them in:
-
-**[TODO item 1 — e.g. Data storage]**
-Options: A, B, C
-Which do you want to go with, or should it stay open?
-
-**[TODO item 2 — e.g. Async processing]**
-Options: SQS, background job, synchronous
-Which do you prefer?
-```
-
-Do not assume a default. If the user says "undecided" or "keep open", leave the `[TODO]` in place.
-
-Also ask about technology choices implied by new requirements that the user described but didn't specify:
-- If a new caching requirement is added, ask: "What cache backend? Options: Redis, Memcached, in-process, CloudFront"
-- If a new queue is needed, ask: "Which queue? Options: SQS, RabbitMQ, existing queue, other"
-
-Only skip this step if the update is purely textual (wording corrections, status changes) with no new technical decisions.
-
-### Step 3 — Apply the Changes
+### Step 4 — Apply the Changes
 
 When modifying the spec:
 
@@ -137,7 +122,7 @@ When modifying the spec:
    - Patch bump (`1.0.0` → `1.0.1`) for minor corrections or clarifications
    - Minor bump (`1.0.0` → `1.1.0`) for significant new requirements or design changes
 4. **Deprecate** removed content with `~~strikethrough~~` rather than deleting it, unless it is clearly obsolete noise
-5. **Append** a changelog entry at the end of the document:
+5. **Append** a changelog entry at the **end of the file**, after section 9 (Open Questions):
 
 ```markdown
 ---
@@ -147,7 +132,7 @@ When modifying the spec:
 - <summary of changes made>
 ```
 
-### Step 4 — Validate After Update
+### Step 5 — Validate After Update
 
 After applying changes, verify:
 - All `[TODO: ...]` items that were addressed are now resolved
@@ -155,7 +140,7 @@ After applying changes, verify:
 - Acceptance criteria still reflect the updated solution
 - Version and status fields are updated
 
-### Step 5 — Output Summary
+### Step 6 — Output Summary
 
 Report:
 1. A concise summary of what was changed

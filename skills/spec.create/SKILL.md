@@ -45,11 +45,11 @@ Extract from the user's message or conversation context:
 - **Problem or goal** — what this feature solves
 - **Scope hints** — any details about APIs, data models, behaviors already mentioned
 
-### Step 1.5 — Confirm Full Picture Before Proceeding
+### Step 2 — Confirm Full Picture Before Proceeding
 
 **This is a mandatory step.** Do not proceed until you have a complete understanding of the need.
 
-After extracting the initial input, use `AskUserQuestion` to actively validate and deepen your understanding. The goal is to arrive at a "visão do todo" — a full picture of the problem, the context, and the expected outcome — before touching the codebase or asking technology questions.
+After extracting the initial input, use `AskUserQuestion` to actively validate and deepen your understanding. The goal is to arrive at a full picture of the problem, the context, and the expected outcome — before touching the codebase or asking technology questions.
 
 Ask only what is genuinely unclear or missing. Adapt the questions to the specific feature.
 
@@ -84,12 +84,12 @@ Before I scan the codebase and ask about technology choices, let me confirm my u
 Answer what you know — for anything undecided, just say so and we'll handle it as an open item.
 ```
 
-Do **not** proceed to Step 2 until:
+Do **not** proceed to Step 3 until:
 - The problem and goal are clearly understood
 - The scope boundaries are defined
 - Any hard constraints are captured
 
-### Step 2 — Scan Existing Codebase
+### Step 3 — Scan Existing Codebase
 
 Before writing, search for:
 - Related files or modules that reveal existing patterns and **technology already in use**
@@ -98,7 +98,7 @@ Before writing, search for:
 
 Note any technology already committed to in the codebase — these don't need to be asked again.
 
-### Step 3 — Technology Discovery Interview
+### Step 4 — Technology Discovery Interview
 
 **This is a mandatory step.** Ask the user targeted questions about technology decisions that are not already evident from the codebase. Do not make assumptions — let the user choose.
 
@@ -126,16 +126,18 @@ Answer what you know; for anything undecided, just say so and it will remain as 
 
 Adapt the questions to what is actually relevant for the feature described. Skip categories that clearly don't apply. Do **not** proceed to writing the spec until this step is done.
 
-### Step 4 — Generate the Spec Document
+### Step 5 — Generate the Spec Document
+
+If the directory `docs/specs/` does not exist, create it before writing the file.
 
 Create the file at `docs/specs/<feature-slug>.md` using the full template in `references/template.md`.
 
 Fill every section with concrete content:
-- Capture all technology decisions made in Step 3 in section **5. Technology Decisions**
+- Capture all technology decisions made in Step 4 in section **5. Technology Decisions**
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
 
-### Step 5 — Output Summary
+### Step 6 — Output Summary
 
 After writing the file:
 1. State the file path created

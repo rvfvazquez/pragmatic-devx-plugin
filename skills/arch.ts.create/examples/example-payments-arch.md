@@ -123,14 +123,18 @@ payments/
 
 ### 6.2 Dependency Direction
 
-```
-handler → service → domain
-repository → domain (implements domain interfaces)
-gateway → domain (implements domain interfaces)
-outbox → domain (implements domain interfaces)
+```mermaid
+flowchart TD
+  Handler[payments/handler] --> Service[payments/service]
+  Service --> Domain[payments/domain]
+  Repository[payments/repository] --> Domain
+  Gateway[payments/gateway] --> Domain
+  Outbox[payments/outbox] --> Domain
+
+  style Domain fill:#d4edda,stroke:#28a745
 ```
 
-Forbidden: `domain` must never import from `handler`, `repository`, `gateway`, or `outbox`.
+**Forbidden:** `payments/domain` must never import from `handler`, `repository`, `gateway`, or `outbox`.
 
 ### 6.3 Communication Style
 
@@ -149,28 +153,50 @@ Forbidden: `domain` must never import from `handler`, `repository`, `gateway`, o
 
 ### Flow 1: Charge a Payment
 
-```
-POST /payments/charge
-  → handler: validate request → call service.Charge()
-  → service: apply ChargePolicy rules → call gateway.Charge()
-  → gateway: call Stripe API → map result to domain Transaction
-  → service: persist Transaction via repository (+ outbox entry) in single DB transaction
-  → service: return Transaction to handler
-  → handler: return 201 with transaction ID
-  [async] outbox worker: publish payment.charged event to SQS
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Handler as payments/handler
+  participant Service as payments/service
+  participant Gateway as payments/gateway
+  participant Repo as payments/repository
+  participant Outbox as payments/outbox
+
+  Client->>Handler: POST /payments/charge
+  Handler->>Service: Charge(ctx, req)
+  Service->>Gateway: Charge(ctx, chargeReq)
+  Gateway->>Gateway: call Stripe API
+  Gateway-->>Service: Transaction (domain type)
+  Service->>Repo: Save(ctx, tx) + Outbox.Enqueue(payment.charged) [single DB txn]
+  Repo-->>Service: ok
+  Service-->>Handler: Transaction
+  Handler-->>Client: 201 Created {transaction_id}
+  Note over Outbox: async — outbox worker publishes payment.charged to SQS
 ```
 
 ### Flow 2: Refund a Payment
 
-```
-POST /payments/{id}/refund
-  → handler: extract transaction ID → call service.Refund()
-  → service: load Transaction via repository → validate state (must be CHARGED)
-  → service: call gateway.Refund()
-  → gateway: call Stripe refund API → map result
-  → service: update Transaction state to REFUNDED + outbox entry in single DB transaction
-  → handler: return 200
-  [async] outbox worker: publish payment.refunded event to SQS
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Handler as payments/handler
+  participant Service as payments/service
+  participant Gateway as payments/gateway
+  participant Repo as payments/repository
+  participant Outbox as payments/outbox
+
+  Client->>Handler: POST /payments/{id}/refund
+  Handler->>Service: Refund(ctx, id)
+  Service->>Repo: FindByID(ctx, id)
+  Repo-->>Service: Transaction (state=CHARGED)
+  Service->>Gateway: Refund(ctx, tx)
+  Gateway->>Gateway: call Stripe refund API
+  Gateway-->>Service: updated Transaction (state=REFUNDED)
+  Service->>Repo: Save(ctx, tx) + Outbox.Enqueue(payment.refunded) [single DB txn]
+  Repo-->>Service: ok
+  Service-->>Handler: ok
+  Handler-->>Client: 200 OK
+  Note over Outbox: async — outbox worker publishes payment.refunded to SQS
 ```
 
 ## 8. External Integrations & Dependencies

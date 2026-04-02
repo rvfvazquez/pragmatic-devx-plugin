@@ -71,6 +71,22 @@ type EntityName struct {
 
 Step-by-step description of how the solution works.
 
+> Add a Mermaid diagram here when behavior involves a multi-step flow (3+ steps, 2+ components),
+> state transitions, or async processing. Use `sequenceDiagram` for request/response,
+> `stateDiagram-v2` for state machines, or `flowchart LR` for async/event flows.
+> Omit if the prose is already unambiguous without a diagram.
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Service
+  participant DB
+  Client->>Service: request
+  Service->>DB: query/persist
+  DB-->>Service: result
+  Service-->>Client: response
+```
+
 ## 7. Acceptance Criteria
 
 Define clear, testable acceptance criteria:

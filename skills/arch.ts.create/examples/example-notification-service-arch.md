@@ -19,34 +19,34 @@
 
 ## 2. Context & Motivation
 
-Notificações ao usuário estavam espalhadas pelo sistema: o serviço de pedidos enviava emails diretamente via SendGrid SDK, o serviço de pagamentos enviava outros emails via uma função utilitária compartilhada, e notificações push nunca foram implementadas por falta de um lugar centralizado.
+User notifications were scattered across the system: the order service sent emails directly via the SendGrid SDK, the payment service sent other emails through a shared utility function, and push notifications had never been implemented due to the lack of a centralized place to do so.
 
-Essa dispersão causou duplicação de lógica, impossibilidade de rastrear o histórico de notificações de forma unificada, e acoplamento direto entre lógica de negócio e detalhes de provedores de envio.
+This dispersion caused logic duplication, made it impossible to track notification history in a unified way, and created direct coupling between business logic and provider-specific details.
 
-O Notification Service centraliza toda entrega de notificações. Outros serviços publicam eventos — o Notification Service decide como e quando notificar.
+The Notification Service centralizes all notification delivery. Other services publish events — the Notification Service decides how and when to notify.
 
 ## 3. Goals & Constraints
 
 **Architectural Goals:**
-- Centralizar toda entrega de notificações em um único serviço
-- Desacoplar produtores (order-service, payment-service) de provedores de entrega (SendGrid, FCM)
-- Tornar canais de notificação plugáveis sem mudança nos produtores
-- Garantir rastreabilidade completa de todas as notificações enviadas
+- Centralize all notification delivery in a single service
+- Decouple producers (order-service, payment-service) from delivery providers (SendGrid, FCM)
+- Make notification channels pluggable without changes to producers
+- Guarantee complete traceability of all notifications sent
 
 **Constraints:**
-- Deve consumir eventos de filas SQS existentes — não pode exigir mudança de contrato nos produtores
-- SendGrid é o único provider de email contratado; FCM para push é novo
-- Deve rodar no ECS Fargate existente (sem nova infraestrutura de compute)
-- Histórico de notificações deve respeitar política de retenção LGPD (90 dias)
+- Must consume events from existing SQS queues — cannot require contract changes in producers
+- SendGrid is the only contracted email provider; FCM for push is new
+- Must run on the existing ECS Fargate cluster (no new compute infrastructure)
+- Notification history must respect the data retention policy (90 days)
 
 **Non-Goals:**
-- Gerenciamento de templates via UI (editado diretamente no SendGrid/FCM dashboards)
-- Notificações por SMS nesta versão
-- Scheduling de notificações (envio agendado para horário futuro)
+- Template management UI (templates are edited directly in SendGrid/FCM dashboards)
+- SMS notifications in this version
+- Notification scheduling (future-dated delivery)
 
 ## 4. High-Level Design
 
-O Notification Service é um consumer SQS que recebe eventos de domínio de outros serviços, os mapeia para notificações concretas, e os despacha para o canal correto via adapters. Um dispatcher central decide qual canal usar com base no tipo de evento e nas preferências do usuário.
+The Notification Service is an SQS consumer that receives domain events from other services, maps them to concrete notifications, and dispatches them to the correct channel via adapters. A central dispatcher decides which channel to use based on the event type and user preferences.
 
 ### 4.1 Component Diagram
 
@@ -69,38 +69,38 @@ graph TD
 
 | Component | Responsibility | Public Interface |
 |-----------|---------------|-----------------|
-| `notification/consumer` | Recebe e parseia mensagens SQS; mapeia para `NotificationRequest` | `Consumer` (goroutine de polling) |
-| `notification/dispatcher` | Decide canal(is) com base no tipo de evento e preferências do usuário | `Dispatcher` interface |
-| `notification/channels/email` | Adapter para SendGrid — formata e envia email | `Channel` interface |
-| `notification/channels/push` | Adapter para FCM — formata e envia push | `Channel` interface |
-| `notification/repository` | Persiste e consulta histórico de notificações | `NotificationRepository` interface |
-| `notification/preferences` | Consulta preferências de canal do usuário (opt-out, canal preferido) | `PreferencesRepository` interface |
+| `notification/consumer` | Receives and parses SQS messages; maps to `NotificationRequest` | `Consumer` (polling goroutine) |
+| `notification/dispatcher` | Decides channel(s) based on event type and user preferences | `Dispatcher` interface |
+| `notification/channels/email` | SendGrid adapter — formats and sends email | `Channel` interface |
+| `notification/channels/push` | FCM adapter — formats and sends push notification | `Channel` interface |
+| `notification/repository` | Persists and queries notification history | `NotificationRepository` interface |
+| `notification/preferences` | Queries user channel preferences (opt-out, preferred channel) | `PreferencesRepository` interface |
 
 ## 5. Key Design Decisions
 
-### Decision 1: Dispatcher Pattern com Interface de Canal
+### Decision 1: Dispatcher Pattern with Channel Interface
 
 - **Status**: Accepted
-- **Context**: Novos canais de notificação (SMS, WhatsApp) podem ser adicionados no futuro. A lógica de qual canal usar não deve estar acoplada aos adapters.
-- **Decision**: Um `Dispatcher` central implementa a lógica de roteamento. Cada canal de entrega implementa a interface `Channel`. O dispatcher recebe os canais por injeção de dependência.
-- **Rationale**: Adicionar um novo canal requer apenas implementar `Channel` e registrá-lo no dispatcher — sem tocar na lógica de roteamento nem no consumer.
-- **Consequences**: O dispatcher precisa conhecer todos os canais disponíveis. A lógica de roteamento (qual evento vai para qual canal) fica centralizada nele e pode se tornar complexa à medida que novos tipos de evento e canais são adicionados.
+- **Context**: New notification channels (SMS, WhatsApp) may be added in the future. The logic of which channel to use must not be coupled to the adapters themselves.
+- **Decision**: A central `Dispatcher` implements the routing logic. Each delivery channel implements the `Channel` interface. The dispatcher receives channels via dependency injection.
+- **Rationale**: Adding a new channel only requires implementing `Channel` and registering it with the dispatcher — no changes to routing logic or the consumer.
+- **Consequences**: The dispatcher must know all available channels. The routing logic (which event goes to which channel) is centralized in it and may grow complex as new event types and channels are added.
 
-### Decision 2: Consumer Confirma Mensagem Independente de Falha de Envio
-
-- **Status**: Accepted
-- **Context**: Falhas de entrega no SendGrid ou FCM não devem causar reprocessamento infinito da mensagem SQS.
-- **Decision**: O consumer sempre confirma (`ack`) a mensagem SQS após tentativa de dispatch, independente do resultado. Falhas de envio são registradas no banco com `status=failed` e podem ser reprocessadas por um job separado se necessário.
-- **Rationale**: Falhas de provider são transitórias e não justificam reentrega da mensagem original. Reprocessamento sem controle pode causar spam ao usuário.
-- **Consequences**: Notificações com falha precisam de monitoramento ativo. Um job de retry para `status=failed` deve ser implementado em iteração futura.
-
-### Decision 3: Preferências de Canal Consultadas em Runtime
+### Decision 2: Consumer Acks Message Regardless of Delivery Failure
 
 - **Status**: Accepted
-- **Context**: Usuários podem ter optado por não receber determinados canais (opt-out de email, desabilitado push).
-- **Decision**: O dispatcher consulta `PreferencesRepository` antes de despachar para qualquer canal. Se o usuário optou por não receber naquele canal, o envio é pulado e registrado como `skipped`.
-- **Rationale**: Centralizar a verificação de preferências no dispatcher evita que cada adapter precise reimplementar a lógica de opt-out.
-- **Consequences**: Cada dispatch adiciona uma leitura ao banco de preferências. Considerar cache em memória com TTL curto se o volume for alto.
+- **Context**: Delivery failures in SendGrid or FCM must not cause infinite SQS message reprocessing.
+- **Decision**: The consumer always acks the SQS message after a dispatch attempt, regardless of the result. Delivery failures are recorded in the database with `status=failed` and can be retried by a separate job if needed.
+- **Rationale**: Provider failures are transient and do not justify redelivering the original message. Uncontrolled reprocessing can result in user spam.
+- **Consequences**: Failed notifications require active monitoring. A retry job for `status=failed` records must be implemented in a future iteration.
+
+### Decision 3: Channel Preferences Consulted at Runtime
+
+- **Status**: Accepted
+- **Context**: Users may have opted out of certain channels (email unsubscribe, push disabled).
+- **Decision**: The dispatcher consults `PreferencesRepository` before dispatching to any channel. If the user has opted out of that channel, the send is skipped and recorded as `skipped`.
+- **Rationale**: Centralizing preference checks in the dispatcher prevents each adapter from reimplementing opt-out logic.
+- **Consequences**: Each dispatch adds a database read for preferences. Consider an in-memory cache with a short TTL if volume is high.
 
 ## 6. Architecture Patterns & Conventions
 
@@ -147,24 +147,24 @@ flowchart TD
     style Domain fill:#d4edda,stroke:#28a745
 ```
 
-**Forbidden:** `notification/domain` não importa de nenhum outro pacote interno. `consumer` não conhece canais diretamente — apenas `dispatcher`.
+**Forbidden:** `notification/domain` must not import from any other internal package. `consumer` must not know channels directly — only `dispatcher`.
 
 ### 6.3 Communication Style
 
-- `consumer → dispatcher`: chamada Go síncrona dentro da mesma goroutine de processamento
-- `dispatcher → channels`: chamadas síncronas via interface `Channel`; o dispatcher espera resultado de cada canal antes de registrar
-- `dispatcher → repository / preferences`: chamadas síncronas via interfaces injetadas
-- `consumer ← SQS`: polling assíncrono a cada 5s; até 10 mensagens por batch
+- `consumer → dispatcher`: synchronous Go function call within the same processing goroutine
+- `dispatcher → channels`: synchronous calls via the `Channel` interface; the dispatcher waits for each channel result before recording
+- `dispatcher → repository / preferences`: synchronous calls via injected interfaces
+- `consumer ← SQS`: async polling every 5s; up to 10 messages per batch
 
 ### 6.4 Error Handling Strategy
 
-- Erros de provider (SendGrid/FCM) são logados e o resultado `failed` é persistido — não propagam para o consumer
-- Erros de banco (repository/preferences) são propagados para o dispatcher, que os propaga para o consumer — o consumer loga e confirma a mensagem mesmo assim (ver Decision 2)
-- Erros de parsing de mensagem SQS (evento desconhecido ou malformado) resultam em `ack` imediato com log de `WARN` — não bloqueiam o batch
+- Provider errors (SendGrid/FCM) are logged and the `failed` result is persisted — they do not propagate to the consumer
+- Database errors (repository/preferences) propagate to the dispatcher, then to the consumer — the consumer logs and acks the message regardless (see Decision 2)
+- SQS message parsing errors (unknown or malformed event) result in an immediate ack with a `WARN` log — they do not block the batch
 
 ## 7. Data Flow
 
-### Flow 1: Notificação de pedido enviado (email)
+### Flow 1: Order shipped notification (email opted-in)
 
 ```mermaid
 sequenceDiagram
@@ -191,7 +191,7 @@ sequenceDiagram
     Consumer->>SQS: ack message
 ```
 
-### Flow 2: Usuário com opt-out de email
+### Flow 2: User with email opt-out
 
 ```mermaid
 flowchart LR
@@ -209,23 +209,23 @@ flowchart LR
 
 | Dependency | Type | Purpose | Owned by |
 |-----------|------|---------|---------|
-| SQS `order-events` | AWS Managed | Eventos de mudança de status de pedidos | Order Service team |
-| SQS `payment-events` | AWS Managed | Eventos de pagamento (confirmado, estornado) | Payment Service team |
-| SendGrid API | External HTTP | Entrega de emails transacionais | Vendor (contrato existente) |
-| Firebase FCM | External HTTP | Entrega de notificações push mobile | Vendor (novo) |
-| PostgreSQL | Infrastructure | Histórico de notificações e preferências | Platform team |
+| SQS `order-events` | AWS Managed | Order status change events | Order Service team |
+| SQS `payment-events` | AWS Managed | Payment events (confirmed, refunded) | Payment Service team |
+| SendGrid API | External HTTP | Transactional email delivery | Vendor (existing contract) |
+| Firebase FCM | External HTTP | Mobile push notification delivery | Vendor (new) |
+| PostgreSQL | Infrastructure | Notification history and preferences | Platform team |
 
 ## 9. Non-Functional Requirements & Strategies
 
 | Attribute | Requirement | Strategy |
 |-----------|------------|---------|
-| Testabilidade | Lógica de dispatcher 100% testável sem providers externos | Dependency inversion; Channel é interface mockável |
-| Rastreabilidade | Todo envio (sent/failed/skipped) deve ser auditável | Persistência em `notifications` com status e timestamps |
-| LGPD | Dados de notificação retidos por no máximo 90 dias | Job de purge diário sobre `notifications.created_at` |
-| Resiliência | Falha do SendGrid não deve parar o processamento da fila | Consumer faz ack sempre; falhas registradas para retry manual |
-| Observabilidade | Métricas de sent/failed/skipped por canal e tipo de evento | Structured logging com `event_type`, `channel`, `status` |
+| Testability | Dispatcher logic must be 100% testable without external providers | Dependency inversion; `Channel` is a mockable interface |
+| Traceability | Every send attempt (sent/failed/skipped) must be auditable | Persist to `notifications` table with status and timestamps |
+| Data retention | Notification data retained for at most 90 days | Daily purge job on `notifications.created_at` |
+| Resilience | SendGrid failure must not stop queue processing | Consumer always acks; failures recorded for manual retry |
+| Observability | Metrics for sent/failed/skipped by channel and event type | Structured logging with `event_type`, `channel`, `status` |
 
 ## 10. Open Questions
 
-- [ ] [TODO: decide — implementar cache de preferências em memória com TTL? Se sim, qual TTL aceitável considerando que opt-out deve ter efeito imediato]
-- [ ] [TODO: decide — job de retry para notificações `failed`: frequência, número máximo de tentativas, e critério de abandono]
+- [ ] [TODO: decide — implement in-memory preferences cache with TTL? If yes, what TTL is acceptable given that opt-out must take effect immediately]
+- [ ] [TODO: decide — retry job for `failed` notifications: frequency, maximum retry attempts, and abandonment criteria]

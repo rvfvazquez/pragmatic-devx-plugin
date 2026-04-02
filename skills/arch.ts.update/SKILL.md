@@ -151,13 +151,18 @@ Only skip this step if the update contains no new architectural decisions (e.g.,
 When modifying the arch spec:
 
 1. **Preserve** all content not being changed
-2. **Update** the `Status` field if appropriate (e.g., Draft → Review → Approved)
-3. **Increment** the `Version` field:
+2. **Update diagrams when their source sections change** — diagrams must always reflect the current state of the spec:
+   - Section 4.1 (Component Diagram) → update when any component is added, removed, or renamed
+   - Section 6.2 (Dependency Direction) → update when dependency rules change
+   - Section 7 (Data Flow) → update when any flow step, participant, or async boundary changes
+   - If a diagram becomes inaccurate due to the change, it must be updated in the same edit — never leave a diagram describing a state the spec has moved away from
+3. **Update** the `Status` field if appropriate (e.g., Draft → Review → Approved)
+4. **Increment** the `Version` field:
    - Patch bump (`1.0.0` → `1.0.1`) for wording corrections, TODO resolution, or minor clarifications
    - Minor bump (`1.0.0` → `1.1.0`) for new ADRs, updated component boundaries, or new integrations
    - Major bump (`1.0.0` → `2.0.0`) for fundamental architecture changes (e.g., new dependency direction, major component restructuring)
-4. **Deprecate** superseded ADRs — mark them with `~~strikethrough~~` and add a note referencing the new decision. Never delete prior ADRs.
-5. **Append** a changelog entry at the end of the document:
+5. **Deprecate** superseded ADRs — mark them with `~~strikethrough~~` and add a note referencing the new decision. Never delete prior ADRs.
+6. **Append** a changelog entry at the end of the document:
 
 ```markdown
 ---

@@ -137,6 +137,18 @@ Fill every section with concrete content:
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
 
+#### When to add diagrams
+
+Add a Mermaid diagram to section **6.3 (Behavior & Logic)** when the behavior being described falls into one of these categories:
+
+| Situation | Diagram type |
+|-----------|-------------|
+| Multi-step request/response flow (3+ steps involving 2+ components) | `sequenceDiagram` |
+| State transitions (e.g., order status, approval workflow) | `stateDiagram-v2` |
+| Async flow with queues, events, or background processing | `flowchart LR` |
+
+Do **not** add a diagram for simple single-step operations or when the prose is already unambiguous without it. One diagram per distinct flow — do not combine multiple flows into a single diagram.
+
 ### Step 6 — Output Summary
 
 After writing the file:
@@ -158,4 +170,8 @@ docs/specs/<feature-slug>.md
 
 ### Example Files
 
-- **`examples/example-auth-spec.md`** — Complete example of a filled-in spec (JWT authentication feature). Use as a calibration target for output structure, level of detail, and writing style
+Use these examples as calibration targets for output structure, level of detail, diagram usage, and writing style. Each example showcases a different diagram type:
+
+- **`examples/example-auth-spec.md`** — JWT authentication feature. Showcases `sequenceDiagram` for multi-step request/response flows (login + middleware validation)
+- **`examples/example-order-notifications-spec.md`** — Async email notifications via SQS. Showcases `flowchart LR` for event-driven and asynchronous processing flows
+- **`examples/example-order-lifecycle-spec.md`** — Order status state machine. Showcases `stateDiagram-v2` for features with explicit state transitions and validity rules

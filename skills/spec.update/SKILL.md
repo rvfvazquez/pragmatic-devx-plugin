@@ -117,12 +117,13 @@ Do not proceed to Step 4 until:
 When modifying the spec:
 
 1. **Preserve** all content not being changed
-2. **Update** the `Status` field if appropriate (e.g., Draft → Review)
-3. **Increment** the `Version` field:
+2. **Update diagrams when their source sections change** — a diagram must always reflect the current state of the spec. If the change affects section 6.1 (API/Interface), 6.2 (Data Model), or 6.3 (Behavior & Logic), review any diagrams in those sections and update them in the same edit. Never leave a diagram describing behavior the spec has moved away from.
+3. **Update** the `Status` field if appropriate (e.g., Draft → Review)
+4. **Increment** the `Version` field:
    - Patch bump (`1.0.0` → `1.0.1`) for minor corrections or clarifications
    - Minor bump (`1.0.0` → `1.1.0`) for significant new requirements or design changes
-4. **Deprecate** removed content with `~~strikethrough~~` rather than deleting it, unless it is clearly obsolete noise
-5. **Append** a changelog entry at the **end of the file**, after section 9 (Open Questions):
+5. **Deprecate** removed content with `~~strikethrough~~` rather than deleting it, unless it is clearly obsolete noise
+6. **Append** a changelog entry at the **end of the file**, after section 9 (Open Questions):
 
 ```markdown
 ---

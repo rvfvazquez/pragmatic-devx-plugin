@@ -100,13 +100,54 @@ type User struct {
 
 ### 6.3 Behavior & Logic
 
-1. Client sends `POST /auth/login` with email and password
-2. Handler validates request body (400 if invalid)
-3. `AuthService.Login` queries the `users` table by email (404-safe: return `invalid_credentials` regardless of whether user exists, to avoid email enumeration)
-4. Compare submitted password against `password_hash` using bcrypt
-5. On match: generate JWT with `user_id`, `email`, `iat`, `exp` (24h), signed with `AUTH_JWT_SECRET`
-6. Return `LoginResponse`
-7. Auth middleware on protected routes: extract `Authorization: Bearer <token>`, call `AuthService.ValidateToken`, inject `Claims` into request context; return 401 on failure
+**Flow 1: Login**
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Handler as POST /auth/login
+  participant Service as AuthService
+  participant DB as users table
+
+  Client->>Handler: {email, password}
+  Handler->>Handler: validate request body
+  alt invalid body
+    Handler-->>Client: 400 validation_error
+  end
+  Handler->>Service: Login(ctx, req)
+  Service->>DB: SELECT WHERE email = ?
+  DB-->>Service: user row (or not found)
+  Service->>Service: bcrypt.Compare(password, hash)
+  alt mismatch or not found
+    Service-->>Handler: ErrInvalidCredentials
+    Handler-->>Client: 401 invalid_credentials
+  end
+  Service->>Service: jwt.Sign({user_id, email, exp:+24h}, AUTH_JWT_SECRET)
+  Service-->>Handler: LoginResponse
+  Handler-->>Client: 200 {access_token, expires_at}
+```
+
+> Note: email enumeration is prevented — "not found" and "wrong password" both return `401 invalid_credentials`.
+
+**Flow 2: Accessing a protected route**
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Middleware as Auth Middleware
+  participant Service as AuthService
+  participant Handler as Protected Handler
+
+  Client->>Middleware: GET /resource (Authorization: Bearer <token>)
+  Middleware->>Service: ValidateToken(ctx, token)
+  alt missing, expired, or invalid signature
+    Service-->>Middleware: error
+    Middleware-->>Client: 401 unauthorized
+  end
+  Service-->>Middleware: Claims{user_id, email}
+  Middleware->>Handler: request + Claims in context
+  Handler-->>Client: 200 response
+```
 
 ## 7. Acceptance Criteria
 

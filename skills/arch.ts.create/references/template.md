@@ -74,7 +74,19 @@ Describe the standard layout and organization for components in this system.
 
 ### 6.2 Dependency Direction
 
-Define the allowed dependency flow between layers or components (e.g., Domain ← Application ← Infrastructure).
+Define the allowed dependency flow between layers or components. Use a Mermaid `flowchart TD` to make allowed and forbidden directions explicit:
+
+```mermaid
+flowchart TD
+  Handler --> Service
+  Service --> Domain
+  Repository --> Domain
+  Gateway --> Domain
+
+  style Domain fill:#d4edda,stroke:#28a745
+```
+
+> Add a note below the diagram listing any explicitly **forbidden** dependencies (e.g., "Domain must never import from Repository, Gateway, or Handler").
 
 ### 6.3 Communication Style
 
@@ -86,15 +98,37 @@ How errors propagate across boundaries and how they are surfaced to consumers.
 
 ## 7. Data Flow
 
-Describe how data moves through the system for the primary use cases:
+Describe 1–3 key flows with enough detail to understand runtime behavior. Use Mermaid diagrams — do not use plain text arrows.
 
-```
-Request → [Component A] → [Component B] → [Storage]
-                       ↓
-               [Event Bus] → [Component C] → ...
+- Use `sequenceDiagram` for synchronous request/response flows
+- Use `flowchart LR` when the flow involves async steps, queues, events, or conditional branching
+
+### Flow 1: [Name of the primary flow]
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Handler
+  participant Service
+  participant Repository
+  Client->>Handler: POST /resource (payload)
+  Handler->>Service: call business method
+  Service->>Repository: persist entity
+  Repository-->>Service: entity saved
+  Service-->>Handler: result
+  Handler-->>Client: 201 Created
 ```
 
-Narrate 1–3 key flows with enough detail to understand the runtime behavior.
+### Flow 2: [Name of an async or event-driven flow, if applicable]
+
+```mermaid
+flowchart LR
+  A[Trigger] --> B[Service]
+  B --> C[(Database)]
+  B --> D[Outbox]
+  D --> E[Queue]
+  E --> F[Consumer]
+```
 
 ## 8. External Integrations & Dependencies
 

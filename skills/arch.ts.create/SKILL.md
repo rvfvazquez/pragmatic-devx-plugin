@@ -124,6 +124,23 @@ Create the file at `docs/arch/<name>.arch.md` using the full template in `refere
 
 Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision.
 
+#### Diagram Guide
+
+Use Mermaid diagrams to make structure and behavior immediately visible. Apply the right diagram type for each context:
+
+| Situation | Diagram type | Section |
+|-----------|-------------|---------|
+| Component structure and dependencies | `graph TD` or `flowchart TD` | 4.1, 6.2 |
+| Request/response flow between components | `sequenceDiagram` | 7 |
+| Async flow with queues, events, or branching | `flowchart LR` | 7 |
+| State transitions (e.g., status machine) | `stateDiagram-v2` | 7 |
+
+**Rules:**
+- Section 4.1 (Component Diagram): always use `graph TD` — show every component and their dependency direction
+- Section 6.2 (Dependency Direction): use `flowchart TD` to show allowed vs. forbidden dependency arrows explicitly
+- Section 7 (Data Flow): use `sequenceDiagram` for synchronous flows; use `flowchart LR` when the flow involves async steps, queues, or conditional branching. Replace ASCII art — do not use plain text arrows.
+- Keep diagrams focused: one diagram per flow. Do not combine multiple flows into a single diagram.
+
 ### Step 3 — Output Summary
 
 After creating the file:
@@ -147,4 +164,7 @@ docs/arch/<name>.arch.md
 
 ### Example Files
 
-- **`examples/example-payments-arch.md`** — Complete example of a filled-in architecture spec (payments module). Use as a calibration target for output structure, ADR depth, component boundary detail, and writing style
+Use these examples as calibration targets for output structure, ADR depth, component boundary detail, diagram usage, and writing style. Each example showcases a different architecture pattern:
+
+- **`examples/example-payments-arch.md`** — Payments module with anti-corruption layer and transactional outbox. Showcases `graph TD` for component dependencies, `flowchart TD` for dependency direction, and `sequenceDiagram` for synchronous multi-step flows
+- **`examples/example-notification-service-arch.md`** — Event-driven notification service with multiple channels (email + push). Showcases consumer/dispatcher pattern, `sequenceDiagram` for async flows, and `flowchart LR` for opt-out/skip branching logic

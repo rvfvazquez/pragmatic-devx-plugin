@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-- **Title**: Notificações de Status de Pedido por Email
+- **Title**: Order Status Email Notifications
 - **Status**: Review
 - **Author**: platform-team
 - **Created**: 2026-04-01
@@ -17,41 +17,41 @@
 
 ## 2. Problem Statement
 
-Clientes não recebem comunicação automática quando o status de seus pedidos muda. Isso gera volume desnecessário de contatos ao suporte e reduz a experiência pós-compra. Atualmente toda consulta de status é iniciada pelo cliente — o sistema não notifica proativamente.
+Customers receive no automatic communication when their order status changes. This generates unnecessary support contact volume and degrades the post-purchase experience. All status inquiries are currently customer-initiated — the system does not proactively notify.
 
 ## 3. Goals & Non-Goals
 
 **Goals:**
-- Enviar email automático ao cliente quando o pedido muda para `shipped` ou `delivered`
-- Garantir que o envio não bloqueie nem atrase a operação de mudança de status
-- Registrar cada notificação enviada para fins de auditoria e LGPD
+- Send an automatic email to the customer when an order transitions to `shipped` or `delivered`
+- Ensure the notification dispatch does not block or delay the status change operation
+- Record each notification attempt for auditing and data retention compliance
 
 **Non-Goals:**
-- Notificações por SMS ou push mobile
-- Painel de configuração de preferências para o cliente (deferred)
-- Retry automático de emails com falha de entrega no provider
-- Internacionalização dos templates de email
+- SMS or mobile push notifications
+- Customer-facing preferences panel (deferred)
+- Automatic retry for failed delivery attempts at the provider level
+- Email template internationalization
 
 ## 4. Proposed Solution
 
-Ao mudar o status de um pedido, o serviço de pedidos publica um evento em uma fila SQS. Um consumer dedicado lê esses eventos, filtra os status relevantes, e dispara o envio via SendGrid Dynamic Templates. O histórico de envios é persistido na tabela `order_notifications` no PostgreSQL existente.
+When an order status changes, the order service publishes an event to an SQS queue. A dedicated consumer reads those events, filters for relevant statuses, and triggers delivery via SendGrid Dynamic Templates. The send history is persisted to the `order_notifications` table in the existing PostgreSQL database.
 
 ## 5. Technology Decisions
 
 | Concern | Decision | Alternatives Considered | Rationale |
 |---------|----------|------------------------|-----------|
-| Email provider | SendGrid (existente) | SES, Mailgun | Já contratado e com templates configurados |
-| Entrega do disparo | Assíncrono via SQS | Síncrono na request, SNS | Desacopla mudança de status do envio; tolerante a falhas do provider |
-| Templates | SendGrid Dynamic Templates | Go html/template, hardcoded | Editável sem deploy; suportado pelo contrato SendGrid atual |
-| Persistência de histórico | PostgreSQL — tabela `order_notifications` | Sem persistência, tabela separada | DB já em uso; histórico necessário para auditoria LGPD |
-| Opt-out (LGPD) | Link de unsubscribe nativo do SendGrid | Configuração no perfil do usuário | Solução mais simples; atende requisito legal sem nova UI |
+| Email provider | SendGrid (existing) | SES, Mailgun | Already contracted and has templates configured |
+| Delivery mechanism | Async via SQS | Synchronous in request, SNS | Decouples status change from send; tolerant to provider failures |
+| Templates | SendGrid Dynamic Templates | Go html/template, hardcoded | Editable without deploy; supported by current SendGrid contract |
+| Notification history | PostgreSQL — `order_notifications` table | No persistence, separate table | DB already in use; history required for audit and data retention |
+| Opt-out | SendGrid native unsubscribe link | User profile setting | Simpler solution; satisfies legal requirement without new UI |
 
 ## 6. Detailed Design
 
 ### 6.1 API / Interface
 
 ```go
-// NotificationService define o contrato do serviço de notificações
+// NotificationService defines the contract for the notification service
 type NotificationService interface {
     SendOrderStatusEmail(ctx context.Context, event OrderStatusChangedEvent) error
 }
@@ -66,7 +66,7 @@ type OrderStatusChangedEvent struct {
 
 ### 6.2 Data Model
 
-Nova tabela `order_notifications`:
+New table `order_notifications`:
 
 ```go
 type OrderNotification struct {
@@ -94,34 +94,34 @@ flowchart LR
     G --> H
 ```
 
-**Passos do consumer:**
-1. Recebe mensagem SQS com `OrderStatusChangedEvent`
-2. Verifica se `new_status` é `shipped` ou `delivered` — se não, faz skip (registra `skipped`) e confirma mensagem
-3. Busca email e nome do cliente pelo `customer_id` no serviço de usuários
-4. Seleciona o Dynamic Template ID correspondente ao status
-5. Dispara envio via SendGrid com os dados do pedido
-6. Persiste resultado em `order_notifications` (sent/failed)
-7. Confirma (`ack`) a mensagem SQS independente do resultado — falhas de envio não reprocessam
+**Consumer steps:**
+1. Receive SQS message with `OrderStatusChangedEvent`
+2. Check if `new_status` is `shipped` or `delivered` — if not, skip (record `skipped`) and ack message
+3. Fetch customer email and name via `customer_id` from the user service
+4. Select the Dynamic Template ID corresponding to the status
+5. Trigger send via SendGrid with order data
+6. Persist result to `order_notifications` (sent/failed)
+7. Ack the SQS message regardless of send result — delivery failures do not trigger reprocessing
 
 ## 7. Acceptance Criteria
 
-- [ ] Ao mudar status de um pedido para `shipped`, o cliente recebe email em até 30s
-- [ ] Ao mudar status para `delivered`, o cliente recebe email em até 30s
-- [ ] Mudanças para `pending` ou `cancelled` não disparam email (registradas como `skipped`)
-- [ ] Email contém link de opt-out funcional via unsubscribe do SendGrid
-- [ ] Após opt-out, nenhum email adicional é enviado para aquele endereço
-- [ ] Cada tentativa de envio é registrada em `order_notifications` com status e timestamp
-- [ ] Falha no SendGrid não causa reprocessamento da mensagem SQS (mensagem é confirmada mesmo com erro)
+- [ ] When an order status changes to `shipped`, the customer receives an email within 30s
+- [ ] When an order status changes to `delivered`, the customer receives an email within 30s
+- [ ] Changes to `pending` or `cancelled` do not trigger an email (recorded as `skipped`)
+- [ ] Email contains a functional opt-out link via SendGrid unsubscribe
+- [ ] After opt-out, no further emails are sent to that address
+- [ ] Each send attempt is recorded in `order_notifications` with status and timestamp
+- [ ] A SendGrid failure does not cause SQS message reprocessing (message is acked even on error)
 
 ## 8. Technical Considerations
 
-- **Idempotência:** se a mesma mensagem SQS for entregue mais de uma vez (at-least-once), pode haver emails duplicados. Mitigação: verificar `order_id + status` em `order_notifications` antes de enviar.
-- **LGPD:** o histórico em `order_notifications` deve respeitar a política de retenção de dados do cliente. Incluir `customer_id` para facilitar exclusão em caso de solicitação de apagamento.
-- **Dependencies:** SendGrid SDK (`github.com/sendgrid/sendgrid-go`), AWS SDK para SQS — ambos já em `go.mod`.
-- **Breaking changes:** nenhum — o serviço de pedidos só precisa publicar eventos na fila existente. Nenhum contrato existente é alterado.
-- **Observabilidade:** logar `order_id`, `customer_id` e `status` em cada tentativa de envio para rastreabilidade.
+- **Idempotency:** if the same SQS message is delivered more than once (at-least-once), duplicate emails may be sent. Mitigation: check `order_id + status` in `order_notifications` before sending.
+- **Data retention:** the `order_notifications` history must respect the customer data retention policy. Include `customer_id` to support deletion requests.
+- **Dependencies:** SendGrid SDK (`github.com/sendgrid/sendgrid-go`), AWS SDK for SQS — both already in `go.mod`.
+- **Breaking changes:** none — the order service only needs to publish events to the existing queue. No existing contracts are changed.
+- **Observability:** log `order_id`, `customer_id`, and `status` on each send attempt for traceability.
 
 ## 9. Open Questions
 
-- [ ] [TODO: decide — qual o comportamento em caso de erro ao buscar o email do cliente? Opções: skip (registra failed), retry com backoff, dead-letter queue]
-- [ ] [TODO: decide — quais outros status além de `shipped` e `delivered` devem disparar email em versões futuras?]
+- [ ] [TODO: decide — what should happen when fetching the customer email fails? Options: skip (record failed), retry with backoff, dead-letter queue]
+- [ ] [TODO: decide — which statuses beyond `shipped` and `delivered` should trigger email in future iterations?]

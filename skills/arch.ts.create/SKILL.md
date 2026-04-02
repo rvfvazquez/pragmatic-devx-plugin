@@ -164,4 +164,7 @@ docs/arch/<name>.arch.md
 
 ### Example Files
 
-- **`examples/example-payments-arch.md`** — Complete example of a filled-in architecture spec (payments module). Use as a calibration target for output structure, ADR depth, component boundary detail, and writing style
+Use these examples as calibration targets for output structure, ADR depth, component boundary detail, diagram usage, and writing style. Each example showcases a different architecture pattern:
+
+- **`examples/example-payments-arch.md`** — Payments module with anti-corruption layer and transactional outbox. Showcases `graph TD` for component dependencies, `flowchart TD` for dependency direction, and `sequenceDiagram` for synchronous multi-step flows
+- **`examples/example-notification-service-arch.md`** — Event-driven notification service with multiple channels (email + push). Showcases consumer/dispatcher pattern, `sequenceDiagram` for async flows, and `flowchart LR` for opt-out/skip branching logic

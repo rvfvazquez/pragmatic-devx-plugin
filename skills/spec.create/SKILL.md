@@ -170,4 +170,8 @@ docs/specs/<feature-slug>.md
 
 ### Example Files
 
-- **`examples/example-auth-spec.md`** — Complete example of a filled-in spec (JWT authentication feature). Use as a calibration target for output structure, level of detail, and writing style
+Use these examples as calibration targets for output structure, level of detail, diagram usage, and writing style. Each example showcases a different diagram type:
+
+- **`examples/example-auth-spec.md`** — JWT authentication feature. Showcases `sequenceDiagram` for multi-step request/response flows (login + middleware validation)
+- **`examples/example-order-notifications-spec.md`** — Async email notifications via SQS. Showcases `flowchart LR` for event-driven and asynchronous processing flows
+- **`examples/example-order-lifecycle-spec.md`** — Order status state machine. Showcases `stateDiagram-v2` for features with explicit state transitions and validity rules

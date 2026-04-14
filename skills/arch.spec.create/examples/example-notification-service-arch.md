@@ -1,6 +1,6 @@
 # Example Architecture Spec: Notification Service
 
-> This is a complete example of an architecture tech spec produced by arch.ts.create.
+> This is a complete example of an architecture tech spec produced by arch.spec.create.
 > **Pattern showcased:** event-driven service — consumer-based architecture with SQS,
 > multiple notification channels, and a dispatcher pattern.
 > Use it as a reference for documenting services that are triggered by events rather

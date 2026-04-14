@@ -1,6 +1,6 @@
 # Architecture Conformance Report Format
 
-Use this format when generating the conformance report in Step 4 of arch.ts.check.
+Use this format when generating the conformance report in Step 4 of arch.spec.check.
 
 ---
 

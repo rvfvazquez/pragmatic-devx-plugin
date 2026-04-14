@@ -1,6 +1,6 @@
 # Example Architecture Spec: Payments Module
 
-> This is a complete example of an architecture tech spec produced by arch.ts.create.
+> This is a complete example of an architecture tech spec produced by arch.spec.create.
 > Use it as a reference for output structure, level of detail, ADR format, and writing style.
 
 ---

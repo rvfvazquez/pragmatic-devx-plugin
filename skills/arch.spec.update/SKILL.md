@@ -1,30 +1,30 @@
 ---
-name: arch.ts.update
+name: arch.spec.update
 description: This skill should be used when the user asks to "update an architecture spec", "revise the arch spec", "update this architecture document", "add a new ADR", "change the component boundaries", "fill in the TODOs in the arch spec", "correct the architecture spec", or wants to apply new decisions, corrections, or intentional deviations to an existing architecture technical specification document.
 ---
 
-# arch.ts.update
+# arch.spec.update
 
 Update an existing architecture technical specification with new architectural decisions, corrections, or intentional deviations.
 
 ## Purpose
 
-Evolve an arch spec safely — preserving existing ADRs, versioning changes, and appending a changelog. Never overwrite prior decisions; mark superseded ADRs as deprecated rather than deleting them. This skill is the natural next step when `arch.ts.check` identifies a violation that is resolved via **Option B** (the code reflects an intentional evolution the spec has not yet captured).
+Evolve an arch spec safely — preserving existing ADRs, versioning changes, and appending a changelog. Never overwrite prior decisions; mark superseded ADRs as deprecated rather than deleting them. This skill is the natural next step when `arch.spec.check` identifies a violation that is resolved via **Option B** (the code reflects an intentional evolution the spec has not yet captured).
 
 ## When This Skill Applies
 
-Use this skill when an arch spec **already exists** and needs to capture new decisions, corrections, or intentional deviations — including when `arch.ts.check` produces a violation resolved via **Option B** (the code reflects an intentional evolution the spec hasn't captured yet).
+Use this skill when an arch spec **already exists** and needs to capture new decisions, corrections, or intentional deviations — including when `arch.spec.check` produces a violation resolved via **Option B** (the code reflects an intentional evolution the spec hasn't captured yet).
 
 **Do not use when:**
-- No arch spec exists yet → use `arch.ts.create`
-- The user only wants a quality review of the spec document without making changes → use `arch.ts.validate`
+- No arch spec exists yet → use `arch.spec.create`
+- The user only wants a quality review of the spec document without making changes → use `arch.spec.validate`
 
-**Key distinction from `arch.ts.check`:** `arch.ts.check` is read-only diagnosis. This skill is the write operation triggered by its findings (Option B) or by any new architectural decision that must be formally recorded.
+**Key distinction from `arch.spec.check`:** `arch.spec.check` is read-only diagnosis. This skill is the write operation triggered by its findings (Option B) or by any new architectural decision that must be formally recorded.
 
 ## Lifecycle Position
 
 ```
-arch.ts.create → arch.ts.validate → arch.ts.check → [arch.ts.update] → arch.ts.check
+arch.spec.create → arch.spec.validate → arch.spec.check → [arch.spec.update] → arch.spec.check
 ```
 
 Use this skill when the arch spec needs to catch up with the implemented code, or when a new architectural decision must be formally recorded.
@@ -63,7 +63,7 @@ Analyze what needs to change:
 - Is this an **update to component boundaries** (responsibilities, public interfaces, dependency direction)?
 - Is this a **correction** to existing content (wrong information, outdated constraint)?
 - Is this resolving a **[TODO: ...]** placeholder?
-- Is this capturing an **intentional deviation** identified by `arch.ts.check`?
+- Is this capturing an **intentional deviation** identified by `arch.spec.check`?
 
 Map which sections are directly affected and which may be indirectly impacted — a change to a component boundary may also affect dependency direction rules, data flow descriptions, and NFRs.
 
@@ -188,4 +188,4 @@ Report:
 2. Any remaining `[TODO: ...]` items still present in the document
 3. Sections that may need human review due to the changes
 
-**Next step:** run `arch.ts.check` to verify the updated spec now correctly reflects the implemented code.
+**Next step:** run `arch.spec.check` to verify the updated spec now correctly reflects the implemented code.

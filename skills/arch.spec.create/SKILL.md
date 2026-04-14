@@ -1,9 +1,9 @@
 ---
-name: arch.ts.create
+name: arch.spec.create
 description: This skill should be used when the user asks to "create an architecture spec", "document the architecture", "write an architecture document", "create arch spec for this module", "document this system's architecture", "generate an ADR", "create architecture documentation for this service", "write arch spec for integration", or needs to formally document the architecture of a system, module, layer, or integration.
 ---
 
-# arch.ts.create
+# arch.spec.create
 
 Create a software architecture technical specification document for a system, module, layer, or integration.
 
@@ -25,8 +25,8 @@ Default scope when not specified: `module`.
 Use this skill when **no arch spec exists yet** for the system, module, or integration being documented.
 
 **Do not use when:**
-- An arch spec already exists and the user wants to modify it → use `arch.ts.update`
-- An arch spec already exists and the user wants a quality review → use `arch.ts.validate`
+- An arch spec already exists and the user wants to modify it → use `arch.spec.update`
+- An arch spec already exists and the user wants a quality review → use `arch.spec.validate`
 
 **Edge case:** if the user asks to "document the actual architecture" of an existing codebase (reverse-engineering decisions from code), scan the codebase thoroughly in Step 1 before the discovery interview — the code is the source of truth for what was actually built.
 
@@ -148,7 +148,7 @@ After creating the file:
 2. Summarize the key architectural decisions documented
 3. List any `[TODO: ...]` items that remain open
 
-**Next step:** run `arch.ts.validate` to verify the spec is complete and sound before using it as a reference for conformance checks.
+**Next step:** run `arch.spec.validate` to verify the spec is complete and sound before using it as a reference for conformance checks.
 
 ## Output Location
 

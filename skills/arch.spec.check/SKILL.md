@@ -1,9 +1,9 @@
 ---
-name: arch.ts.check
+name: arch.spec.check
 description: This skill should be used when the user asks to "check if the code conforms to the architecture spec", "verify architecture conformance", "does the code follow the arch spec?", "check if the project respects the architecture", "validate architecture rules in the codebase", "run an architecture check", "arch conformance check", or wants to verify that the actual project structure and code comply with documented architecture technical specifications.
 ---
 
-# arch.ts.check
+# arch.spec.check
 
 Verify whether the actual project code and structure conform to the rules and decisions declared in one or more architecture tech spec documents (`.arch.md`).
 
@@ -16,23 +16,23 @@ This skill is language-agnostic: it applies to any codebase regardless of progra
 ## Lifecycle Position
 
 ```
-arch.ts.create → arch.ts.validate → [arch.ts.check] → arch.ts.update → arch.ts.check
+arch.spec.create → arch.spec.validate → [arch.spec.check] → arch.spec.update → arch.spec.check
 ```
 
-Use this skill after `arch.ts.validate` confirms the spec is sound. Run it periodically to detect drift between code and spec. When Option B is chosen for a violation (the code reflects an intentional evolution), use `arch.ts.update` to capture the decision in the spec, then re-run this check.
+Use this skill after `arch.spec.validate` confirms the spec is sound. Run it periodically to detect drift between code and spec. When Option B is chosen for a violation (the code reflects an intentional evolution), use `arch.spec.update` to capture the decision in the spec, then re-run this check.
 
 ## When This Skill Applies
 
 Use this skill when an arch spec **and** a codebase both exist, and the user wants to verify whether the code follows the spec.
 
 **Do not use when:**
-- No arch spec exists yet → use `arch.ts.create` first
-- The user wants to check the quality of the spec document itself (not the code) → use `arch.ts.validate`
-- The user wants to update the spec to reflect new decisions → use `arch.ts.update`
+- No arch spec exists yet → use `arch.spec.create` first
+- The user wants to check the quality of the spec document itself (not the code) → use `arch.spec.validate`
+- The user wants to update the spec to reflect new decisions → use `arch.spec.update`
 
-**Prerequisite:** the arch spec should pass `arch.ts.validate` before running this check. If the spec has unresolved `[TODO]` items or missing sections, conformance results will be unreliable.
+**Prerequisite:** the arch spec should pass `arch.spec.validate` before running this check. If the spec has unresolved `[TODO]` items or missing sections, conformance results will be unreliable.
 
-**Key distinction from `arch.ts.validate`:** `arch.ts.validate` reviews the spec document; `arch.ts.check` scans the actual codebase against the spec.
+**Key distinction from `arch.spec.validate`:** `arch.spec.validate` reviews the spec document; `arch.spec.check` scans the actual codebase against the spec.
 
 ## How to Check Architecture Conformance
 

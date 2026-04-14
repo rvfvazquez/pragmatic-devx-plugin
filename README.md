@@ -94,7 +94,7 @@ Overall Status: WARN
 
 ---
 
-### `arch.ts.create`
+### `arch.spec.create`
 
 Creates a software architecture technical specification document for a system, module, layer, or integration.
 
@@ -116,7 +116,7 @@ Claude will scan the codebase for existing patterns, then generate `docs/arch/no
 
 ---
 
-### `arch.ts.check`
+### `arch.spec.check`
 
 Verifies whether the actual project code and structure conform to the rules declared in one or more architecture tech spec documents.
 
@@ -152,7 +152,7 @@ Overall Status: PARTIAL
 
 ---
 
-### `arch.ts.validate`
+### `arch.spec.validate`
 
 Validates an architecture tech spec for completeness, consistency, and architectural soundness.
 
@@ -189,11 +189,11 @@ None.
 
 ---
 
-### `arch.ts.update`
+### `arch.spec.update`
 
 Updates an existing architecture tech spec with new architectural decisions, corrections, or intentional deviations.
 
-Preserves existing ADRs, increments the version semantically (patch/minor/major), deprecates superseded decisions without deleting history, and appends a changelog entry. This is the natural next step when `arch.ts.check` identifies a violation resolved via **Option B** — the code reflects an intentional evolution the spec has not yet captured.
+Preserves existing ADRs, increments the version semantically (patch/minor/major), deprecates superseded decisions without deleting history, and appends a changelog entry. This is the natural next step when `arch.spec.check` identifies a violation resolved via **Option B** — the code reflects an intentional evolution the spec has not yet captured.
 
 **Triggers when you say things like:**
 - "Update the payments arch spec — we adopted the anti-corruption layer"
@@ -225,15 +225,15 @@ pragmatic-devx-plugin/
 │   │   └── SKILL.md
 │   ├── spec.validate/
 │   │   └── SKILL.md
-│   ├── arch.ts.create/
+│   ├── arch.spec.create/
 │   │   ├── SKILL.md
 │   │   └── references/
 │   │       └── template.md        # Architecture tech spec template
-│   ├── arch.ts.validate/
+│   ├── arch.spec.validate/
 │   │   └── SKILL.md
-│   ├── arch.ts.check/
+│   ├── arch.spec.check/
 │   │   └── SKILL.md
-│   └── arch.ts.update/
+│   └── arch.spec.update/
 │       └── SKILL.md
 ├── LICENSE
 └── README.md

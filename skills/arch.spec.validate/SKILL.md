@@ -142,3 +142,54 @@ Optional improvements.
 - For each WARN, provide a concrete, actionable suggestion
 - If all checks pass, summarize architectural strengths and confirm readiness for approval
 - **Next step after PASS:** run `arch.spec.check` to verify the codebase conforms to this spec
+
+### Step 4 — Generate Claude Rules (Optional, PASS only)
+
+Only offer this step when the overall validation status is **PASS**.
+
+After printing the report, use `AskUserQuestion` to ask:
+
+```
+Would you like to generate Claude project rules from this architecture spec?
+
+This creates a `.claude/rules/<spec-name>-arch.md` file with concrete architectural
+constraints that Claude will follow automatically during development in this project
+(e.g. forbidden imports, naming conventions, component boundary rules).
+```
+
+#### If the user accepts:
+
+Extract only rules that passed **Section E (Checkability)** criteria — rules that are concrete, named, and verifiable. Do not extract vague guidelines.
+
+Map spec content to rule types:
+
+| Spec content | Rule type |
+|---|---|
+| Forbidden dependency direction (e.g., domain must not import infrastructure) | `Never import <X> inside <Y>` |
+| Allowed dependency direction | `<A> may only depend on <B>` |
+| Naming conventions (e.g., `*Service`, `*Repository`) | `Files in <path> must follow <pattern> naming` |
+| Component boundary (e.g., all external calls via ACL) | `<X> must not call <Y> directly — route through <Z>` |
+| Communication style (sync/async enforcement) | `<X> must communicate with <Y> via <mechanism>` |
+
+Write the file to `.claude/rules/<spec-name>-arch.md` using this format:
+
+```markdown
+# Architecture Rules — <System/Module Name>
+# Source: <path to .arch.md file>
+# Generated: <today's date>
+
+## Dependency Rules
+- <rule>
+
+## Naming Conventions
+- <rule>
+
+## Component Boundaries
+- <rule>
+```
+
+Only include sections that have at least one rule. Omit empty sections.
+
+After writing the file, state the path created and how many rules were extracted, and include this note:
+
+> **Note:** Claude rules guide Claude during development sessions but are not guaranteed enforcement — Claude may not follow them perfectly in long conversations or when the user overrides them. For guaranteed architectural conformance, run `arch.spec.check` in CI.

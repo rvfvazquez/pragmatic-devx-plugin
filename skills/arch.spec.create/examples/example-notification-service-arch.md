@@ -131,6 +131,12 @@ notification/
     event.go          — Parsed domain event types (OrderStatusChangedEvent, etc.)
 ```
 
+> **Language equivalents for this layout:**
+> - **TypeScript:** `consumer/consumer.ts` + `consumer/__tests__/consumer.test.ts`; interfaces in `channels/channel.ts`
+> - **Python:** `consumer/consumer.py` + `tests/test_consumer.py`; abstract base class in `channels/channel.py`
+> - **Java:** `consumer/NotificationConsumer.java` + `consumer/NotificationConsumerTest.java`; interface in `channels/Channel.java`
+> - **Rust:** `src/consumer.rs` (inline `#[cfg(test)]`) + `tests/consumer_test.rs`; trait in `src/channels/channel.rs`
+
 ### 6.2 Dependency Direction
 
 ```mermaid
@@ -151,7 +157,7 @@ flowchart TD
 
 ### 6.3 Communication Style
 
-- `consumer → dispatcher`: synchronous Go function call within the same processing goroutine
+- `consumer → dispatcher`: synchronous function call within the same processing context (Go: direct call in same goroutine; TypeScript: `await dispatcher.dispatch()`; Python: direct method call in same thread; Rust: direct call in same tokio task)
 - `dispatcher → channels`: synchronous calls via the `Channel` interface; the dispatcher waits for each channel result before recording
 - `dispatcher → repository / preferences`: synchronous calls via injected interfaces
 - `consumer ← SQS`: async polling every 5s; up to 10 messages per batch

@@ -32,9 +32,27 @@ Use this skill when **no arch spec exists yet** for the system, module, or integ
 
 ## How to Create an Architecture Spec
 
+### Pre-condition — Check for Existing Arch Spec
+
+Before anything else, determine the `<name>` from the user's message and check whether `docs/arch/<name>.arch.md` already exists.
+
+If the file **exists**:
+> "An architecture spec already exists at `docs/arch/<name>.arch.md`. This skill will **replace** it. Did you mean to:
+> - Update decisions or component boundaries → use `arch.spec.update`
+> - Review its quality → use `arch.spec.validate`
+>
+> I will only continue if you explicitly confirm you want to replace the existing architecture spec."
+
+**STOP. Do not proceed until the user explicitly confirms they want to replace the existing spec.** If the user wants to update or validate instead, end this skill now.
+
+---
+
 ### Step 0 — Language Selection
 
-**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the architecture spec document generated in:
+Infer the document language before asking:
+1. **Detect user message language** — if ≥80% of prose words in the user's message are in pt-BR, es-ES, or en-US, use that language without asking
+2. **Check existing arch specs** — if step 1 is ambiguous (e.g., mostly technical terms or code snippets), scan `docs/arch/` for existing arch spec files and use their language if uniform
+3. **Ask only if inconclusive** — if both steps above are ambiguous, use `AskUserQuestion`:
 
 ```
 In which language would you like the architecture spec to be generated?
@@ -45,7 +63,7 @@ In which language would you like the architecture spec to be generated?
 4. Other — specify which language
 ```
 
-Record the chosen language and use it consistently for **all content** in the generated document — section headings, component descriptions, ADR rationale, data flow descriptions, and TODO comments. Do not proceed to the next step until the language is confirmed.
+Record the chosen language and use it consistently for **all content** in the generated document — section headings, component descriptions, ADR rationale, data flow descriptions, and TODO comments.
 
 ### Step 1 — Understand the Context
 
@@ -113,7 +131,7 @@ What is not working well today? (select all that apply)
 Answer what you know — for anything undecided, I'll capture it as an open ADR item in the spec.
 ```
 
-Do **not** proceed to Step 2 until:
+**STOP. Do not generate the architecture document until all three conditions below are met.** Architecture specs written without this foundation will have FAIL findings in `arch.spec.validate`:
 - The purpose and main quality attributes are understood
 - Key constraints are captured
 - Major open decisions are identified
@@ -148,7 +166,7 @@ After creating the file:
 2. Summarize the key architectural decisions documented
 3. List any `[TODO: ...]` items that remain open
 
-**Next step:** run `arch.spec.validate` to verify the spec is complete and sound before using it as a reference for conformance checks.
+**Next step:** run `arch.spec.validate` immediately to verify the spec is complete and sound. Do not use this spec as a reference for `arch.spec.check` until it passes validation.
 
 ## Output Location
 

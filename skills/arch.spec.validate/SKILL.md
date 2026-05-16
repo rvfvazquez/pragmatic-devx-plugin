@@ -32,9 +32,12 @@ Use this skill when an arch spec **already exists** and the user wants to assess
 
 ## How to Validate an Architecture Spec
 
-### Step 0 — Language Selection
+### Step 0 — Language Detection
 
-**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the validation report generated in:
+Infer the report language from the existing arch spec:
+1. If the spec contains a `Language:` metadata field, use it
+2. Otherwise, infer from the majority language of prose content in the Context & Motivation section and ADR rationale — if ≥80% of prose words are attributable to a single language, use that language
+3. If no prose exists or no language reaches 80%, use `AskUserQuestion`:
 
 ```
 In which language would you like the validation report to be generated?
@@ -45,11 +48,25 @@ In which language would you like the validation report to be generated?
 4. Other — specify which language
 ```
 
-Record the chosen language and use it for **all report content** — section headings, check descriptions, notes, suggestions, and recommended actions. Do not proceed to the next step until the language is confirmed.
+Record the chosen language and use it for **all report content** — section headings, check descriptions, notes, suggestions, and recommended actions.
 
 ### Step 1 — Locate and Read the Spec
 
 Find the architecture spec file. Common locations: `docs/arch/`, or any `.arch.md` file matching the provided path. Read the full document before running any checks.
+
+### Step 1.5 — Pre-scan: Detect Open TODO Items
+
+**This is a mandatory step before running any checks.**
+
+After reading the spec in Step 1, count all `[TODO: ...]` occurrences across the document. If any are found, use `AskUserQuestion` to ask:
+
+> "I found **N open TODO item(s)** in this arch spec. These will result in WARN or FAIL findings. Would you like to:
+> 1. **Resolve them first** with `arch.spec.update` — for a cleaner validation report
+> 2. **Continue with validation as-is** — TODOs will be reported as findings"
+
+**STOP. Wait for the user's choice before proceeding.** If the user chooses to resolve TODOs first, end this skill and defer to `arch.spec.update`.
+
+---
 
 ### Step 2 — Run Validation Checks
 
@@ -85,7 +102,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, or **FAIL** with a sho
 #### D. Design Quality
 - **Component structure defined** — A standard layout for components is described
 - **Communication style stated** — How components interact is explicit (sync/async, events, direct calls)
-- **Testability strategy present** — Describes how the architecture supports testing
+- **Testability strategy present** — Describes how the architecture supports testing. A passing strategy must address: (a) which layers or components are unit-testable in isolation, (b) where external dependencies are mocked or stubbed (e.g., via interfaces or adapters at component boundaries), and (c) which flows require integration or e2e tests. A vague mention of "we will write tests" does not pass this check.
 - **External dependencies documented** — Integrations and external systems are listed with their purpose
 
 #### E. Checkability
@@ -141,6 +158,7 @@ Optional improvements.
 - **Every FAIL must include a "How to resolve" block** with two options: fix the spec to satisfy the criterion, or reconsider the criterion if a deliberate decision makes it inapplicable
 - For each WARN, provide a concrete, actionable suggestion
 - If all checks pass, summarize architectural strengths and confirm readiness for approval
+- **After a FAIL report:** assert explicitly — "**Do not run `arch.spec.check` against this spec** and do not use it as an implementation reference until FAIL items are resolved. Use `arch.spec.update` to address them."
 - **Next step after PASS:** run `arch.spec.check` to verify the codebase conforms to this spec
 
 ### Step 4 — Generate Claude Rules (Optional, PASS only)

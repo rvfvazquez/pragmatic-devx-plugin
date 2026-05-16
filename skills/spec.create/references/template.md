@@ -49,7 +49,10 @@ Explicit record of technology choices made for this feature. Every row must have
 Define public interfaces, function signatures, or API contracts.
 
 ```go
-// Interface definitions go here
+// Interface definitions go here — adapt to project language:
+// TypeScript: export interface ServiceName { methodName(input: InputType): Promise<OutputType> }
+// Python:     class ServiceName(Protocol): def method_name(self, input: InputType) -> OutputType: ...
+// Java:       public interface ServiceName { OutputType methodName(InputType input); }
 type ServiceName interface {
     MethodName(ctx context.Context, input InputType) (OutputType, error)
 }
@@ -60,7 +63,10 @@ type ServiceName interface {
 Describe any new or modified data structures, schemas, or types.
 
 ```go
-// Type definitions go here
+// Type/data model definitions go here — adapt to project language:
+// TypeScript: export interface EntityName { id: string; createdAt: Date }
+// Python:     @dataclass class EntityName: id: str; created_at: datetime
+// Java:       public record EntityName(String id, Instant createdAt) {}
 type EntityName struct {
     ID        string    `json:"id"`
     CreatedAt time.Time `json:"created_at"`
@@ -89,11 +95,13 @@ sequenceDiagram
 
 ## 7. Acceptance Criteria
 
-Define clear, testable acceptance criteria:
+Each criterion must follow **Given/When/Then** format and be specific enough to implement as a direct test case without interpretation.
 
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
+- [ ] **Given** [context], **When** [action], **Then** [observable result]
+- [ ] **Given** [context], **When** [action], **Then** [observable result]
+- [ ] **Given** [context], **When** [action], **Then** [observable result]
+
+> Include at minimum: 1 happy-path criterion and 1 error or edge-case criterion.
 
 ## 8. Technical Considerations
 

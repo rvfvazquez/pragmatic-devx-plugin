@@ -41,6 +41,17 @@ In which language would you like the spec updates to be written?
 
 Record the chosen language and apply it consistently to **all new or modified content** — section text, changelog entries, TODO comments, and any new acceptance criteria. Existing content that is not being changed should remain in its original language.
 
+### Pre-condition — Check Spec Status
+
+After locating the spec, check its `Status` field before proceeding.
+
+If `Status: Approved`:
+> "This spec is in **Approved** status. Modifying it may invalidate existing conformance checks. Confirm this update is intentional — and consider whether the status should be downgraded to Review as part of this change."
+
+**STOP. Do not apply changes to an Approved spec until the user explicitly confirms the update is intentional.**
+
+---
+
 ### Step 1 — Locate the Spec
 
 Find the spec file from the user's context. Common locations:
@@ -147,3 +158,5 @@ Report:
 1. A concise summary of what was changed
 2. Any remaining `[TODO: ...]` items still present in the document
 3. Sections that may need human review due to the changes
+
+**Next step:** run `spec.validate` to verify the updated spec is still sound and consistent.

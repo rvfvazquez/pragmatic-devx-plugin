@@ -121,6 +121,12 @@ payments/
     worker.go        — Background polling worker
 ```
 
+> **Language equivalents for this layout:**
+> - **TypeScript:** `handler/handler.ts` + `handler/__tests__/handler.test.ts` (or `handler.spec.ts`)
+> - **Python:** `handler/handler.py` + `tests/test_handler.py`
+> - **Java:** `handler/PaymentHandler.java` + `handler/PaymentHandlerTest.java`
+> - **Rust:** `src/handler.rs` (inline `#[cfg(test)]` module) + `tests/handler_test.rs`
+
 ### 6.2 Dependency Direction
 
 ```mermaid
@@ -138,7 +144,7 @@ flowchart TD
 
 ### 6.3 Communication Style
 
-- `handler → service`: direct synchronous Go function calls
+- `handler → service`: direct synchronous function calls (Go: direct call in same goroutine; TypeScript: `await service.method()`; Python: direct method call; Rust: direct call in same tokio task)
 - `service → repository / gateway / outbox`: synchronous calls via injected interfaces
 - `outbox → SQS`: asynchronous; outbox worker polls at 5s interval
 

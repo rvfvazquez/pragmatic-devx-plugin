@@ -23,9 +23,27 @@ Use this skill when **no spec exists yet** and the user wants to formally docume
 
 ## How to Create a Spec
 
+### Pre-condition — Check for Existing Spec
+
+Before anything else, determine the `<feature-slug>` from the user's message and check whether `docs/specs/<feature-slug>.md` already exists.
+
+If the file **exists**:
+> "A spec already exists at `docs/specs/<feature-slug>.md`. This skill will **replace** it. Did you mean to:
+> - Update specific sections → use `spec.update`
+> - Review its quality → use `spec.validate`
+>
+> I will only continue if you explicitly confirm you want to replace the existing spec."
+
+**STOP. Do not proceed until the user explicitly confirms they want to replace the existing spec.** If the user wants to update or validate instead, end this skill now.
+
+---
+
 ### Step 0 — Language Selection
 
-**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the spec document generated in:
+Infer the document language before asking:
+1. **Detect user message language** — if ≥80% of prose words in the user's message are in pt-BR, es-ES, or en-US, use that language without asking
+2. **Check existing specs** — if step 1 is ambiguous (e.g., mostly technical terms or code snippets), scan `docs/specs/` for existing spec files and use their language if uniform
+3. **Ask only if inconclusive** — if both steps above are ambiguous, use `AskUserQuestion`:
 
 ```
 In which language would you like the spec document to be generated?
@@ -36,7 +54,7 @@ In which language would you like the spec document to be generated?
 4. Other — specify which language
 ```
 
-Record the chosen language and use it consistently for **all content** in the generated document — section headings, descriptions, acceptance criteria, TODO comments, and the changelog. Do not proceed to the next step until the language is confirmed.
+Record the chosen language and use it consistently for **all content** in the generated document — section headings, descriptions, acceptance criteria, TODO comments, and the changelog.
 
 ### Step 1 — Understand the Input
 
@@ -84,7 +102,7 @@ Before I scan the codebase and ask about technology choices, let me confirm my u
 Answer what you know — for anything undecided, just say so and we'll handle it as an open item.
 ```
 
-Do **not** proceed to Step 3 until:
+**STOP. Do not proceed to Step 3 until all three conditions below are met.** A spec written without this confirmation will have gaps that `spec.validate` will FAIL:
 - The problem and goal are clearly understood
 - The scope boundaries are defined
 - Any hard constraints are captured
@@ -121,10 +139,15 @@ Before I write the spec, I need to clarify a few technology decisions:
 **Infrastructure / Deployment**
 - Are there constraints on where this runs? (Lambda, container, specific region, existing service)
 
+**Testing Strategy**
+- What test levels are expected for this feature? Options: unit only, unit + integration, unit + integration + e2e, contract tests, no automated tests
+- Infer the testing framework from the codebase (Step 3) before asking — only ask if not evident
+- Are there coverage gates or quality requirements? (e.g., all acceptance criteria must have a corresponding integration test)
+
 Answer what you know; for anything undecided, just say so and it will remain as an open question in the spec.
 ```
 
-Adapt the questions to what is actually relevant for the feature described. Skip categories that clearly don't apply. Do **not** proceed to writing the spec until this step is done.
+Adapt the questions to what is actually relevant for the feature described. Skip categories that clearly don't apply. **STOP. Do not write the spec until this step is complete.** Technology decisions skipped here will appear as FAIL findings in `spec.validate`.
 
 ### Step 5 — Generate the Spec Document
 
@@ -136,6 +159,10 @@ Fill every section with concrete content:
 - Capture all technology decisions made in Step 4 in section **5. Technology Decisions**
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
+
+**Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then [observable result]`. Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion.
+
+**Code blocks in sections 6.1 and 6.2:** The template uses Go as placeholder syntax. Always adapt code blocks to the project's actual programming language — inferred from Step 3 codebase scan or from the technology stack discussed in Step 4. For example: use TypeScript interfaces for a Node.js project, Python dataclasses or Protocol classes for a Python project, Java interfaces for a JVM project.
 
 #### When to add diagrams
 
@@ -155,6 +182,8 @@ After writing the file:
 1. State the file path created
 2. Summarize the key decisions captured, especially technology choices
 3. List any `[TODO: ...]` items that remain open, indicating who needs to decide
+
+**Next step:** run `spec.validate` to verify completeness before sharing with the team or starting implementation.
 
 ## Output Location
 

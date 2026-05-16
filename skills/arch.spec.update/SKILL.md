@@ -31,9 +31,12 @@ Use this skill when the arch spec needs to catch up with the implemented code, o
 
 ## How to Update an Architecture Spec
 
-### Step 0 — Language Selection
+### Step 0 — Language Detection
 
-**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the updated content written in:
+Infer the output language from the existing arch spec:
+1. If the spec contains a `Language:` metadata field, use it
+2. Otherwise, infer from the majority language of prose content in ADR rationale and component descriptions — if ≥80% of prose words are attributable to a single language, use that language
+3. If no prose exists or no language reaches 80%, use `AskUserQuestion`:
 
 ```
 In which language would you like the arch spec updates to be written?
@@ -44,7 +47,7 @@ In which language would you like the arch spec updates to be written?
 4. Other — specify which language
 ```
 
-Record the chosen language and apply it consistently to **all new or modified content** — ADR text, component descriptions, changelog entries, and TODO comments. Existing content that is not being changed should remain in its original language. Do not proceed to the next step until the language is confirmed.
+Record the chosen language and apply it consistently to **all new or modified content** — ADR text, component descriptions, changelog entries, and TODO comments. Existing content that is not being changed should remain in its original language.
 
 ### Step 1 — Locate the Arch Spec
 

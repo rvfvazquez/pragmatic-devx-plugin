@@ -22,6 +22,16 @@ Use this skill when a spec **and** an implementation both exist and the user wan
 
 ## How to Run a Conformance Check
 
+### Pre-condition — Verify Spec Readiness
+
+After identifying the spec in Step 1a, check its `Status` field:
+- If `Status: Draft` → assert: "This spec is in **Draft** status. Conformance results will be unreliable because the spec may be incomplete. Consider running `spec.validate` first."
+- If the spec has open `[TODO: ...]` items → note their count upfront. Dimension 3 will evaluate them explicitly.
+
+**STOP if the spec is in Draft status and the user has not explicitly confirmed they want to proceed anyway.**
+
+---
+
 ### Step 0 — Language Detection
 
 Infer the report language from the existing spec:
@@ -41,7 +51,12 @@ If none of the above is available, use `AskUserQuestion` to ask. If multiple spe
 ### Step 1b — Locate the Implementation
 
 1. Extract the feature slug from the spec filename (e.g., `auth.md` → `auth`)
-2. Search common paths: `src/<slug>/`, `internal/<slug>/`, `pkg/<slug>/`, `lib/<slug>/`, `<slug>/` at repo root
+2. First, detect the project layout by checking which top-level directories exist (e.g., `src/`, `app/`, `internal/`, `pkg/`, `lib/`, `packages/`). Then search the most likely paths for the slug:
+   - General: `src/<slug>/`, `lib/<slug>/`, `<slug>/` at repo root
+   - Go: `internal/<slug>/`, `pkg/<slug>/`
+   - Rails/Django/Laravel: `app/<slug>/`, `app/models/`, `app/services/`
+   - Java/Kotlin: `src/main/java/**/<slug>/`, `src/main/kotlin/**/<slug>/`
+   - JavaScript/TypeScript monorepo: `packages/<slug>/`, `apps/<slug>/`
 3. If exactly one match is found with high confidence → proceed
 4. If multiple candidates are found → `AskUserQuestion` listing the candidates, asking the user to select
 5. If nothing is found → `AskUserQuestion` asking the user to specify the implementation path
@@ -60,7 +75,7 @@ If no open `[TODO: ...]` items exist in the spec → mark Dimension 3 as `N/A`.
 
 For each element extracted in Step 2:
 
-- **Acceptance criteria** → search test files (`*_test.go`, `*.test.ts`, `*.spec.ts`, `*.test.py`, `*_test.py`, `*Test.java`, etc.) for test cases that exercise the criterion. A criterion is PASS if a test clearly covers it, WARN if only indirectly covered, FAIL if no test is found.
+- **Acceptance criteria** → search test files for test cases that exercise the criterion. Common patterns by language: Go (`*_test.go`, `*_integration_test.go`), TypeScript/JavaScript (`*.test.ts`, `*.spec.ts`, `*.test.js`, `**/__tests__/*`), Python (`*.test.py`, `*_test.py`, `test_*.py`, `tests/`), Java/Kotlin (`*Test.java`, `*Tests.java`, `*Test.kt`), Rust (`*_test.rs`, `tests/`), C# (`*Tests.cs`, `*Test.cs`), Ruby (`*_spec.rb`, `*_test.rb`), Scala (`*Spec.scala`, `*Suite.scala`). If the project's test naming convention is not in this list, detect it from existing test files before scanning. A criterion is PASS if a test clearly covers it, WARN if only indirectly covered, FAIL if no test is found.
 
 - **Interfaces, structs, endpoints** → search source files for type definitions, function signatures, and route registrations. PASS if matches spec exactly, WARN if present but deviates in a minor way (with details), FAIL if not found.
 
@@ -133,6 +148,7 @@ Overall Status:
 - Each action is tagged `[code]` (fix belongs in the implementation) or `[spec.update]` (decision or clarification needed in the spec)
 - N/A checks are not counted in Summary totals
 - If all dimensions are PASS or N/A: omit Recommended Actions and output a **Strengths** section summarizing what was verified and confirmed correct
+- **After a FAIL report:** assert explicitly — "**This implementation does not conform to spec.** Fix `[code]` items before marking the story as done. For `[spec.update]` items — these represent decisions not yet captured in the spec; use `spec.update` before the next conformance check."
 
 ## Additional Resources
 

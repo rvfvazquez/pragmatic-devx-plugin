@@ -36,9 +36,12 @@ Use this skill when an arch spec **and** a codebase both exist, and the user wan
 
 ## How to Check Architecture Conformance
 
-### Step 0 — Language Selection
+### Step 0 — Language Detection
 
-**This is a mandatory first step.** Use `AskUserQuestion` to ask the user which language they want the conformance report generated in:
+Infer the report language from the arch spec(s) being checked:
+1. If the spec contains a `Language:` metadata field, use it
+2. Otherwise, infer from the majority language of prose content in the spec — if ≥80% of prose words are attributable to a single language, use that language
+3. If checking multiple specs with different languages, or if no language reaches 80%, use `AskUserQuestion`:
 
 ```
 In which language would you like the conformance report to be generated?
@@ -49,7 +52,17 @@ In which language would you like the conformance report to be generated?
 4. Other — specify which language
 ```
 
-Record the chosen language and use it for **all report content** — section headings, check descriptions, findings, and suggested actions. Do not proceed to the next step until the language is confirmed.
+Record the chosen language and use it for **all report content** — section headings, check descriptions, findings, and suggested actions.
+
+### Pre-condition — Verify Spec Readiness
+
+Before loading any spec, check each target arch spec for:
+- `Status` field: if `Draft` → assert: "This spec is in **Draft** status. Conformance results will be unreliable. Run `arch.spec.validate` first to confirm the spec is ready."
+- Open `[TODO: ...]` items: note their count upfront — these indicate areas where the spec's rules are incomplete, and violations in those areas may not be meaningful.
+
+**STOP if any spec is in Draft status and the user has not explicitly confirmed they want to proceed anyway.**
+
+---
 
 ### Step 1 — Define the Check Scope
 
@@ -119,9 +132,18 @@ Use Glob and Grep to gather evidence from the codebase within the defined scope.
 - Are there `TODO`, `FIXME`, or `HACK` comments that indicate intentional or unresolved architectural debt?
 - Are there commented-out blocks that suggest a recent deviation from the original design?
 
+#### G. Testability Conformance
+- Are components declared as unit-testable in the spec actually isolated from external dependencies in code (no direct infrastructure imports inside domain/business layers)?
+- Do components that the spec identifies as requiring mocking expose interfaces or abstract types rather than concrete implementations?
+- For integrations documented as requiring contract or integration tests, is there evidence of test infrastructure in the codebase (test helpers, mock servers, test configs, test fixtures)?
+
 ### Step 4 — Generate Conformance Report
 
 Produce the report using the format and output rules defined in `references/report-format.md`.
+
+After generating the report, assert based on the overall status:
+- **VIOLATION or PARTIAL:** "For violations resolved via **Option B** (intentional deviation): use `arch.spec.update` to capture the decision before the next check. Do not leave known violations unresolved in the spec."
+- **CONFORMANT:** "Architecture is aligned with the spec. Run this check periodically to detect drift."
 
 ## Additional Resources
 

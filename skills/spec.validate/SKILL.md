@@ -45,6 +45,20 @@ Record the chosen language and use it for **all report content** — section hea
 
 Find the spec file. Common locations: `docs/specs/`, `specs/`, or the path provided. Read the full document before running any checks.
 
+### Step 1.5 — Pre-scan: Detect Open TODO Items
+
+**This is a mandatory step before running any checks.**
+
+After reading the spec in Step 1, count all `[TODO: ...]` occurrences across the document. If any are found, use `AskUserQuestion` to ask:
+
+> "I found **N open TODO item(s)** in this spec. These will result in WARN or FAIL findings. Would you like to:
+> 1. **Resolve them first** with `spec.update` — for a cleaner validation report
+> 2. **Continue with validation as-is** — TODOs will be reported as findings"
+
+**STOP. Wait for the user's choice before proceeding.** If the user chooses to resolve TODOs first, end this skill and defer to `spec.update`.
+
+---
+
 ### Step 2 — Run Validation Checks
 
 Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** with a short explanation for each.
@@ -76,7 +90,8 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 - **Consistent terminology** — Key terms are used consistently throughout
 
 #### Consistency
-- **Criteria are testable** — Each acceptance criterion can be objectively verified *(may be N/A — see table above)*
+- **Criteria are testable** — Each acceptance criterion specifies an actor, an action, and an observable result. FAIL if any criterion uses vague language ("the system should work correctly", "it should be fast") without measurable definitions. WARN if criteria are not in Given/When/Then format but are otherwise unambiguous. *(may be N/A — see table above)*
+- **Error/edge cases covered** — At least one acceptance criterion addresses an error path, boundary condition, or edge case (not only happy path). *(may be N/A — see table above)*
 - **Interface matches design** — If APIs/interfaces are defined, they align with the described behavior *(may be N/A — see table above)*
 - **No contradictions** — Goals do not contradict the proposed solution or acceptance criteria
 
@@ -128,3 +143,4 @@ Produce the report in this format:
 - Overall Status is FAIL if any check is FAIL; WARN if any check is WARN and none are FAIL; PASS if all checks are PASS or N/A
 - If all checks pass: summarize the spec's strengths instead of listing recommended actions
 - If FAILs or actionable WARNs are present: end the report with an explicit recommendation to use `spec.update` to address them
+- **After a FAIL report:** assert explicitly — "**Do not use this spec as an implementation reference** and do not share it with the team until FAIL items are resolved. Use `spec.update` to address them before starting implementation."

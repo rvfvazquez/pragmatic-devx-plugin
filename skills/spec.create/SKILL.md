@@ -23,7 +23,29 @@ Use this skill when **no spec exists yet** and the user wants to formally docume
 
 ## How to Create a Spec
 
-### Pre-condition — Check for Existing Spec
+### Pre-condition 0 — Check for Project Constitution
+
+Before anything else, check whether `docs/constitution.md` exists.
+
+**If it does NOT exist:**
+
+Use `AskUserQuestion` to ask:
+
+> "No project constitution found at `docs/constitution.md`. A constitution defines cross-module rules, global stack decisions, and AI guardrails that apply to every spec — writing this feature spec without one may produce decisions that conflict with undocumented global constraints.
+>
+> Would you like to create a constitution first, or continue without one?"
+
+Options:
+- **Create constitution first** — end this skill now and run `project.constitution`. Return here after the constitution is created.
+- **Continue without it** — proceed. Note that global tech stack and cross-module constraints will not be enforced for this spec.
+
+**If it EXISTS:**
+
+Load `docs/constitution.md` in full and hold it as active context for the rest of this skill. It will be used in Step 4 to skip questions already answered globally and to flag any decisions that conflict with the constitution.
+
+---
+
+### Pre-condition 1 — Check for Existing Spec
 
 Before anything else, determine the `<feature-slug>` from the user's message and check whether `docs/specs/<feature-slug>.md` already exists.
 
@@ -119,6 +141,16 @@ Note any technology already committed to in the codebase — these don't need to
 ### Step 4 — Technology Discovery Interview
 
 **This is a mandatory step.** Ask the user targeted questions about technology decisions that are not already evident from the codebase. Do not make assumptions — let the user choose.
+
+**If a project constitution was loaded in Pre-condition 0:** Before asking any question in this step, check whether the constitution already answers it. If it does, do not ask — state the decision as inherited:
+
+> "Database: PostgreSQL (from project constitution — no choice needed)"
+
+If a technology option the user proposes conflicts with the constitution, flag it immediately:
+
+> "The constitution defines [X] as the only permitted [category]. Choosing [Y] would conflict with the project constitution. To proceed with [Y], update the constitution first via `project.constitution.update`."
+
+Do not silently accept a decision that violates the constitution.
 
 Use `AskUserQuestion` to ask. Group questions by concern to avoid overwhelming the user. Example format:
 

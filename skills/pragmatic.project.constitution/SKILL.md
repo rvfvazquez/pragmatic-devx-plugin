@@ -1,0 +1,251 @@
+﻿---
+name: pragmatic.project.constitution
+description: This skill should be used when the user asks to "create a project constitution", "define global project rules", "set up project governance", "create a constitution", "define what the AI can decide alone", "define cross-module rules", "document global architecture decisions", "establish project-wide constraints", or wants a single source of truth for decisions that apply across all modules, features, and architecture specs — above any individual arch spec or feature spec.
+---
+
+# pragmatic.project.constitution
+
+Create a project-wide governance document that defines what every agent, developer, and spec in this project must respect — regardless of module or feature.
+
+## Purpose
+
+Establish the rules that live above any individual arch spec or feature spec: project identity, non-negotiable tech stack decisions, cross-module constraints, and AI behavior guardrails. This document is loaded first — before any module arch spec or feature spec is read.
+
+## Lifecycle Position
+
+```
+[pragmatic.project.constitution] → pragmatic.project.constitution.update
+         ↓ read by
+pragmatic.spec.create · pragmatic.arch.spec.create · pragmatic.spec.build · pragmatic.spec.check
+```
+
+A constitution is created once and updated as global decisions evolve. It is not a spec — it has no acceptance criteria and is not validated against the codebase.
+
+## When This Skill Applies
+
+Use when:
+- No `docs/constitution.md` exists yet and the project needs global governance
+- The user wants to capture cross-module rules that no single arch spec owns
+- The user wants to define what the AI must always ask before deciding autonomously
+
+**Do not use when:**
+- A constitution already exists and the user wants to modify it → use `pragmatic.project.constitution.update`
+- The rule belongs to a specific module → use `pragmatic.arch.spec.create` or `pragmatic.arch.spec.update`
+
+---
+
+## How to Create a Constitution
+
+### Pre-condition — Check for Existing Constitution
+
+Check whether `docs/constitution.md` already exists.
+
+If it **exists**:
+> "A project constitution already exists at `docs/constitution.md`. This skill will **replace** it. Use `pragmatic.project.constitution.update` to make targeted changes instead.
+>
+> I will only continue if you explicitly confirm you want to replace the existing constitution."
+
+**STOP. Do not proceed until the user explicitly confirms.** If they want targeted changes, end this skill now.
+
+---
+
+### Step 0 — Language Detection
+
+Infer the document language before asking:
+1. If the user's message is ≥80% in a single language (pt-BR, es-ES, en-US), use it without asking
+2. If ambiguous, check existing docs in `docs/` for language uniformity
+3. If still ambiguous, use `AskUserQuestion`:
+
+```
+In which language would you like the constitution to be generated?
+
+1. pt-BR — Portuguese (Brazil)
+2. es-ES — Spanish (Spain)
+3. en-US — English (United States)
+4. Other — specify which language
+```
+
+Use the chosen language for all content in both output files.
+
+---
+
+### Step 1 — Scan Existing Context
+
+Before the discovery interview, read:
+- All files in `docs/arch/` — extract global patterns already decided (tech stack, communication style, naming conventions that repeat across multiple specs)
+- `.claude/rules/` — extract rules already in force
+- `CLAUDE.md` at project root — understand any existing project-level instructions
+- `docs/specs/` — scan a sample to infer the project domain and tech stack
+
+From this scan, build a preliminary picture of what the project already is. Bring decisions already documented into the discovery interview as defaults — do not ask the user to re-decide what is already evident. Only ask about what is genuinely unknown or not documented anywhere.
+
+---
+
+### Step 2 — Discovery Interview
+
+Use `AskUserQuestion` to fill the four areas of the constitution. Only ask what is NOT already clear from the Step 1 scan. Adapt the questions to the project context.
+
+**Area 1 — Project Identity**
+
+Ask about the project's nature and non-negotiable context:
+- What kind of product is it? (SaaS, internal tool, API platform, mobile backend, CLI, library...)
+- Who are the end users or customers?
+- Are there compliance requirements that are non-negotiable? (LGPD, GDPR, SOC2, PCI-DSS, HIPAA...)
+- Is this multi-tenant? If yes, what is the tenancy model and isolation boundary?
+
+**Area 2 — Global Tech Stack** (`multiSelect: true`)
+
+Ask which technology decisions apply to ALL modules — not just one:
+- Programming language(s) — is there more than one allowed?
+- Database engine(s) — which are permitted? Are any explicitly forbidden?
+- Infrastructure constraints (cloud provider, runtime, deployment model)?
+- Project-wide library standards (ORM, HTTP client, job queue, auth library)?
+
+**Area 3 — Cross-Module Rules** (`multiSelect: true`)
+
+Ask about rules that govern how modules interact with each other:
+- Is there a module that must be the single source of truth for a domain? (e.g., AuthModule owns all user identity — no module may maintain its own user store)
+- Are there modules that must never communicate directly? (must use events, queue, or gateway)
+- Is there a module that all outbound calls (HTTP, email, SMS) must route through?
+- Are there shared resources (DB, cache, queue) with rules on how all modules access them?
+
+**Area 4 — AI Behavior Guardrails** (`multiSelect: true`)
+
+Ask what the AI must ALWAYS stop and ask before deciding on its own:
+- Introducing a new third-party dependency?
+- Adding a new external service integration?
+- Creating a new database table or changing an existing schema?
+- Changing a public API contract (rename field, remove endpoint, change response shape)?
+- Choosing a technology not already in the project stack?
+
+**STOP. Do not generate any files until Areas 1 and 2 have enough content to produce a meaningful constitution.** Areas 3 and 4 may be left as "none defined yet" if the user has no cross-module rules or guardrails to declare — but this must be an explicit answer, not a skipped step.
+
+---
+
+### Step 3 — Generate `docs/constitution.md`
+
+If the `docs/` directory does not exist, create it. Create `docs/constitution.md` with this structure:
+
+```markdown
+# Project Constitution
+**Project:** <name>
+**Status:** Active
+**Language:** <language>
+**Last Updated:** <date>
+
+---
+
+## 1. Project Identity
+
+<description of what the project is, who it serves, compliance requirements, tenancy model>
+
+---
+
+## 2. Global Tech Stack
+
+Non-negotiable technology decisions that apply to every module. No spec or implementation may deviate from these without updating this constitution first.
+
+| Decision | Value | Rationale |
+|---|---|---|
+| Language | <value> | <why> |
+| Database | <value> | <why> |
+| <...> | <...> | <...> |
+
+---
+
+## 3. Cross-Module Rules
+
+Rules that govern interactions between modules. These rules do not belong to any single module's arch spec — they apply to all modules simultaneously.
+
+- **<Rule name>:** <description and rationale>
+
+---
+
+## 4. AI Behavior Guardrails
+
+Decisions the AI agent must NOT make autonomously. For each item, the agent must stop, present the situation clearly, and wait for explicit human approval before proceeding.
+
+- **<Guardrail name>:** <what triggers it and what the agent must do instead>
+
+---
+
+## Changelog
+
+| Date | Change | Reason |
+|---|---|---|
+| <date> | Initial constitution created | — |
+```
+
+Fill every section with concrete content. Use `— none defined yet —` only for areas where the user explicitly stated there are no constraints. Do not leave sections blank or with placeholder text.
+
+---
+
+### Step 4 — Generate `.claude/rules/00-project-constitution.md`
+
+Create `.claude/rules/` if it does not exist. Write `.claude/rules/00-project-constitution.md`.
+
+The `00-` prefix ensures this file is loaded before any module-specific rules files in every Claude Code session.
+
+Extract only **concrete, actionable rules** from sections 2, 3, and 4 of the constitution. Do not copy prose — translate decisions into directive statements the agent can act on during any session.
+
+```markdown
+# Project Constitution Rules
+# Source: docs/constitution.md
+# Generated: <date>
+# Scope: ALL modules · ALL features · ALL sessions
+# Priority: These rules take precedence over all module-specific arch rules.
+
+## Project Context
+<1–2 sentence summary of what the project is and its compliance context>
+
+## Global Stack Constraints
+- <directive, e.g.: "Only PostgreSQL is permitted as a database engine. Never suggest SQLite, MongoDB, or any other engine.">
+
+## Cross-Module Constraints
+- <directive, e.g.: "AuthModule is the single source of truth for user identity. No module may maintain its own user store or replicate identity data.">
+
+## AI Guardrails — Stop and Ask Before Deciding
+- <directive, e.g.: "Never add a third-party dependency without listing: package name, purpose, license, and why an existing dependency does not cover it. Present this and wait for confirmation — do not modify package.json before approval.">
+```
+
+Only include sections that have at least one rule. Omit empty sections entirely.
+
+---
+
+### Step 5 — Output Summary
+
+After writing both files:
+
+1. State the two file paths created
+2. List each rule extracted into `.claude/rules/00-project-constitution.md` by category
+3. List any areas explicitly marked as "none defined yet" — and what would typically trigger filling them
+4. State:
+
+> **These rules are now active.** Claude Code loads `.claude/rules/00-project-constitution.md` automatically at the start of every session. All future `pragmatic.spec.create`, `pragmatic.arch.spec.create`, and `pragmatic.spec.build` runs will use these as context.
+>
+> **Next step:** run `pragmatic.spec.create` for your first feature spec or `pragmatic.arch.spec.create` for the first module — the constitution will be read automatically.
+
+---
+
+## Output Locations
+
+```
+docs/constitution.md                       ← human-readable governance document
+.claude/rules/00-project-constitution.md  ← auto-loaded by Claude Code every session
+```
+
+## Constraint Priority
+
+The constitution sits at the top of the constraint hierarchy:
+
+```
+docs/constitution.md                      ← project constitution (this skill)
+  ↓ takes precedence over
+docs/arch/*.arch.md                       ← module arch specs
+  ↓ takes precedence over
+.claude/rules/<spec-name>-arch.md         ← generated module rules
+  ↓ takes precedence over
+Codebase conventions (inferred)
+```
+
+If a feature spec, arch spec, or implementation decision conflicts with the constitution, **stop and flag the conflict explicitly** — do not silently pick one side.

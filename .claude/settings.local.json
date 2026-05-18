@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch"
+      "WebSearch",
+      "Bash(git checkout *)",
+      "Bash(grep -rn \"use \\\\`spec\\\\.\\\\|use \\\\`arch\\\\.spec\\\\.\\\\|use \\\\`project\\\\.constitution\" skills/ --include=\"*.md\")",
+      "Bash(grep -rn \"\\\\`spec\\\\.\\\\|\\\\`arch\\\\.spec\\\\.\\\\|\\\\`project\\\\.constitution\" skills/ --include=\"*.md\")",
+      "Bash(git mv *)"
     ]
   }
 }

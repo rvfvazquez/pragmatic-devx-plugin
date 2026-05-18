@@ -18,13 +18,183 @@ claude plugin install pragmatic-devx-plugin@pragmatic-devx-plugin
 
 After installation, the skills activate automatically. No configuration needed — Claude detects your intent from the conversation and loads the right skill.
 
+## Skill Lifecycle
+
+The plugin organizes its skills into three layers. Each layer builds on the one above it — but you can start at any layer that matches your current need.
+
+```
+LAYER 0 ── Project Constitution  (once per project)
+LAYER 1 ── Arch Spec Track       (once per module)
+LAYER 2 ── Feature Spec Track    (once per feature)
+```
+
+### Big Picture
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║              pragmatic.project.constitution                      ║
+║  Project identity · global tech stack · cross-module rules       ║
+║  AI guardrails                  (auto-loaded every session)      ║
+╚══════════════════════════╤═══════════════════════════════════════╝
+                           │ consulted by every skill below
+          ┌────────────────┴─────────────────────────┐
+          │                                           │
+          ▼                                           │
+┌─────────────────────┐                              │
+│   ARCH SPEC TRACK   │                              │
+│                     │                              │
+│  arch.spec.create   │                              │
+│         │           │                              │
+│  arch.spec.validate │                              │
+│       │    ▲        │                              │
+│       │    └─ arch.spec.update (revise)            │
+│       │             │                              │
+│  arch.spec.check    │                              │
+│    │        │       │                              │
+│ CONFORM  NON-CONFORM│                              │
+│    │        │       │                              │
+│    │   Option A: fix code → re-check               │
+│    │   Option B: arch.spec.update → re-check       │
+└────┼────────────────┘                              │
+     │                                               │
+     │  arch rules flow into feature spec track      │
+     │  at three points (see below)                  │
+     │                                               ▼
+     │                              ┌────────────────────────────┐
+     │                              │   FEATURE SPEC TRACK       │
+     │                              │                            │
+     │   ┌── reads docs/arch/ ──────►  spec.create              │
+     │   │                          │       │                    │
+     │   │                          │  spec.validate             │
+     │   │                          │     │    ▲                 │
+     │   │                          │     │    └─ spec.update    │
+     │   │                          │     │       (revise)       │
+     │   │                          │     │                      │
+     │   ├── loads arch rules ───────►  spec.build              │
+     │   │   (constraint brief)     │       │                    │
+     │   │                          │  spec.check               │
+     │   └── enforces arch rules ───►    │       │              │
+     │                              │  PASS    FAIL             │
+     │                              │  (done)    │              │
+     │                              │         spec.update       │
+     │                              │         (and re-run)      │
+     └──────────────────────────────┴────────────────────────────┘
+```
+
+---
+
+### Layer 0 — Project Constitution
+
+Defined **once per project**, before any spec or arch work begins. The constitution is loaded automatically at every session and constrains all skills below it.
+
+> "Create a project constitution — we use TypeScript and PostgreSQL everywhere, AuthModule owns all user identity, and the AI must never add a new dependency without asking first."
+
+`pragmatic.project.constitution` runs a discovery interview (scanning existing `docs/arch/`, `.claude/rules/`, and `CLAUDE.md` first to avoid re-asking what's already decided), then writes two files:
+
+- `docs/constitution.md` — human-readable governance document with project identity, global tech stack decisions, cross-module rules, and AI guardrails
+- `.claude/rules/00-project-constitution.md` — directive form, prefixed `00-` so it loads before any module-specific rules in every session
+
+If a future spec, implementation, or arch decision conflicts with the constitution, the skill stops and flags the conflict explicitly — it never silently picks a side.
+
+---
+
+### Layer 1 — Arch Spec Track
+
+Defined **once per module**, before feature specs for that module are written. Arch specs act as rules files that the feature spec track reads automatically.
+
+```
+arch.spec.create → arch.spec.validate ──► arch.spec.check
+                          ▲                      │
+                   arch.spec.update ◄── NON-CONFORMANT (Option B)
+                                                 │
+                                        arch.spec.check (re-run)
+```
+
+**Step 1 — Document the architecture**
+
+> "Create an architecture spec for the payments module."
+
+`pragmatic.arch.spec.create` scans the codebase and generates `docs/arch/payments.arch.md` — component boundaries, ADRs, dependency direction, data flow, and NFRs.
+
+**Step 2 — Validate the spec document**
+
+> "Is the payments arch spec ready to use as reference?"
+
+`pragmatic.arch.spec.validate` reviews the document in isolation (not the code). Checks completeness, soundness (no circular coupling), clarity, and design quality. Outputs a grouped PASS / WARN / FAIL report.
+
+**Step 3 — Check code conformance**
+
+> "Does the payments code follow the arch spec?"
+
+`pragmatic.arch.spec.check` compares the live codebase against the declared rules via static analysis (file structure, imports, naming, dependency direction). Every violation includes a mandatory **How to Fix** block.
+
+**Step 4a — Fix the code (Option A)**
+
+The code is wrong. Fix it to match the spec, then re-run `pragmatic.arch.spec.check`.
+
+**Step 4b — Update the spec (Option B)**
+
+> "We adopted an anti-corruption layer — the spec hasn't caught up yet."
+
+`pragmatic.arch.spec.update` captures the decision as a new ADR (options, rationale, consequences), deprecates the superseded ADR, bumps the version, and appends a changelog entry. Re-run `pragmatic.arch.spec.check` to confirm the spec now describes reality.
+
+---
+
+### Layer 2 — Feature Spec Track
+
+Run **once per feature or story**, after the module's arch spec is in place (if one exists). The feature spec track reads arch rules at three points automatically — no extra configuration needed.
+
+```
+spec.create → spec.validate ──► spec.build → spec.check
+                   ▲                               │
+             spec.update ◄────────── FAIL ─────────┘
+```
+
+| Step | Skill reads arch spec | What it does with it |
+|---|---|---|
+| `spec.create` | yes | Respects module boundaries and technology decisions when drafting the spec |
+| `spec.build` | yes | Builds a constraint brief (dependency direction, naming, forbidden imports) before writing any code |
+| `spec.check` | yes | Enforces arch rules as additional conformance criteria alongside spec acceptance criteria |
+
+**Step 1 — Write the spec**
+
+> "Create a spec for the notifications module — it should support email and in-app channels."
+
+`pragmatic.spec.create` scans the codebase, reads the constitution and any arch specs in `docs/arch/`, then generates `docs/specs/notifications.md` with all sections filled in and `[TODO: ...]` markers for open decisions.
+
+**Step 2 — Validate it**
+
+> "Is the notifications spec ready for review?"
+
+`pragmatic.spec.validate` runs 20+ checks (completeness, clarity, consistency, unresolved TODOs) and outputs a PASS / WARN / FAIL report — without touching the file.
+
+**Step 3 — Resolve open items (if needed)**
+
+> "Fill in the TODO for delivery ordering and bump the version."
+
+`pragmatic.spec.update` preserves history, increments the version, and appends a changelog entry. Re-run `pragmatic.spec.validate` until the spec passes.
+
+**Step 4 — Implement**
+
+> "Implement the notifications spec — it's approved."
+
+`pragmatic.spec.build` reads the spec and arch rules, builds a constraint brief, then implements each acceptance criterion as a tracked task with test stubs in Given/When/Then format.
+
+**Step 5 — Verify**
+
+> "Check if the notifications implementation matches the spec."
+
+`pragmatic.spec.check` compares the live code against every acceptance criterion and applicable arch rules. Returns PASS (done) or FAIL with a diff-style report linking each gap to the criterion it violates.
+
+---
+
 ## Skills
 
 These are **context-triggered skills**, not slash commands. Just describe what you want in natural language and Claude will apply the right skill automatically.
 
 ---
 
-### `spec.create`
+### `pragmatic.spec.create`
 
 Creates a structured technical specification document for a feature, story, or module.
 
@@ -44,7 +214,7 @@ Claude will scan the codebase for existing patterns, then generate `docs/specs/u
 
 ---
 
-### `spec.update`
+### `pragmatic.spec.update`
 
 Updates an existing specification with new requirements, corrections, or decisions.
 
@@ -64,7 +234,7 @@ Claude will update the relevant sections, bump the version to `1.1.0`, mark the 
 
 ---
 
-### `spec.validate`
+### `pragmatic.spec.validate`
 
 Validates a specification for completeness, clarity, and consistency.
 
@@ -94,7 +264,28 @@ Overall Status: WARN
 
 ---
 
-### `arch.spec.create`
+### `pragmatic.project.constitution`
+
+Creates a project-wide governance document that defines what every agent, developer, and spec in the project must respect — regardless of module or feature.
+
+Generates two artifacts: `docs/constitution.md` (human-readable governance document) and `.claude/rules/00-project-constitution.md` (auto-loaded by Claude Code every session). Covers project identity, non-negotiable tech stack decisions, cross-module constraints, and AI behavior guardrails.
+
+**Triggers when you say things like:**
+- "Create a project constitution"
+- "Define the global rules for this project"
+- "Set up project governance"
+- "Define what the AI can decide alone"
+- "Document global architecture decisions"
+
+**Example:**
+
+> You: "Create a project constitution — we use TypeScript and PostgreSQL everywhere, AuthModule owns all user identity, and the AI must never add a new dependency without asking first."
+
+Claude will scan existing `docs/arch/`, `.claude/rules/`, and `CLAUDE.md` for decisions already in force, run a discovery interview for anything not yet documented, then generate `docs/constitution.md` with all four sections (project identity, global tech stack, cross-module rules, AI guardrails) and extract concrete directives into `.claude/rules/00-project-constitution.md` — loaded automatically in every future session.
+
+---
+
+### `pragmatic.arch.spec.create`
 
 Creates a software architecture technical specification document for a system, module, layer, or integration.
 
@@ -116,7 +307,7 @@ Claude will scan the codebase for existing patterns, then generate `docs/arch/no
 
 ---
 
-### `arch.spec.check`
+### `pragmatic.arch.spec.check`
 
 Verifies whether the actual project code and structure conform to the rules declared in one or more architecture tech spec documents.
 
@@ -152,7 +343,7 @@ Overall Status: PARTIAL
 
 ---
 
-### `arch.spec.validate`
+### `pragmatic.arch.spec.validate`
 
 Validates an architecture tech spec for completeness, consistency, and architectural soundness.
 
@@ -189,11 +380,11 @@ None.
 
 ---
 
-### `arch.spec.update`
+### `pragmatic.arch.spec.update`
 
 Updates an existing architecture tech spec with new architectural decisions, corrections, or intentional deviations.
 
-Preserves existing ADRs, increments the version semantically (patch/minor/major), deprecates superseded decisions without deleting history, and appends a changelog entry. This is the natural next step when `arch.spec.check` identifies a violation resolved via **Option B** — the code reflects an intentional evolution the spec has not yet captured.
+Preserves existing ADRs, increments the version semantically (patch/minor/major), deprecates superseded decisions without deleting history, and appends a changelog entry. This is the natural next step when `pragmatic.arch.spec.check` identifies a violation resolved via **Option B** — the code reflects an intentional evolution the spec has not yet captured.
 
 **Triggers when you say things like:**
 - "Update the payments arch spec — we adopted the anti-corruption layer"
@@ -209,13 +400,13 @@ Claude will confirm the scope of the change, capture the decision as a new ADR (
 
 ---
 
-### `spec.build`
+### `pragmatic.spec.build`
 
 Translates an approved technical specification into a working implementation — guided by the spec, architecture documents in `docs/arch/`, and project rules in `.claude/rules/`.
 
 Before writing a single line of code, synthesizes all constraints: technology decisions from the spec, component boundaries and dependency rules from architecture docs, and naming conventions from project rules. Then implements each acceptance criterion as a tracked task, generating test stubs in Given/When/Then format alongside the implementation.
 
-The definition of done is explicit: `spec.check` returning PASS.
+The definition of done is explicit: `pragmatic.spec.check` returning PASS.
 
 **Triggers when you say things like:**
 - "Implement the spec for the notifications module"
@@ -228,7 +419,7 @@ The definition of done is explicit: `spec.check` returning PASS.
 
 > You: "Implement docs/specs/user-authentication.md — the spec is approved."
 
-Claude will read the spec, scan `docs/arch/` for applicable architecture rules (dependency direction, naming conventions, forbidden imports), read `.claude/rules/` for project-level constraints, then build a constraint brief before writing any code. Implementation proceeds criterion by criterion, each tracked as a todo task, with test stubs generated in Given/When/Then format. Ends with an explicit prompt to run `spec.check` as the conformance gate.
+Claude will read the spec, scan `docs/arch/` for applicable architecture rules (dependency direction, naming conventions, forbidden imports), read `.claude/rules/` for project-level constraints, then build a constraint brief before writing any code. Implementation proceeds criterion by criterion, each tracked as a todo task, with test stubs generated in Given/When/Then format. Ends with an explicit prompt to run `pragmatic.spec.check` as the conformance gate.
 
 ---
 
@@ -240,25 +431,27 @@ pragmatic-devx-plugin/
 │   ├── plugin.json                # Plugin manifest (name, description, author)
 │   └── marketplace.json           # Marketplace registry (lists this plugin)
 ├── skills/
-│   ├── spec.create/
+│   ├── pragmatic.project.constitution/
+│   │   └── SKILL.md
+│   ├── pragmatic.spec.create/
 │   │   ├── SKILL.md               # Skill definition & trigger logic
 │   │   └── references/
 │   │       └── template.md        # Spec document template
-│   ├── spec.update/
+│   ├── pragmatic.spec.update/
 │   │   └── SKILL.md
-│   ├── spec.validate/
+│   ├── pragmatic.spec.validate/
 │   │   └── SKILL.md
-│   ├── spec.build/
+│   ├── pragmatic.spec.build/
 │   │   └── SKILL.md
-│   ├── arch.spec.create/
+│   ├── pragmatic.arch.spec.create/
 │   │   ├── SKILL.md
 │   │   └── references/
 │   │       └── template.md        # Architecture tech spec template
-│   ├── arch.spec.validate/
+│   ├── pragmatic.arch.spec.validate/
 │   │   └── SKILL.md
-│   ├── arch.spec.check/
+│   ├── pragmatic.arch.spec.check/
 │   │   └── SKILL.md
-│   └── arch.spec.update/
+│   └── pragmatic.arch.spec.update/
 │       └── SKILL.md
 ├── LICENSE
 └── README.md

@@ -209,6 +209,29 @@ Claude will confirm the scope of the change, capture the decision as a new ADR (
 
 ---
 
+### `spec.build`
+
+Translates an approved technical specification into a working implementation — guided by the spec, architecture documents in `docs/arch/`, and project rules in `.claude/rules/`.
+
+Before writing a single line of code, synthesizes all constraints: technology decisions from the spec, component boundaries and dependency rules from architecture docs, and naming conventions from project rules. Then implements each acceptance criterion as a tracked task, generating test stubs in Given/When/Then format alongside the implementation.
+
+The definition of done is explicit: `spec.check` returning PASS.
+
+**Triggers when you say things like:**
+- "Implement the spec for the notifications module"
+- "Build this feature from docs/specs/user-authentication.md"
+- "Start implementing the payment flow spec"
+- "Code this feature following the spec"
+- "Build based on the approved spec"
+
+**Example:**
+
+> You: "Implement docs/specs/user-authentication.md — the spec is approved."
+
+Claude will read the spec, scan `docs/arch/` for applicable architecture rules (dependency direction, naming conventions, forbidden imports), read `.claude/rules/` for project-level constraints, then build a constraint brief before writing any code. Implementation proceeds criterion by criterion, each tracked as a todo task, with test stubs generated in Given/When/Then format. Ends with an explicit prompt to run `spec.check` as the conformance gate.
+
+---
+
 ## Project Structure
 
 ```
@@ -224,6 +247,8 @@ pragmatic-devx-plugin/
 │   ├── spec.update/
 │   │   └── SKILL.md
 │   ├── spec.validate/
+│   │   └── SKILL.md
+│   ├── spec.build/
 │   │   └── SKILL.md
 │   ├── arch.spec.create/
 │   │   ├── SKILL.md

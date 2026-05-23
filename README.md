@@ -1,7 +1,7 @@
 ﻿# pragmatic-devx-plugin
 
 <div align="center">
-  <img src="pragmatic_devx_plugin.png" width="100px" alt="GitHub Readme Stats" />
+  <img src="pragmatic_devx_plugin.png" width="450px" alt="GitHub Readme Stats" />
   <h1 style="font-size: 28px; margin: 10px 0;">Pragmatic Devx Plugin</h1>
   <p>Spec Driven Development!</p>
 </div>

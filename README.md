@@ -1,5 +1,11 @@
 ﻿# pragmatic-devx-plugin
 
+<div align="center">
+  <img src="pragmatic_devx_plugin.png" width="100px" alt="GitHub Readme Stats" />
+  <h1 style="font-size: 28px; margin: 10px 0;">Pragmatic Devx Plugin</h1>
+  <p>Spec Driven Development!</p>
+</div>
+
 Claude Code plugin focused on Developer Experience — structured specs, architecture documentation, and pragmatic engineering patterns.
 
 ## Installation

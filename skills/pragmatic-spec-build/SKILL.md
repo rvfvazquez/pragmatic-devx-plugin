@@ -33,6 +33,19 @@ Use this skill when a spec **exists and is not in Draft status** and the user wa
 
 ---
 
+<HARD-GATE>
+Do NOT write any implementation code, create any files, or scaffold any structure until the spec Status is confirmed as Review or Approved AND has no open [TODO: ...] items in technology decisions or acceptance criteria.
+
+This applies even if:
+- The user says they know the spec is ready
+- The spec is "almost done" or "good enough to start"
+- This is a prototype or proof of concept
+
+If the spec is in Draft status or has unresolved TODOs: STOP. Run `pragmatic-spec-validate` and `pragmatic-spec-update` first. Then return to this skill.
+</HARD-GATE>
+
+---
+
 ## How to Build from a Spec
 
 ### Pre-condition — Verify Spec Readiness

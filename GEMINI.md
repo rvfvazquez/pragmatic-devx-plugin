@@ -1,0 +1,12 @@
+@./skills/pragmatic-howto/SKILL.md
+@./skills/pragmatic-project-constitution/SKILL.md
+@./skills/pragmatic-project-constitution-update/SKILL.md
+@./skills/pragmatic-spec-create/SKILL.md
+@./skills/pragmatic-spec-update/SKILL.md
+@./skills/pragmatic-spec-validate/SKILL.md
+@./skills/pragmatic-spec-build/SKILL.md
+@./skills/pragmatic-spec-check/SKILL.md
+@./skills/pragmatic-arch-spec-create/SKILL.md
+@./skills/pragmatic-arch-spec-update/SKILL.md
+@./skills/pragmatic-arch-spec-validate/SKILL.md
+@./skills/pragmatic-arch-spec-check/SKILL.md

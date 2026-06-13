@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -d .*-plugin)",
+      "Bash(ls GEMINI.md gemini-extension.json)",
+      "Bash(ls *.md scripts/ tests/)",
+      "Bash(bash scripts/bump-version.sh 0.4.0)",
+      "Bash(bash scripts/bump-version.sh 0.5.0)",
+      "Bash(git config *)",
+      "Bash(ln -s CLAUDE.md AGENTS_TEST.md)",
+      "Bash(rm -f AGENTS_TEST.md)",
+      "Bash(bash scripts/sync-agents.sh)"
+    ]
+  }
+}

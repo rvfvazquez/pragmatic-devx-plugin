@@ -1,0 +1,1 @@
+We adopted a new database — Redis for caching. I need to add this to our project constitution as a permitted technology in the global tech stack, alongside the rationale for it.

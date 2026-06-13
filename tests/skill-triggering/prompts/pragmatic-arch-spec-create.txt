@@ -1,0 +1,1 @@
+I need to document the architecture of our API gateway module — the component boundaries, how requests flow through it, the patterns we're using, and the key decisions we made. Can you write an architecture document for it?

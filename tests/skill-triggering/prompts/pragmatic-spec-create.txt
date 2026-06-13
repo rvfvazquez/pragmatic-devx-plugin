@@ -1,0 +1,1 @@
+I need to document the user authentication feature as a technical specification. It should cover registration, login with JWT, password reset via email, and protected routes. Can you write the spec?

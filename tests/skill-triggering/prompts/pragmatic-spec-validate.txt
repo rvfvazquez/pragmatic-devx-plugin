@@ -1,0 +1,1 @@
+I've written a spec for the payments feature at docs/specs/payments.md. Is it complete and ready to be implemented? Can you check if there's anything missing or ambiguous?

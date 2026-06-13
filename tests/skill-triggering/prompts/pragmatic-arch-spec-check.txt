@@ -1,0 +1,1 @@
+We have an architecture spec at docs/arch/api-gateway.arch.md. Does our actual codebase follow what we documented? Are there any components violating the boundaries or dependencies going in the wrong direction?

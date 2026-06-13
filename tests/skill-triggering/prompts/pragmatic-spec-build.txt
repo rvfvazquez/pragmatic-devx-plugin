@@ -1,0 +1,1 @@
+The authentication spec at docs/specs/auth.md has been approved. Let's implement it now — start building the feature based on what the spec says.

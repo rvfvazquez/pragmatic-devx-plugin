@@ -1,0 +1,1 @@
+We decided to switch the data layer from direct SQL to an ORM. This changes a key architectural decision we documented in docs/arch/data-layer.arch.md. Can you update the architecture spec to reflect this and add an ADR for the decision?

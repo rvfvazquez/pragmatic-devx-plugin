@@ -1,0 +1,1 @@
+We decided to also support Apple Pay in the payments flow. The spec at docs/specs/payments.md needs to be updated to reflect this new requirement and the technology decision we made.

@@ -1,0 +1,1 @@
+We finished implementing the authentication module. Does the code we wrote actually match what the spec at docs/specs/auth.md requires? Can you verify the acceptance criteria were all covered?

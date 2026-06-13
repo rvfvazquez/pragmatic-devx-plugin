@@ -1,0 +1,41 @@
+{
+  "name": "pragmatic-devx-plugin",
+  "version": "0.5.0",
+  "description": "Structured specs, architecture documentation, and pragmatic engineering patterns for developer experience.",
+  "author": {
+    "name": "rvfvazquez",
+    "url": "https://github.com/rvfvazquez"
+  },
+  "homepage": "https://github.com/rvfvazquez/pragmatic-devx-plugin",
+  "repository": "https://github.com/rvfvazquez/pragmatic-devx-plugin",
+  "license": "MIT",
+  "keywords": [
+    "specs",
+    "architecture",
+    "developer-experience",
+    "documentation",
+    "pragmatic"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Pragmatic DevX",
+    "shortDescription": "Structured spec and architecture workflows for engineering teams",
+    "longDescription": "Use Pragmatic DevX to guide teams through feature specification, architecture documentation, project constitution, and spec-driven implementation — from first draft to conformance check.",
+    "developerName": "rvfvazquez",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Create a spec for this feature.",
+      "Document the architecture of this module.",
+      "Build this feature from the spec."
+    ],
+    "websiteURL": "https://github.com/rvfvazquez/pragmatic-devx-plugin",
+    "composerIcon": "./assets/icon-small.svg",
+    "logo": "./assets/logo.svg",
+    "screenshots": []
+  }
+}

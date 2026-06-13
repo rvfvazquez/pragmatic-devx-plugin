@@ -29,7 +29,7 @@ Use when:
 - The user wants to define what the AI must always ask before deciding autonomously
 
 **Do not use when:**
-- A constitution already exists and the user wants to modify it → use `pragmatic-project-constitution-update`
+- A constitution already exists and the user wants to modify it → use `pragmatic-project-constitution-update` ✓ *this skill exists*
 - The rule belongs to a specific module → use `pragmatic-arch-spec-create` or `pragmatic-arch-spec-update`
 
 ---
@@ -41,7 +41,7 @@ Use when:
 Check whether `docs/constitution.md` already exists.
 
 If it **exists**:
-> "A project constitution already exists at `docs/constitution.md`. This skill will **replace** it. Use `pragmatic-project-constitution-update` to make targeted changes instead.
+> "A project constitution already exists at `docs/constitution.md`. This skill will **replace** it. Use `pragmatic-project-constitution-update` (available) to make targeted changes instead.
 >
 > I will only continue if you explicitly confirm you want to replace the existing constitution."
 

@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# SessionStart hook for pragmatic-devx plugin
+#
+# Injects project state (constitution, specs, arch specs) into session context.
+# Outputs nothing if no pragmatic documentation exists in the project —
+# safe to coexist with superpowers and other plugins.
+
+set -euo pipefail
+
+# Resolve project root (where the user opened the session, not plugin root)
+PROJECT_ROOT="${PWD}"
+
+# ── Scan for pragmatic artifacts ─────────────────────────────────────────────
+
+constitution_path="${PROJECT_ROOT}/docs/constitution.md"
+specs_dir="${PROJECT_ROOT}/docs/specs"
+arch_dir="${PROJECT_ROOT}/docs/arch"
+
+has_constitution=false
+spec_files=()
+arch_files=()
+
+[ -f "$constitution_path" ] && has_constitution=true
+
+if [ -d "$specs_dir" ]; then
+    while IFS= read -r -d '' f; do
+        spec_files+=("$(basename "$f")")
+    done < <(find "$specs_dir" -maxdepth 1 -name "*.md" -print0 2>/dev/null | sort -z)
+fi
+
+if [ -d "$arch_dir" ]; then
+    while IFS= read -r -d '' f; do
+        arch_files+=("$(basename "$f")")
+    done < <(find "$arch_dir" -maxdepth 1 -name "*.md" -print0 2>/dev/null | sort -z)
+fi
+
+# ── Exit silently if no pragmatic artifacts found ────────────────────────────
+# This keeps the plugin invisible in projects that don't use pragmatic docs,
+# and avoids any noise alongside superpowers or other plugins.
+
+if ! $has_constitution && [ ${#spec_files[@]} -eq 0 ] && [ ${#arch_files[@]} -eq 0 ]; then
+    exit 0
+fi
+
+# ── Build context message ─────────────────────────────────────────────────────
+
+lines=()
+lines+=("Pragmatic DevX documentation found in this project:")
+lines+=("")
+
+if $has_constitution; then
+    lines+=("Constitution: docs/constitution.md ✓")
+else
+    lines+=("Constitution: not found — consider running pragmatic-project-constitution")
+fi
+
+if [ ${#spec_files[@]} -gt 0 ]; then
+    lines+=("Feature specs (${#spec_files[@]}): ${spec_files[*]}")
+else
+    lines+=("Feature specs: none")
+fi
+
+if [ ${#arch_files[@]} -gt 0 ]; then
+    lines+=("Architecture specs (${#arch_files[@]}): ${arch_files[*]}")
+else
+    lines+=("Architecture specs: none")
+fi
+
+lines+=("")
+lines+=("Use the pragmatic-howto skill for the full skill map and lifecycle guide.")
+
+context_body=$(printf '%s\n' "${lines[@]}")
+context="<pragmatic-project-context>"$'\n'"${context_body}"$'\n'"</pragmatic-project-context>"
+
+# ── Escape for JSON embedding ─────────────────────────────────────────────────
+
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+context_escaped=$(escape_for_json "$context")
+
+# ── Output in platform-appropriate JSON format ────────────────────────────────
+# Mirrors superpowers platform detection to match each harness's expected schema.
+
+if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+    printf '{\n  "additional_context": "%s"\n}\n' "$context_escaped"
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+    printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$context_escaped"
+else
+    printf '{\n  "additionalContext": "%s"\n}\n' "$context_escaped"
+fi
+
+exit 0

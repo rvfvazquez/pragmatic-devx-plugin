@@ -1,0 +1,1 @@
+We have an architecture spec at docs/arch/api-gateway.arch.md. Is it complete? Are the ADRs properly documented? Is it ready to be used as a reference by the team?

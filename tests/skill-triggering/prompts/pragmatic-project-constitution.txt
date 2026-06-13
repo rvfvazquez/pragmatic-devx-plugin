@@ -1,0 +1,1 @@
+I want to establish global rules for my project that all modules and features must follow — things like which database we use, naming conventions, what decisions the AI can make autonomously, and cross-module constraints. How do I do that?

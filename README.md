@@ -4,6 +4,8 @@ Claude Code plugin focused on Developer Experience — structured specs, archite
 
 ## Installation
 
+### Claude Code
+
 **1. Add the marketplace:**
 
 ```bash
@@ -16,7 +18,59 @@ claude plugin marketplace add https://github.com/rvfvazquez/pragmatic-devx-plugi
 claude plugin install pragmatic-devx-plugin@pragmatic-devx-plugin
 ```
 
-After installation, the skills activate automatically. No configuration needed — Claude detects your intent from the conversation and loads the right skill.
+Skills activate automatically. Claude detects intent from the conversation and loads the right skill. The SessionStart hook injects your project's constitution and spec summary into context at the start of every session.
+
+---
+
+### Codex (OpenAI)
+
+**1. Clone the repository:**
+
+```bash
+git clone https://github.com/rvfvazquez/pragmatic-devx-plugin.git ~/pragmatic-devx-plugin
+```
+
+**2. Register the plugin:**
+
+```bash
+codex plugin add ~/pragmatic-devx-plugin
+```
+
+The `.codex-plugin/plugin.json` manifest is picked up automatically. Skills load when Codex detects matching intent.
+
+---
+
+### Gemini CLI
+
+**1. Clone the repository:**
+
+```bash
+git clone https://github.com/rvfvazquez/pragmatic-devx-plugin.git ~/pragmatic-devx-plugin
+```
+
+**2. Install the extension:**
+
+```bash
+gemini extension install ~/pragmatic-devx-plugin
+```
+
+The extension is registered via `gemini-extension.json`. At session start, Gemini loads `GEMINI.md` which references all 12 skill files — no further configuration needed.
+
+---
+
+### Cursor
+
+**1. Clone the repository:**
+
+```bash
+git clone https://github.com/rvfvazquez/pragmatic-devx-plugin.git ~/pragmatic-devx-plugin
+```
+
+**2. Register the plugin in Cursor settings:**
+
+Open **Settings → Features → Custom plugins** and add the path to the cloned directory. The `.cursor-plugin/plugin.json` manifest is picked up automatically.
+
+Skills load as conversation context when Cursor detects matching intent. The SessionStart hook injects project constitution and spec state into each new session.
 
 ## Skill Lifecycle
 
@@ -428,31 +482,66 @@ Claude will read the spec, scan `docs/arch/` for applicable architecture rules (
 ```
 pragmatic-devx-plugin/
 ├── .claude-plugin/
-│   ├── plugin.json                # Plugin manifest (name, description, author)
-│   └── marketplace.json           # Marketplace registry (lists this plugin)
+│   ├── plugin.json                # Claude Code manifest
+│   ├── marketplace.json           # Marketplace registry
+│   └── hooks/
+│       └── hooks.json             # SessionStart hook (Claude Code)
+├── .codex-plugin/
+│   └── plugin.json                # Codex adapter manifest
+├── .cursor-plugin/
+│   └── plugin.json                # Cursor adapter manifest
+├── GEMINI.md                      # Gemini skill index (12 @./skills/ references)
+├── gemini-extension.json          # Gemini extension manifest
+├── hooks/
+│   ├── hooks.json                 # SessionStart hook definition
+│   ├── hooks-cursor.json          # Cursor-specific hook definition
+│   ├── run-hook.cmd               # Cross-platform hook runner (Windows/Unix)
+│   └── session-start              # Hook script — injects project context
 ├── skills/
+│   ├── pragmatic-howto/
+│   │   ├── SKILL.md               # Bootstrap skill — maps all skills and lifecycle
+│   │   └── references/
+│   │       └── skill-map.md       # Full per-skill reference
 │   ├── pragmatic-project-constitution/
 │   │   └── SKILL.md
+│   ├── pragmatic-project-constitution-update/
+│   │   └── SKILL.md
 │   ├── pragmatic-spec-create/
-│   │   ├── SKILL.md               # Skill definition & trigger logic
+│   │   ├── SKILL.md
 │   │   └── references/
-│   │       └── template.md        # Spec document template
+│   │       └── template.md        # Feature spec template
 │   ├── pragmatic-spec-update/
 │   │   └── SKILL.md
 │   ├── pragmatic-spec-validate/
 │   │   └── SKILL.md
 │   ├── pragmatic-spec-build/
+│   │   └── SKILL.md               # Includes HARD-GATE: blocks execution on Draft specs
+│   ├── pragmatic-spec-check/
 │   │   └── SKILL.md
 │   ├── pragmatic-arch-spec-create/
 │   │   ├── SKILL.md
 │   │   └── references/
-│   │       └── template.md        # Architecture tech spec template
+│   │       └── template.md        # Architecture spec template
 │   ├── pragmatic-arch-spec-validate/
 │   │   └── SKILL.md
 │   ├── pragmatic-arch-spec-check/
 │   │   └── SKILL.md
 │   └── pragmatic-arch-spec-update/
 │       └── SKILL.md
+├── assets/
+│   ├── logo.svg                   # 100×100 plugin logo
+│   └── icon-small.svg             # 32×32 compact icon
+├── scripts/
+│   ├── bump-version.sh            # Updates version in all 5 manifests atomically
+│   └── sync-agents.sh             # Syncs CLAUDE.md → AGENTS.md
+├── tests/
+│   └── skill-triggering/
+│       ├── run-test.sh            # Single-skill trigger test
+│       ├── run-all.sh             # Runs all prompts, reports PASS/FAIL
+│       └── prompts/               # 12 natural-language trigger prompts (one per skill)
+├── AGENTS.md                      # Mirror of CLAUDE.md for Codex/OpenAI agents
+├── CLAUDE.md                      # AI agent contributor guidelines
+├── RELEASE-NOTES.md               # Version history
 ├── LICENSE
 └── README.md
 ```

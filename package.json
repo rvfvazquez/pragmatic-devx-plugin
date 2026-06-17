@@ -1,0 +1,22 @@
+{
+  "name": "pragmatic-devx-plugin",
+  "version": "0.5.0",
+  "description": "Structured specs, architecture documentation, and pragmatic engineering patterns.",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "skills",
+    "specs",
+    "architecture",
+    "developer-experience",
+    "pragmatic"
+  ],
+  "pi": {
+    "extensions": [
+      "./.pi/extensions/pragmatic-devx.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  }
+}

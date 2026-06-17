@@ -78,6 +78,16 @@ Open **Settings → Features → Custom plugins** and add the path to the cloned
 
 Skills load as conversation context when Cursor detects matching intent. The SessionStart hook injects project constitution and spec state into each new session.
 
+---
+
+### Antigravity (agy)
+
+```bash
+agy plugin install https://github.com/rvfvazquez/pragmatic-devx-plugin
+```
+
+Antigravity reads `package.json` → `"pi"` section, loads `.pi/extensions/pragmatic-devx.ts`, and registers the `skills/` directory for skill discovery. At session start, the extension injects `pragmatic-howto` as bootstrap context so the agent knows the full skill map without an explicit prompt.
+
 ## Skill Lifecycle
 
 The plugin organizes its skills into three layers. Each layer builds on the one above it — but you can start at any layer that matches your current need.
@@ -496,6 +506,9 @@ pragmatic-devx-plugin/
 │   └── plugin.json                # Codex adapter manifest
 ├── .cursor-plugin/
 │   └── plugin.json                # Cursor adapter manifest
+├── .pi/
+│   └── extensions/
+│       └── pragmatic-devx.ts      # Antigravity (agy) Pi extension
 ├── GEMINI.md                      # Gemini skill index (12 @./skills/ references)
 ├── gemini-extension.json          # Gemini extension manifest
 ├── hooks/
@@ -545,6 +558,7 @@ pragmatic-devx-plugin/
 │       ├── run-test.sh            # Single-skill trigger test
 │       ├── run-all.sh             # Runs all prompts, reports PASS/FAIL
 │       └── prompts/               # 12 natural-language trigger prompts (one per skill)
+├── package.json                   # Pi/Antigravity manifest (pi.extensions + pi.skills)
 ├── AGENTS.md                      # Mirror of CLAUDE.md for Codex/OpenAI agents
 ├── CLAUDE.md                      # AI agent contributor guidelines
 ├── RELEASE-NOTES.md               # Version history

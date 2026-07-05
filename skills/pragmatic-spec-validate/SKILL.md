@@ -144,3 +144,5 @@ Produce the report in this format:
 - If all checks pass: summarize the spec's strengths instead of listing recommended actions
 - If FAILs or actionable WARNs are present: end the report with an explicit recommendation to use `pragmatic-spec-update` to address them
 - **After a FAIL report:** assert explicitly — "**Do not use this spec as an implementation reference** and do not share it with the team until FAIL items are resolved. Use `pragmatic-spec-update` to address them before starting implementation."
+- **After a WARN report:** close with: "Spec can proceed to implementation. Consider resolving WARN items with `pragmatic-spec-update` before building. When ready, run `pragmatic-spec-build` against this spec."
+- **After a PASS report:** close with: "Spec is ready for implementation. Run `pragmatic-spec-build` against `docs/specs/<feature-slug>.md` to start."

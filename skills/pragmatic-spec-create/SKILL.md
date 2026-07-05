@@ -215,7 +215,12 @@ After writing the file:
 2. Summarize the key decisions captured, especially technology choices
 3. List any `[TODO: ...]` items that remain open, indicating who needs to decide
 
-**Next step:** run `pragmatic-spec-validate` to verify completeness before sharing with the team or starting implementation.
+---
+
+> **Spec created** — `docs/specs/<feature-slug>.md` (Status: Draft).
+>
+> **Next step:** Run `pragmatic-spec-validate` to check completeness before sharing with the team or starting implementation.
+> FAIL or WARN items → resolve with `pragmatic-spec-update` → re-validate until PASS → then proceed to `pragmatic-spec-build`.
 
 ## Output Location
 

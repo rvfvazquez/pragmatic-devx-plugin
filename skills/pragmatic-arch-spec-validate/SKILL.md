@@ -159,7 +159,8 @@ Optional improvements.
 - For each WARN, provide a concrete, actionable suggestion
 - If all checks pass, summarize architectural strengths and confirm readiness for approval
 - **After a FAIL report:** assert explicitly — "**Do not run `pragmatic-arch-spec-check` against this spec** and do not use it as an implementation reference until FAIL items are resolved. Use `pragmatic-arch-spec-update` to address them."
-- **Next step after PASS:** run `pragmatic-arch-spec-check` to verify the codebase conforms to this spec
+- **After a WARN report:** close with: "Arch spec can proceed to conformance check. Consider resolving WARN items with `pragmatic-arch-spec-update` first. When ready, run `pragmatic-arch-spec-check`."
+- **After a PASS report:** close with: "Arch spec is sound and ready. Run `pragmatic-arch-spec-check` to verify the codebase conforms to this spec."
 
 ### Step 4 — Generate Claude Rules (Optional, PASS only)
 

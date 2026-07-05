@@ -218,14 +218,16 @@ Mark the corresponding `TodoWrite` task complete immediately after implementing 
 <HARD-GATE>
 Do NOT declare the implementation complete, say "done", or express satisfaction until you have run `pragmatic-spec-check` against this spec and its output shows PASS for all acceptance criteria.
 
-"I believe all criteria are implemented" is not evidence.
-
 Run the check. Show the output. Only then claim completion.
 
-This applies even if:
-- All TodoWrite tasks are marked complete
-- The code compiles and tests pass locally
-- The user says they're satisfied
+| Rationalization | Reality |
+|---|---|
+| "I believe all criteria are implemented" | Belief ≠ evidence. Run the check. |
+| "All TodoWrite tasks are marked complete" | Task completion ≠ spec conformance. |
+| "The code compiles and tests pass locally" | Local tests ≠ spec criteria coverage. |
+| "The user said they're satisfied" | The spec is the contract, not the conversation. |
+| "spec-check is overkill for this" | No exceptions — one FAIL missed is a bug shipped. |
+| "This is a prototype / proof of concept" | The spec defines done. Run the check. |
 
 If `pragmatic-spec-check` returns FAIL or PARTIAL: address the gaps, re-run, confirm PASS. Then close.
 </HARD-GATE>

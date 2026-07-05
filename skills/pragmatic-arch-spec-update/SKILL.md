@@ -191,4 +191,6 @@ Report:
 2. Any remaining `[TODO: ...]` items still present in the document
 3. Sections that may need human review due to the changes
 
-**Next step:** run `pragmatic-arch-spec-check` to verify the updated spec now correctly reflects the implemented code.
+> **Arch spec updated** — `docs/arch/<name>.arch.md`.
+>
+> **Next step:** Run `pragmatic-arch-spec-check` to verify the updated spec now correctly reflects the implemented code.

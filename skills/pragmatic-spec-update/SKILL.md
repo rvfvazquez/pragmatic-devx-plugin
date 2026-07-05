@@ -159,4 +159,6 @@ Report:
 2. Any remaining `[TODO: ...]` items still present in the document
 3. Sections that may need human review due to the changes
 
-**Next step:** run `pragmatic-spec-validate` to verify the updated spec is still sound and consistent.
+> **Spec updated** — `docs/specs/<feature-slug>.md`.
+>
+> **Next step:** Run `pragmatic-spec-validate` to verify the updated spec is still sound and consistent.

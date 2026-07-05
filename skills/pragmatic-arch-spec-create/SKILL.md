@@ -166,7 +166,12 @@ After creating the file:
 2. Summarize the key architectural decisions documented
 3. List any `[TODO: ...]` items that remain open
 
-**Next step:** run `pragmatic-arch-spec-validate` immediately to verify the spec is complete and sound. Do not use this spec as a reference for `pragmatic-arch-spec-check` until it passes validation.
+---
+
+> **Arch spec created** — `docs/arch/<name>.arch.md`.
+>
+> **Next step:** Run `pragmatic-arch-spec-validate` to verify the spec is complete and sound. Do not use this spec as reference for `pragmatic-arch-spec-check` until it passes validation.
+> FAIL or WARN items → resolve with `pragmatic-arch-spec-update` → re-validate until PASS → then run `pragmatic-arch-spec-check`.
 
 ## Output Location
 

@@ -142,7 +142,7 @@ Use Glob and Grep to gather evidence from the codebase within the defined scope.
 Produce the report using the format and output rules defined in `references/report-format.md`.
 
 After generating the report, assert based on the overall status:
-- **VIOLATION or PARTIAL:** assert explicitly — "**The codebase does not fully conform to the architecture spec.** Fix `[code]` violations before marking the architecture as done. For violations resolved via **Option B** (intentional deviation): use `pragmatic-arch-spec-update` to capture the decision before the next check. Do not mark conformance as achieved until the next check returns CONFORMANT."
+- **VIOLATION or PARTIAL:** assert explicitly — "**The codebase does not fully conform to the architecture spec.** Fix `[code]` violations before marking the architecture as done. For violations resolved via **Option B** (intentional deviation): use `pragmatic-arch-spec-update` to capture the decision, then re-run this check. Do not mark conformance as achieved until the next check returns CONFORMANT."
 - **CONFORMANT:** close with: "Architecture is aligned with the spec. Run this check periodically to detect drift."
 
 ## Additional Resources

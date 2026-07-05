@@ -69,6 +69,23 @@ Use the inferred language for all output in this skill: task descriptions, comme
 
 ---
 
+### Step 0.5 — Confirm Implementation Preferences
+
+Before reading any files, confirm two execution preferences with a single `AskUserQuestion` call.
+
+**Test strategy:**
+- Interleaved: write one failing test then implement it, per acceptance criterion
+- After each AC: implement the criterion then write its test
+- Stubs first: write all test stubs upfront, then implement all behavior
+
+**Scaffold preference:**
+- Interface/type stubs first, then implement behavior
+- End-to-end per AC: type + logic + test together for each criterion
+
+These preferences affect execution order in Step 7 only — all acceptance criteria and tests are required regardless of choice.
+
+---
+
 ### Step 1 — Read the Spec in Full
 
 Read the entire spec document. Extract and record:
@@ -131,23 +148,6 @@ If any of these questions cannot be answered from spec + arch + rules, use `AskU
 
 ---
 
-### Step 5 — Confirm Implementation Preferences
-
-Use `AskUserQuestion` to confirm two things before starting:
-
-**Test strategy:**
-- Write tests alongside implementation (interleaved TDD)
-- Write tests after each acceptance criterion is implemented
-- Write all stubs first, then implement
-
-**Scaffold preference:**
-- Create interface/type stubs first, then implement behavior
-- Implement each acceptance criterion end-to-end (type + logic + test together)
-
-These preferences affect execution order only — all acceptance criteria and tests are required regardless.
-
----
-
 ### Step 6 — Decompose into Tracked Tasks
 
 Use `TodoWrite` to create one task per acceptance criterion from section 7 of the spec. Each task description must:
@@ -164,7 +164,7 @@ Mark all tasks as pending. Mark each task complete immediately after its impleme
 
 ### Step 7 — Implement Each Task
 
-For each task (in the order established by Step 5 preferences):
+For each task (in the order established by Step 0.5 preferences):
 
 #### 7a — Scaffold the component structure (if needed)
 
@@ -212,6 +212,23 @@ If a behavior requires an integration with an external dependency listed in spec
 #### 7e — Mark the task complete
 
 Mark the corresponding `TodoWrite` task complete immediately after implementing its criterion's behavior and test stub. Do not batch task completion.
+
+---
+
+<HARD-GATE>
+Do NOT declare the implementation complete, say "done", or express satisfaction until you have run `pragmatic-spec-check` against this spec and its output shows PASS for all acceptance criteria.
+
+"I believe all criteria are implemented" is not evidence.
+
+Run the check. Show the output. Only then claim completion.
+
+This applies even if:
+- All TodoWrite tasks are marked complete
+- The code compiles and tests pass locally
+- The user says they're satisfied
+
+If `pragmatic-spec-check` returns FAIL or PARTIAL: address the gaps, re-run, confirm PASS. Then close.
+</HARD-GATE>
 
 ---
 

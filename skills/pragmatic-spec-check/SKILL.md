@@ -149,6 +149,8 @@ Overall Status:
 - N/A checks are not counted in Summary totals
 - If all dimensions are PASS or N/A: omit Recommended Actions and output a **Strengths** section summarizing what was verified and confirmed correct
 - **After a FAIL report:** assert explicitly — "**This implementation does not conform to spec.** Fix `[code]` items before marking the story as done. For `[pragmatic-spec-update]` items — these represent decisions not yet captured in the spec; use `pragmatic-spec-update` before the next conformance check."
+- **After a WARN report:** close with: "Implementation partially conforms. Address WARN items before marking the story as done — partial conformance is not done."
+- **After a PASS report:** close with: "Implementation conforms to spec. Story can be marked as done."
 
 ## Additional Resources
 

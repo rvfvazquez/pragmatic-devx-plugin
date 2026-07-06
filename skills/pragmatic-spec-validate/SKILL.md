@@ -74,6 +74,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 | Interface matches design | N/A if sections 6.1/6.2 are absent |
 | Breaking changes flagged | N/A for brand-new features with no prior API surface |
 | Security considerations addressed | N/A for purely internal tooling or non-networked features where security is genuinely not applicable |
+| Single feature focus | N/A if the spec explicitly documents a bounded context that intentionally includes multiple related subsystems |
 
 #### Completeness
 - **Title & Status** — Has a clear title and a defined status (Draft/Review/Approved)
@@ -105,6 +106,9 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 - **Dependencies identified** — External dependencies and integrations are listed
 - **Breaking changes flagged** — Any breaking changes are explicitly noted *(may be N/A — see table above)*
 - **Security considerations addressed** — Security implications are at least mentioned *(may be N/A — see table above)*
+
+#### Scope
+- **Single feature focus** — Section 7 (acceptance criteria) describes one cohesive feature. WARN if criteria span multiple independent user workflows with no shared data model or flow — such a spec is better split into separate documents. *(may be N/A — see table above)*
 
 ### Step 3 — Generate Validation Report
 
@@ -145,4 +149,5 @@ Produce the report in this format:
 - If FAILs or actionable WARNs are present: end the report with an explicit recommendation to use `pragmatic-spec-update` to address them
 - **After a FAIL report:** assert explicitly — "**Do not use this spec as an implementation reference** and do not share it with the team until FAIL items are resolved. Use `pragmatic-spec-update` to address them before starting implementation."
 - **After a WARN report:** close with: "Spec can proceed to implementation. Consider resolving WARN items with `pragmatic-spec-update` before building. When ready, run `pragmatic-spec-build` against this spec."
+- **If a Single feature focus WARN is present:** add: "Consider splitting this spec at `[boundary]` into separate specs — one per subsystem. A scoped spec produces a more precise `pragmatic-spec-check` report."
 - **After a PASS report:** close with: "Spec is ready for implementation. Run `pragmatic-spec-build` against `docs/specs/<feature-slug>.md` to start."

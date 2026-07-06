@@ -124,10 +124,33 @@ Before I scan the codebase and ask about technology choices, let me confirm my u
 Answer what you know — for anything undecided, just say so and we'll handle it as an open item.
 ```
 
-**STOP. Do not proceed to Step 3 until all three conditions below are met.** A spec written without this confirmation will have gaps that `pragmatic-spec-validate` will FAIL:
+**STOP. Do not proceed to Step 2.5 until all three conditions below are met.** A spec written without this confirmation will have gaps that `pragmatic-spec-validate` will FAIL:
 - The problem and goal are clearly understood
 - The scope boundaries are defined
 - Any hard constraints are captured
+
+### Step 2.5 — Scope Validation
+
+Evaluate whether the described scope is cohesive or spans multiple independent subsystems.
+
+**Signs of over-broad scope — flag if two or more apply:**
+- The feature name or description joins independent capabilities with "and" (e.g., "authentication and billing")
+- The acceptance criteria would describe multiple distinct user workflows with no shared data model or primary entry point
+- Removing one part of the scope would leave a complete, independently shippable feature
+
+**If the scope appears to cover multiple independent subsystems**, do NOT proceed to Step 3. Assert:
+
+> "This feature covers **[A]** and **[B]** — these look like independent subsystems. A single spec spanning both will produce acceptance criteria that are harder to verify independently and will make `pragmatic-spec-check` less precise.
+>
+> **Recommended:** create separate specs:
+> - `docs/specs/<subsystem-a>.md`
+> - `docs/specs/<subsystem-b>.md`
+>
+> If these subsystems are genuinely interdependent (shared data model, single deployment unit, or one cannot ship without the other), confirm and I will proceed with a single spec."
+
+**STOP. Wait for user confirmation before proceeding.**
+- User confirms interdependence → proceed to Step 3
+- User agrees to split → end this skill; run `pragmatic-spec-create` separately for each subsystem
 
 ### Step 3 — Scan Existing Codebase
 

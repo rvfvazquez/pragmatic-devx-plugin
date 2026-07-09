@@ -192,7 +192,7 @@ AGENTS.md                                         ← Codex CLI, Antigravity, an
 .cursor/rules/project-constitution.mdc            ← Cursor
 .windsurf/rules/project-constitution.md           ← Windsurf
 .github/copilot-instructions.md                   ← GitHub Copilot
-GEMINI.md                                         ← Gemini CLI / Antigravity, only if the file already existed
+GEMINI.md                                         ← Gemini CLI / Antigravity, only if the file already exists
 ```
 
 ## Key Invariants

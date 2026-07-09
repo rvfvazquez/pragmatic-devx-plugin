@@ -162,7 +162,7 @@ Optional improvements.
 - **After a WARN report:** close with: "Arch spec can proceed to conformance check. Consider resolving WARN items with `pragmatic-arch-spec-update` first. When ready, run `pragmatic-arch-spec-check`."
 - **After a PASS report:** close with: "Arch spec is sound and ready. Run `pragmatic-arch-spec-check` to verify the codebase conforms to this spec."
 
-### Step 4 — Generate Claude Rules (Optional, PASS only)
+### Step 4 — Generate Project Rules (Optional, PASS only)
 
 Only offer this step when the overall validation status is **PASS**.
 

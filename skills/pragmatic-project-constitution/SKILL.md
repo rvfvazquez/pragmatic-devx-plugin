@@ -218,7 +218,7 @@ Then render the same sections into the cross-tool destinations described in `ref
 
 After writing both files:
 
-1. State every file path created or updated — `docs/constitution.md`, `.claude/rules/00-project-constitution.md`, and every cross-tool destination actually written (`AGENTS.md`, `.cursor/rules/project-constitution.mdc`, `.windsurf/rules/project-constitution.md`, `.github/copilot-instructions.md`, and `GEMINI.md` if it existed)
+1. State every file path created or updated — `docs/constitution.md`, `.claude/rules/00-project-constitution.md`, and every cross-tool destination actually written (`AGENTS.md`, `.cursor/rules/project-constitution.mdc`, `.windsurf/rules/project-constitution.md`, `.github/copilot-instructions.md`, and `GEMINI.md` if it exists)
 2. List each rule extracted into `.claude/rules/00-project-constitution.md` by category
 3. List any areas explicitly marked as "none defined yet" — and what would typically trigger filling them
 4. State:
@@ -238,7 +238,7 @@ AGENTS.md                                         ← Codex CLI, Antigravity, an
 .cursor/rules/project-constitution.mdc            ← Cursor
 .windsurf/rules/project-constitution.md           ← Windsurf
 .github/copilot-instructions.md                   ← GitHub Copilot
-GEMINI.md                                         ← Gemini CLI / Antigravity, only if the file already existed
+GEMINI.md                                         ← Gemini CLI / Antigravity, only if the file already exists
 ```
 
 ## Constraint Priority

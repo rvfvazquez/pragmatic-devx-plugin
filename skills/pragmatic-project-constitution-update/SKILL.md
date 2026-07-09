@@ -166,6 +166,8 @@ Extract only **concrete, actionable directives** — not prose. Follow the same 
 
 Omit any section that has no active rules (after deprecations). The file must reflect only the current active state of the constitution — no deprecated rules.
 
+Then re-render the same sections into the cross-tool destinations described in `../pragmatic-project-constitution/references/cross-tool-rules-sync.md`, using `slug=project-constitution`, `title=Project Constitution Rules`, `source_path=docs/constitution.md`, `always_apply=true`. This cascades the update to every destination previously synced by `pragmatic-project-constitution`.
+
 ---
 
 ### Step 6 — Output Summary
@@ -173,7 +175,7 @@ Omit any section that has no active rules (after deprecations). The file must re
 Report:
 1. Which sections were changed and what was added, corrected, or deprecated
 2. The updated `Last Updated` date and new version (if applicable)
-3. Confirmation that `.claude/rules/00-project-constitution.md` was regenerated
+3. Confirmation that `.claude/rules/00-project-constitution.md` and every cross-tool destination (`AGENTS.md`, `.cursor/rules/project-constitution.mdc`, `.windsurf/rules/project-constitution.md`, `.github/copilot-instructions.md`, and `GEMINI.md` if present) were regenerated
 
 State:
 
@@ -184,8 +186,13 @@ State:
 ## Output Locations
 
 ```
-docs/constitution.md                      ← updated governance document
-.claude/rules/00-project-constitution.md ← regenerated from updated sections 2, 3, 4
+docs/constitution.md                              ← updated governance document
+.claude/rules/00-project-constitution.md          ← regenerated from updated sections 2, 3, 4
+AGENTS.md                                         ← Codex CLI, Antigravity, and most other agentic tools
+.cursor/rules/project-constitution.mdc            ← Cursor
+.windsurf/rules/project-constitution.md           ← Windsurf
+.github/copilot-instructions.md                   ← GitHub Copilot
+GEMINI.md                                         ← Gemini CLI / Antigravity, only if the file already existed
 ```
 
 ## Key Invariants

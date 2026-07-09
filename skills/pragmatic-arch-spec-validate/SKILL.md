@@ -169,11 +169,13 @@ Only offer this step when the overall validation status is **PASS**.
 After printing the report, use `AskUserQuestion` to ask:
 
 ```
-Would you like to generate Claude project rules from this architecture spec?
+Would you like to generate project rules from this architecture spec?
 
-This creates a `.claude/rules/<spec-name>-arch.md` file with concrete architectural
-constraints that Claude will follow automatically during development in this project
-(e.g. forbidden imports, naming conventions, component boundary rules).
+This creates `.claude/rules/<spec-name>-arch.md` plus matching rule files for
+other agentic tools (AGENTS.md, Cursor, Windsurf, GitHub Copilot, and GEMINI.md
+if present) with concrete architectural constraints — forbidden imports, naming
+conventions, component boundary rules — that these tools will follow
+automatically during development in this project.
 ```
 
 #### If the user accepts:
@@ -209,6 +211,8 @@ Write the file to `.claude/rules/<spec-name>-arch.md` using this format:
 
 Only include sections that have at least one rule. Omit empty sections.
 
-After writing the file, state the path created and how many rules were extracted, and include this note:
+Then render the same sections into the cross-tool destinations described in `../pragmatic-project-constitution/references/cross-tool-rules-sync.md`, using `slug=<spec-name>-arch`, `title=Architecture Rules — <System/Module Name>`, `source_path=<path to .arch.md file>`. Set `always_apply=false` with `globs` pointing at the module's own paths only when the arch spec clearly names them (e.g. `src/<module>/**`); otherwise leave `always_apply=true` rather than guessing a glob.
 
-> **Note:** Claude rules guide Claude during development sessions but are not guaranteed enforcement — Claude may not follow them perfectly in long conversations or when the user overrides them. For guaranteed architectural conformance, run `pragmatic-arch-spec-check` in CI.
+After writing the files, state every path created or updated and how many rules were extracted, and include this note:
+
+> **Note:** These rule files guide agentic tools during development sessions but are not guaranteed enforcement — an agent may not follow them perfectly in long conversations or when the user overrides them. For guaranteed architectural conformance, run `pragmatic-arch-spec-check` in CI.

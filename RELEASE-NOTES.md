@@ -1,5 +1,26 @@
 # Pragmatic DevX — Release Notes
 
+## v0.6.0 (2026-07-09)
+
+### Cross-Tool Rule Generation
+
+`pragmatic-project-constitution`, `pragmatic-project-constitution-update`, and
+`pragmatic-arch-spec-validate` now sync generated rules beyond
+`.claude/rules/` so they are respected in other agentic IDEs, not just Claude
+Code:
+
+- **`AGENTS.md`** — read natively by Codex CLI and Antigravity (v1.20.3+), and
+  used as fallback context by most other agentic tools
+- **`.cursor/rules/<slug>.mdc`** — Cursor, with `alwaysApply`/`globs` frontmatter
+- **`.windsurf/rules/<slug>.md`** — Windsurf
+- **`.github/copilot-instructions.md`** — GitHub Copilot
+- **`GEMINI.md`** — synced only when the project already has one, since it
+  overrides `AGENTS.md` for Gemini-family tools when present
+
+`.claude/rules/<slug>.md` generation is unchanged. See
+`skills/pragmatic-project-constitution/references/cross-tool-rules-sync.md`
+for the shared procedure.
+
 ## v0.4.0 (2026-06-13)
 
 ### Multi-Platform Support

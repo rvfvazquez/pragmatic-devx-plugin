@@ -171,9 +171,10 @@ After printing the report, use `AskUserQuestion` to ask:
 ```
 Would you like to generate project rules from this architecture spec?
 
-This creates `.claude/rules/<spec-name>-arch.md` plus matching rule files for
-other agentic tools (AGENTS.md, Cursor, Windsurf, GitHub Copilot, and GEMINI.md
-if present) with concrete architectural constraints — forbidden imports, naming
+This creates a canonical rules file at `.agents/rules/<spec-name>-arch.md`,
+plus matching rule files for Claude Code (`.claude/rules/`) and other agentic
+tools (AGENTS.md, Cursor, Windsurf, GitHub Copilot, and GEMINI.md if present)
+with concrete architectural constraints — forbidden imports, naming
 conventions, component boundary rules — that these tools will follow
 automatically during development in this project.
 ```
@@ -192,26 +193,9 @@ Map spec content to rule types:
 | Component boundary (e.g., all external calls via ACL) | `<X> must not call <Y> directly — route through <Z>` |
 | Communication style (sync/async enforcement) | `<X> must communicate with <Y> via <mechanism>` |
 
-Write the file to `.claude/rules/<spec-name>-arch.md` using this format:
+Group the extracted rules into sections — `Dependency Rules`, `Naming Conventions`, `Component Boundaries` — omitting any section with zero rules.
 
-```markdown
-# Architecture Rules — <System/Module Name>
-# Source: <path to .arch.md file>
-# Generated: <today's date>
-
-## Dependency Rules
-- <rule>
-
-## Naming Conventions
-- <rule>
-
-## Component Boundaries
-- <rule>
-```
-
-Only include sections that have at least one rule. Omit empty sections.
-
-Then render the same sections into the cross-tool destinations described in `../pragmatic-project-constitution/references/cross-tool-rules-sync.md`, using `slug=<spec-name>-arch`, `title=Architecture Rules — <System/Module Name>`, `source_path=<path to .arch.md file>`. Set `always_apply=false` with `globs` pointing at the module's own paths only when the arch spec clearly names them (e.g. `src/<module>/**`); otherwise leave `always_apply=true` rather than guessing a glob.
+Render these sections into the canonical rules file and every cross-tool destination as described in `../pragmatic-project-constitution/references/cross-tool-rules-sync.md`, using `slug=<spec-name>-arch`, `title=Architecture Rules — <System/Module Name>`, `source_path=<path to .arch.md file>`, `sections=<the grouped sections above>`. Set `always_apply=false` with `globs` pointing at the module's own paths only when the arch spec clearly names them (e.g. `src/<module>/**`); otherwise leave `always_apply=true` rather than guessing a glob. Do not write `.claude/rules/<spec-name>-arch.md` directly — the shared procedure creates it as a symlink to the canonical `.agents/rules/<spec-name>-arch.md` file.
 
 After writing the files, state every path created or updated and how many rules were extracted, and include this note:
 

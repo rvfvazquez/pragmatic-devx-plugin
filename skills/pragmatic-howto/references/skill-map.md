@@ -60,13 +60,17 @@ All feature specs live in `docs/specs/<feature-slug>.md`.
 - `docs/constitution.md` checked first (load if present).
 
 **Spec sections produced:**
-1. Metadata (status, version, dates, owner)
-2. Problem definition
-3. Proposed solution
-4. Technology decisions
-5. Detailed design
-6. Acceptance criteria
-7. Changelog
+1. Overview (title, status, author, created, version)
+2. Problem Statement
+3. Goals & Non-Goals
+4. Proposed Solution
+5. Technology Decisions
+6. Detailed Design (API/Interface, Data Model, Behavior & Logic)
+7. Acceptance Criteria
+8. Technical Considerations
+9. Open Questions
+
+Changelog is not part of the initial document — it is appended later by `pragmatic-spec-update` on the first edit.
 
 **Guard:** If a spec already exists at the target path, STOP. Offer `pragmatic-spec-update` or `pragmatic-spec-validate` instead. Only replace if the user explicitly confirms.
 
@@ -132,15 +136,15 @@ Assert the block and instruct the user to run `pragmatic-spec-validate` + `pragm
 
 **Purpose:** Verify that the existing implementation matches the spec's acceptance criteria.
 
-**Output:** Conformance report — one row per acceptance criterion with status: PASS / PARTIAL / FAIL / NOT IMPLEMENTED.
+**Output:** Conformance report across three independent dimensions — Acceptance Criteria Coverage, Structural Adherence, and Open Items Resolved — each rated PASS / WARN / FAIL / N/A, with an aggregated Overall Status of PASS / WARN / FAIL.
 
 **Pre-conditions:** Spec exists + some implementation exists to check.
 
 **Behavior:**
-- Reads the spec's acceptance criteria section.
+- Reads the spec's acceptance criteria (section 7), interfaces/types (6.1, 6.2), and open `[TODO: ...]` items.
 - Reads the relevant implementation files.
-- Reports each AC individually with evidence (file path, line reference, or explanation of gap).
-- Concludes with overall PASS (all ACs pass) or FAIL (one or more ACs fail/partial).
+- Reports each item individually with evidence (file path, line reference, or explanation of gap).
+- Recommended Actions are tagged `[code]` or `[pragmatic-spec-update]` depending on whether the fix belongs in the implementation or the spec.
 
 ---
 
@@ -213,7 +217,7 @@ Default scope when not specified: `module`.
 
 **Purpose:** Verify that the codebase conforms to the documented architecture decisions.
 
-**Output:** Conformance report — one row per architecture rule: PASS / VIOLATION / NOT VERIFIABLE.
+**Output:** Conformance report grouped by severity, with an Overall Status of CONFORMANT / PARTIAL / NON-CONFORMANT.
 
 **Pre-conditions:** Arch spec exists + codebase to check.
 

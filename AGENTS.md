@@ -37,6 +37,8 @@ Pragmatic DevX provides skills for two documentation lifecycles — feature spec
 
 **Process skills.** Workflow skills (TDD, debugging, planning, code review) belong in a process plugin like superpowers. This plugin is for documentation artifacts, not development workflows.
 
+**Exception — internal subagents for `pragmatic-spec-build`.** `pragmatic-spec-build` is the one skill in this plugin that produces code, not a document. It may dispatch a process-oriented subagent (e.g. a TDD-discipline implementer) internally, scoped strictly to that skill's own build step. This is not a loophole for adding process skills generally: the subagent must not be exposed as a standalone top-level skill, must not be invoked by any documentation skill (`*-create`, `*-validate`, `*-update`, `*-check`), and any new subagent added under this exception needs the same evidence (specific failure in `pragmatic-spec-build`, before/after behavior) as a skill change under "Skill Changes Require Evidence".
+
 **Duplicate lifecycle coverage.** Each lifecycle step (create → validate → update → build → check) has one skill. Do not add a second create skill for a different output format without first discussing whether a new parameter in the existing skill is sufficient.
 
 ## Skill Changes Require Evidence

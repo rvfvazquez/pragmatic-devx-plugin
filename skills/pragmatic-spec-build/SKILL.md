@@ -84,6 +84,8 @@ Before reading any files, confirm two execution preferences with a single `AskUs
 
 These preferences affect execution order in Step 7 only — all acceptance criteria and tests are required regardless of choice.
 
+If **Interleaved** is chosen and the harness supports dispatching subagents (the `Agent` tool is available), Step 7 dispatches the `tdd-implementer` agent per acceptance criterion instead of writing tests and code inline — see 7c/7d below. If the harness has no subagent dispatch, fall back to the manual flow in 7c/7d and apply red-green-refactor discipline yourself: write the test, run it, confirm it fails for the right reason, then implement.
+
 ---
 
 ### Step 1 — Read the Spec in Full
@@ -184,7 +186,18 @@ Translate each type definition and interface from the spec into the project's ac
 
 Follow naming conventions from the constraint brief exactly.
 
-#### 7c — Generate test stubs from acceptance criteria
+#### 7c/7d — Test and implement the behavior
+
+**If the Step 0.5 test strategy is Interleaved and the `Agent` tool is available:** dispatch the `tdd-implementer` subagent for this task instead of doing 7c/7d manually. Pass it, self-contained (it has no access to this conversation):
+- The acceptance criterion's full Given/When/Then text and its index (e.g. `AC-3`)
+- The constraint brief items relevant to this criterion: target file/directory, allowed and forbidden imports, naming conventions, communication model, and the technology decisions from spec section 5
+- The test framework and file-naming convention detected from the codebase scan
+
+The subagent writes a real (non-stub) failing test, runs it, confirms it fails for the right reason, implements the minimal code to pass, and reruns to confirm green. Its report includes the file paths touched and verbatim red/green run output — treat that output as the evidence the criterion is implemented. Do not mark the task complete without it.
+
+**Otherwise** (a different test strategy was chosen, or no subagent dispatch is available in this harness), do 7c and 7d directly:
+
+**7c — Generate test stubs from acceptance criteria**
 
 For each acceptance criterion in Given/When/Then format, generate a test function stub using:
 - The project's existing test framework and file naming conventions (detected from codebase scan)
@@ -199,7 +212,7 @@ For each acceptance criterion in Given/When/Then format, generate a test functio
 
 Leave the test body empty after the comments — the developer completes the assertion. Do not implement test logic that cannot be derived directly from the criterion text.
 
-#### 7d — Implement the behavior
+**7d — Implement the behavior**
 
 Implement the logic described in spec section 6.3, following:
 - The communication model (sync/async, events) from the constraint brief

@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-arch-spec-check
 description: This skill should be used when the user asks to "check if the code conforms to the architecture spec", "verify architecture conformance", "does the code follow the arch spec?", "check if the project respects the architecture", "validate architecture rules in the codebase", "run an architecture check", "arch conformance check", or wants to verify that the actual project structure and code comply with documented architecture technical specifications.
 ---

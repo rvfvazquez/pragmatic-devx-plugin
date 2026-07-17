@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-project-constitution
 description: This skill should be used when the user asks to "create a project constitution", "define global project rules", "set up project governance", "create a constitution", "define what the AI can decide alone", "define cross-module rules", "document global architecture decisions", "establish project-wide constraints", or wants a single source of truth for decisions that apply across all modules, features, and architecture specs — above any individual arch spec or feature spec.
 ---

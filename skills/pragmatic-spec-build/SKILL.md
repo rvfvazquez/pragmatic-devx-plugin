@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-spec-build
 description: This skill should be used when the user asks to "implement the spec", "build this feature from the spec", "start implementing docs/specs/X.md", "build based on the spec", "implement the acceptance criteria", "code this feature", "build it following the spec", or wants to translate an approved specification document into a working implementation — guided by spec decisions, architecture constraints, and project rules.
 ---

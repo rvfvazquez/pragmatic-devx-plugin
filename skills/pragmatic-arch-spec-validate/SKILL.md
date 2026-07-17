@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-arch-spec-validate
 description: This skill should be used when the user asks to "validate an architecture spec", "check the arch spec", "review this architecture document", "is this arch spec complete?", "audit the architecture spec", "check architecture quality", "validate the ADRs", "is this arch spec ready for approval?", "is the architecture document ready to use?", or wants a structured quality review of an existing architecture technical specification document.
 ---

@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-spec-validate
 description: This skill should be used when the user asks to "validate a spec", "check if this spec is complete", "review the spec for completeness", "is this spec good?", "check the spec quality", "review this specification", "audit the spec", or wants a structured quality review of an existing specification document.
 ---

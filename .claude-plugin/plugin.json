@@ -16,6 +16,5 @@
     "pragmatic"
   ],
   "skills": "./skills/",
-  "agents": ["./agents/tdd-implementer.md"],
-  "hooks": "./hooks/hooks.json"
+  "agents": ["./agents/tdd-implementer.md"]
 }

@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-spec-update
 description: This skill should be used when the user asks to "update a spec", "update this specification", "revise the spec", "add requirements to the spec", "change the spec", "fill in the TODOs in the spec", "correct the spec", or wants to apply new decisions, corrections, or requirements to an existing specification document.
 ---

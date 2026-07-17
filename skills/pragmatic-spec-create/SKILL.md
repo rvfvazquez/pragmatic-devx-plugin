@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-spec-create
 description: This skill should be used when the user asks to "create a spec", "write a technical specification", "document this feature as a spec", "create a spec for this story", "create spec for module", "generate a spec", "write a spec document", or needs to formalize a feature, story, or module as a structured technical specification document.
 ---

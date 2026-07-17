@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-spec-check
 description: This skill should be used when the user asks to "verify if the implementation follows the spec", "check conformance with the spec", "is the code aligned with the spec?", "audit implementation against the spec", "check if the acceptance criteria were implemented", "does the code match the spec", or wants to compare an existing implementation against a specification document.
 ---

@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-arch-spec-update
 description: This skill should be used when the user asks to "update an architecture spec", "revise the arch spec", "update this architecture document", "add a new ADR", "change the component boundaries", "fill in the TODOs in the arch spec", "correct the architecture spec", or wants to apply new decisions, corrections, or intentional deviations to an existing architecture technical specification document.
 ---

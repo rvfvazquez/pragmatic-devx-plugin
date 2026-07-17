@@ -1,4 +1,4 @@
-﻿---
+---
 name: pragmatic-arch-spec-create
 description: This skill should be used when the user asks to "create an architecture spec", "document the architecture", "write an architecture document", "create arch spec for this module", "document this system's architecture", "generate an ADR", "create architecture documentation for this service", "write arch spec for integration", or needs to formally document the architecture of a system, module, layer, or integration.
 ---

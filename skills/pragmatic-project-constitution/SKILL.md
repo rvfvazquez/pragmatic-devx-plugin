@@ -182,35 +182,18 @@ Fill every section with concrete content. Use `— none defined yet —` only fo
 
 ### Step 4 — Generate `.claude/rules/00-project-constitution.md`
 
-Create `.claude/rules/` if it does not exist. Write `.claude/rules/00-project-constitution.md`.
-
-The `00-` prefix ensures this file is loaded before any module-specific rules files in every Claude Code session.
-
 Extract only **concrete, actionable rules** from sections 2, 3, and 4 of the constitution. Do not copy prose — translate decisions into directive statements the agent can act on during any session.
 
-```markdown
-# Project Constitution Rules
-# Source: docs/constitution.md
-# Generated: <date>
-# Scope: ALL modules · ALL features · ALL sessions
-# Priority: These rules take precedence over all module-specific arch rules.
+Group the extracted rules into sections:
 
-## Project Context
-<1–2 sentence summary of what the project is and its compliance context>
-
-## Global Stack Constraints
-- <directive, e.g.: "Only PostgreSQL is permitted as a database engine. Never suggest SQLite, MongoDB, or any other engine.">
-
-## Cross-Module Constraints
-- <directive, e.g.: "AuthModule is the single source of truth for user identity. No module may maintain its own user store or replicate identity data.">
-
-## AI Guardrails — Stop and Ask Before Deciding
-- <directive, e.g.: "Never add a third-party dependency without listing: package name, purpose, license, and why an existing dependency does not cover it. Present this and wait for confirmation — do not modify package.json before approval.">
-```
+- **Project Context** — a 1–2 sentence directive summarizing what the project is and its compliance context, plus the fixed bullet: "These rules take precedence over all module-specific arch rules."
+- **Global Stack Constraints** — e.g.: "Only PostgreSQL is permitted as a database engine. Never suggest SQLite, MongoDB, or any other engine."
+- **Cross-Module Constraints** — e.g.: "AuthModule is the single source of truth for user identity. No module may maintain its own user store or replicate identity data."
+- **AI Guardrails — Stop and Ask Before Deciding** — e.g.: "Never add a third-party dependency without listing: package name, purpose, license, and why an existing dependency does not cover it. Present this and wait for confirmation — do not modify package.json before approval."
 
 Only include sections that have at least one rule. Omit empty sections entirely.
 
-Then render the same sections into the cross-tool destinations described in `references/cross-tool-rules-sync.md`, using `slug=project-constitution`, `title=Project Constitution Rules`, `source_path=docs/constitution.md`, `always_apply=true`.
+Render these sections into the canonical rules file and every cross-tool destination as described in `references/cross-tool-rules-sync.md`, using `slug=project-constitution`, `title=Project Constitution Rules`, `source_path=docs/constitution.md`, `always_apply=true`, `claude_rules_filename=00-project-constitution.md` — the `00-` prefix ensures this file is loaded before any module-specific rules files in every Claude Code session. Do not write `.claude/rules/00-project-constitution.md` directly — the shared procedure creates it as a symlink to the canonical `.agents/rules/project-constitution.md` file.
 
 ---
 

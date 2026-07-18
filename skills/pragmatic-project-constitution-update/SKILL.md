@@ -140,33 +140,18 @@ When modifying `docs/constitution.md`:
 
 ### Step 5 — Regenerate `.claude/rules/00-project-constitution.md`
 
-After updating `docs/constitution.md`, regenerate `.claude/rules/00-project-constitution.md` from the updated sections 2, 3, and 4.
+After updating `docs/constitution.md`, regenerate the rules from the updated sections 2, 3, and 4.
 
-Extract only **concrete, actionable directives** — not prose. Follow the same format as the original generation:
+Extract only **concrete, actionable directives** — not prose. Follow the same section grouping as the original generation:
 
-```markdown
-# Project Constitution Rules
-# Source: docs/constitution.md
-# Generated: <date>
-# Scope: ALL modules · ALL features · ALL sessions
-# Priority: These rules take precedence over all module-specific arch rules.
-
-## Project Context
-<1–2 sentence summary of what the project is and its compliance context>
-
-## Global Stack Constraints
-- <directive>
-
-## Cross-Module Constraints
-- <directive>
-
-## AI Guardrails — Stop and Ask Before Deciding
-- <directive>
-```
+- **Project Context** — a 1–2 sentence directive summarizing what the project is and its compliance context, plus the fixed bullet: "These rules take precedence over all module-specific arch rules."
+- **Global Stack Constraints**
+- **Cross-Module Constraints**
+- **AI Guardrails — Stop and Ask Before Deciding**
 
 Omit any section that has no active rules (after deprecations). The file must reflect only the current active state of the constitution — no deprecated rules.
 
-Then re-render the same sections into the cross-tool destinations described in `../pragmatic-project-constitution/references/cross-tool-rules-sync.md`, using `slug=project-constitution`, `title=Project Constitution Rules`, `source_path=docs/constitution.md`, `always_apply=true`. This cascades the update to every destination previously synced by `pragmatic-project-constitution`.
+Re-render these sections into the canonical rules file and every cross-tool destination as described in `../pragmatic-project-constitution/references/cross-tool-rules-sync.md`, using `slug=project-constitution`, `title=Project Constitution Rules`, `source_path=docs/constitution.md`, `always_apply=true`, `claude_rules_filename=00-project-constitution.md`. This cascades the update to every destination previously synced by `pragmatic-project-constitution` — do not write `.claude/rules/00-project-constitution.md` directly, it is a symlink to the canonical `.agents/rules/project-constitution.md` file.
 
 ---
 

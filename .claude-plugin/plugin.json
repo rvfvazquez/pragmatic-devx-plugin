@@ -1,6 +1,6 @@
 {
   "name": "pragmatic-devx-plugin",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Claude Code plugin focused on Developer Experience — structured specs, architecture documentation, and pragmatic engineering patterns.",
   "author": {
     "name": "rvfvazquez"

@@ -1,5 +1,42 @@
 # Pragmatic DevX — Release Notes
 
+## v0.6.1 (2026-07-17)
+
+### Fixes
+
+- **Plugin failed to install** — `.claude-plugin/plugin.json` declared `"agents"`
+  as a directory string; the schema requires an array of explicit `.md` file
+  paths. Fixed to `["./agents/tdd-implementer.md"]`.
+- **Plugin failed to load** — `plugin.json` also declared `"hooks":
+  "./hooks/hooks.json"`, duplicating the file the loader already auto-loads by
+  convention, which made every install fail with "Duplicate hooks file
+  detected". Removed the redundant declaration.
+- **10 of 12 `SKILL.md` files reported as missing frontmatter** — each file
+  actually had correct frontmatter, but started with a UTF-8 BOM before the
+  opening `---`, so the parser's literal-prefix check never matched. Stripped
+  the BOM; no frontmatter content changed.
+
+### Cross-Tool Rule Sync — Canonical File Redesign
+
+`cross-tool-rules-sync.md` now writes a canonical `.agents/rules/<slug>.md`
+file first, with `.claude/rules/<slug>.md` and `.windsurf/rules/<slug>.md` as
+symlinks to it, instead of duplicating full content into every destination.
+`GEMINI.md`, `AGENTS.md`, and `.github/copilot-instructions.md` still get a
+full-body copy (no reliable import mechanism confirmed for any of them —
+`@path` resolution was tested and disconfirmed for Antigravity's `GEMINI.md`
+handling). `.cursor/rules/<slug>.mdc` now uses an `@import` line instead of a
+full copy.
+
+`pragmatic-project-constitution` and `pragmatic-project-constitution-update`
+are now wired to this shared procedure — previously only
+`pragmatic-arch-spec-validate` used it, and the constitution skills wrote
+`.claude/rules/00-project-constitution.md` directly. A new
+`claude_rules_filename` input lets a caller override the symlink's filename
+independently of `<slug>.md`, so the constitution's `00-` load-order prefix is
+preserved. `pragmatic-arch-spec-validate` also had a stale direct-write
+instruction for `.claude/rules/<spec-name>-arch.md` left over from before this
+procedure existed, conflicting with the procedure's own symlink step; removed.
+
 ## v0.6.0 (2026-07-09)
 
 ### Cross-Tool Rule Generation

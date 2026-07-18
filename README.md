@@ -8,6 +8,11 @@
 
 Claude Code plugin focused on Developer Experience — structured specs, architecture documentation, and pragmatic engineering patterns.
 
+> **See it in action:** [pragmatic-devx-showcase](https://github.com/rvfvazquez/pragmatic-devx-showcase)
+> shows the plugin's skills applied end-to-end — `constitution → arch spec → feature spec →
+> build → check` — against a single fictional domain, with every step as its own commit/PR so
+> you can read the actual diff each skill produced.
+
 ## Installation
 
 ### Claude Code

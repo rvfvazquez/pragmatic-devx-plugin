@@ -229,3 +229,34 @@ Default scope when not specified: `module`.
 - Layer isolation rules enforced
 
 **Behavior on VIOLATION:** Reports the specific file/location, the rule violated, and the ADR that defines the rule.
+
+---
+
+## Reverse Engineering
+
+### pragmatic-reverse-engineer
+
+**Purpose:** `pragmatic-reverse-engineer` generates a feature spec or architecture spec by scanning
+existing, undocumented code, then handing off to `pragmatic-spec-create` /
+`pragmatic-arch-spec-create` to write it.
+
+**Output:** Does not write `docs/specs/` or `docs/arch/` itself — see those
+two skills. Owns only `docs/reverse-engineering/<session-slug>-<date>.report.md`.
+
+**Pre-conditions:** None of its own — the downstream create skill's
+pre-conditions (constitution check, existing-file guard) run unmodified
+when invoked.
+
+**Behavior:**
+- Always asks Architecture / Feature / Both before scanning anything.
+- Tags every finding CONFIRMED (observable in code) or INFERRED (a guess
+  about intent) — CONFIRMED items are stated to the downstream skill
+  outright, INFERRED items are surfaced for the user to confirm or correct.
+- Processes multiple discovery targets one at a time, never batched, so
+  each downstream interview stays scoped to one target.
+- Appends a `## Provenance` section to each document the downstream skill
+  writes, and a session report tying all of them together.
+
+**Guard:** Never writes to `docs/specs/` or `docs/arch/` itself — those
+remain owned exclusively by `pragmatic-spec-create` /
+`pragmatic-arch-spec-create`.

@@ -102,12 +102,16 @@ not a good candidate for a heuristic guess.
    inline-findings handoff as the architecture branch. Multiple features
    naturally produce multiple specs, reusing `pragmatic-spec-create`'s
    existing Step 2.5 over-broad-scope guard rather than reimplementing it.
+   **When multiple features are selected, process them one at a time —
+   see "Sequential Delegation" below.**
 
 ### Step 2c — Both
 
 Run the architecture branch first. Reuse its component boundaries as the seed
 list for feature-boundary discovery (avoids a second full repo scan), then
-run the feature branch.
+run the feature branch. If either branch surfaces multiple independent
+targets, the same one-at-a-time rule applies — see "Sequential Delegation"
+below.
 
 ## Delegation Mechanics
 
@@ -130,6 +134,27 @@ No edits to either skill file are required. The instruction to
 surface inferred findings for the downstream skill's own confirmation step,
 and let that skill's existing guards (constitution check, existing-file
 check, scope-splitting) run unmodified.
+
+### Sequential Delegation — One Target at a Time
+
+When discovery surfaces N targets — N candidate features (Step 2b), or N
+independent architecture scopes surfaced by a whole-repo scan in Step 2a/2c —
+**do not batch all N into a single handoff.** Loop: run discovery for one
+target, invoke the specialized create skill for it end-to-end (confirmation
+interview, file write, Provenance edit), let that invocation finish, then
+move to the next target and repeat.
+
+This matters specifically because the targets come from a large, undocumented
+codebase. Carrying findings for all N targets in context at once and handing
+them off in one giant invocation dilutes attention across everything found —
+the interview for target 3 gets asked with target 1's and target 12's
+findings still crowding the same context, and quality degrades as N grows.
+One target fully handled before the next one starts keeps each
+`pragmatic-spec-create` / `pragmatic-arch-spec-create` invocation scoped to
+exactly what that one document needs, regardless of how many other targets
+the same session will eventually cover. The session report (see Provenance)
+is what ties the N resulting documents back together — the loop itself stays
+uncoupled between iterations.
 
 ## Confidence Tagging
 

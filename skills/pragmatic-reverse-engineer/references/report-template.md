@@ -40,9 +40,15 @@ a named target or an architecture-only session.)*
 
 ## 4. Documents Produced
 
-| Document | Path | Version at generation |
-|----------|------|--------------------------|
-| ... | `docs/specs/...` or `docs/arch/...` | ... |
+Targets attempted but not produced (the downstream skill ended without
+writing a file — e.g. the existing-file guard was declined, or the user
+chose to create a constitution first) are listed here too, with a status
+explaining why.
+
+| Document | Path | Version at generation | Status |
+|----------|------|--------------------------|--------|
+| ... | `docs/specs/...` or `docs/arch/...` | ... | Produced |
+| ... | — | — | Not produced — `<reason>` |
 
 ## 5. Confidence Summary
 

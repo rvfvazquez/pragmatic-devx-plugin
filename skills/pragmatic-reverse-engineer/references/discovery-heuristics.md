@@ -6,7 +6,9 @@ discovery brief, used by both the architecture and feature branches of
 
 ## Confidence Vocabulary
 
-Use exactly two tags when presenting findings during handoff:
+Two primary tags apply to every finding (below); two additional tags refine
+acceptance-criteria findings specifically (see "Feature Branch — Behavior
+Inference").
 
 - **CONFIRMED** — directly observable in the code: an import, a config
   value, a route registration, a passing test, a file that exists. State
@@ -14,6 +16,14 @@ Use exactly two tags when presenting findings during handoff:
 - **INFERRED** — a judgment call about *intent*, *rationale*, or *purpose*
   that code alone cannot prove. Surface these for the user to confirm or
   correct via the downstream skill's own interview.
+
+All confidence tags — including the acceptance-criteria-specific
+CONFIRMED-BY-TEST / INFERRED-NO-TEST — are conversational only. They belong
+in the handoff brief, never in the written spec or arch spec. Once the user
+confirms an item during the downstream skill's interview, it becomes
+ordinary document content with no tag attached. The only marker that may
+ever appear in a persisted document is the existing `[TODO: ...]`
+convention.
 
 A finding about *what exists* is almost always CONFIRMED. A finding about
 *why* it exists, or *what problem it was meant to solve*, is almost always

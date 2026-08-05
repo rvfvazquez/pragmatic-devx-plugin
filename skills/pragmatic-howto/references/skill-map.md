@@ -236,12 +236,14 @@ Default scope when not specified: `module`.
 
 ### pragmatic-reverse-engineer
 
-**Purpose:** `pragmatic-reverse-engineer` generates a feature spec or architecture spec by scanning
+**Purpose:** Generate a feature spec or architecture spec by scanning
 existing, undocumented code, then handing off to `pragmatic-spec-create` /
 `pragmatic-arch-spec-create` to write it.
 
-**Output:** Does not write `docs/specs/` or `docs/arch/` itself — see those
-two skills. Owns only `docs/reverse-engineering/<session-slug>-<date>.report.md`.
+**Output:** Does not create documents in `docs/specs/` or `docs/arch/`
+itself — see those two skills for authorship. Its only edit to an existing
+document there is the Provenance append (Step 4). Owns only
+`docs/reverse-engineering/<session-slug>-<date>.report.md`.
 
 **Pre-conditions:** None of its own — the downstream create skill's
 pre-conditions (constitution check, existing-file guard) run unmodified
@@ -257,6 +259,7 @@ when invoked.
 - Appends a `## Provenance` section to each document the downstream skill
   writes, and a session report tying all of them together.
 
-**Guard:** Never writes to `docs/specs/` or `docs/arch/` itself — those
-remain owned exclusively by `pragmatic-spec-create` /
-`pragmatic-arch-spec-create`.
+**Guard:** Never creates or owns documents in `docs/specs/` or `docs/arch/`
+— those remain owned exclusively by `pragmatic-spec-create` /
+`pragmatic-arch-spec-create`. Its only edit to those files is the
+Provenance append (Step 4).

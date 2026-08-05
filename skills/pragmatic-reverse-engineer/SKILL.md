@@ -14,9 +14,10 @@ built.
 Produce a `docs/specs/<feature-slug>.md` or `docs/arch/<name>.arch.md`
 document for code that already exists and has no spec, by scanning the
 code, inferring its behavior and structure, and handing off to the existing
-create skills to confirm and write the document. This skill never writes
-those files itself — it discovers, tags findings by confidence, and
-delegates.
+create skills to confirm and write the document. This skill never creates
+or owns those files itself — it discovers, tags findings by confidence, and
+delegates; the only edit it makes to a document a create skill has already
+written is the Provenance append (Step 4).
 
 ## When This Skill Applies
 
@@ -34,12 +35,13 @@ code rather than describing what they want built.
   `pragmatic-spec-check` / `pragmatic-arch-spec-check` to verify it still
   matches the code
 
-**Ownership:** This skill never writes to `docs/specs/` or `docs/arch/`. It
-only scans, infers, and hands off — `pragmatic-spec-create` and
-`pragmatic-arch-spec-create` remain the sole owners of those files,
-including their own constitution check, existing-file guard, and
-scope-splitting logic. Nothing about those two skills changes when invoked
-from here.
+**Ownership:** This skill never *creates or owns* documents in
+`docs/specs/` or `docs/arch/` — `pragmatic-spec-create` and
+`pragmatic-arch-spec-create` remain their sole authors, including their own
+constitution check, existing-file guard, and scope-splitting logic. Nothing
+about those two skills changes when invoked from here. The only
+modification this skill makes to those files is appending a `## Provenance`
+section (Step 4) to a document a create skill has already written.
 
 ## How Reverse Engineering Works
 
@@ -94,10 +96,11 @@ isn't a safe guess.
 
 ### Step 2c — Both
 
-Run Step 2a to completion first (including its handoff and provenance —
-Steps 3–4 below). Then run Step 2b, using the components found in Step 2a
-as the seed list for candidate discovery instead of re-scanning the repo
-from scratch.
+Run Step 2a to completion first, including its handoff and the per-document
+Provenance append (Steps 3–4 below, excluding the session report — that is
+written once, after both branches finish). Then run Step 2b, using the
+components found in Step 2a as the seed list for candidate discovery
+instead of re-scanning the repo from scratch.
 
 ### Sequential Delegation — One Target at a Time
 
@@ -134,6 +137,13 @@ it would for a from-scratch spec.
 
 ### Step 4 — Provenance
 
+If the downstream skill ends without writing a file (e.g. the existing-file
+guard was declined, or the user chose to create a constitution first
+instead of continuing), skip the Provenance append for that target, record
+it in the session report as attempted-but-not-produced with the reason, and
+continue to the next target in the Sequential Delegation loop (or, if this
+was the only target, proceed directly to writing the session report).
+
 After the downstream skill finishes writing the document for one target:
 
 1. **Append a `## Provenance` section** to the just-written file (a
@@ -152,6 +162,10 @@ After the downstream skill finishes writing the document for one target:
    Full session report: `docs/reverse-engineering/<session-slug>-<date>.report.md`
    ```
 
+   A corrected item counts under "inferred, confirmed by user" — the
+   correction itself is detailed in the session report, not in this
+   per-document count.
+
 2. **Record the target's results** (target scanned, candidates not
    selected, confidence counts, any corrections the user made to an
    INFERRED item) to be written into the session report once every target
@@ -161,8 +175,10 @@ Once every target from Step 2 has been through Steps 3–4, write the session
 report at `docs/reverse-engineering/<session-slug>-<date>.report.md` using
 `references/report-template.md`. Create the `docs/reverse-engineering/`
 directory first if it doesn't exist. `<session-slug>` is the target name
-from Step 1 (e.g. `payments`), or `repo-wide` when no target was named and
-candidate discovery ran across the whole repository.
+from Step 2a/2b (e.g. `payments`), or `repo-wide` when no target was named and
+candidate discovery ran across the whole repository. If a report already
+exists at that exact path (same target, same day), append `-2`, `-3`, etc.
+rather than overwriting it.
 
 ### Step 5 — Output Summary
 
@@ -188,7 +204,8 @@ After the session report is written:
 ## Output Location
 
 This skill does not own an output location for specs/arch specs — see
-`pragmatic-spec-create` / `pragmatic-arch-spec-create`. It owns only:
+`pragmatic-spec-create` / `pragmatic-arch-spec-create`. Its only edit to
+those files is the Provenance append (Step 4). It owns only:
 
 ```
 docs/reverse-engineering/<session-slug>-<date>.report.md

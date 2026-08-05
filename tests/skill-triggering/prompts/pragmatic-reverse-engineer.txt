@@ -1,0 +1,1 @@
+We inherited a checkout module with zero documentation — no spec, no comments explaining the business rules, nothing written down anywhere. Can you read through the existing code and generate a spec from what it actually does, so we finally have something in docs/specs for it?

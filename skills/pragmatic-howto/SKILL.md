@@ -52,6 +52,20 @@ pragmatic-arch-spec-create  →  pragmatic-arch-spec-validate  →  pragmatic-ar
 | `pragmatic-arch-spec-update` | Arch spec needs new ADRs, corrections, or boundary changes |
 | `pragmatic-arch-spec-check` | Verify codebase matches documented architecture decisions |
 
+## Reverse Engineering Entry Point
+
+When code already exists with no spec or arch spec at all,
+`pragmatic-reverse-engineer` is the entry point instead of starting a
+lifecycle interview from scratch. It scans the code, tags findings by
+confidence (confirmed vs. inferred), and hands off into
+`pragmatic-spec-create` or `pragmatic-arch-spec-create` — those two skills
+still produce and own the document; this is only a different way to arrive
+at their first step.
+
+| Skill | When to invoke |
+|---|---|
+| `pragmatic-reverse-engineer` | Code exists, no spec/arch spec exists yet, and the document should be produced by reading the code rather than describing what to build |
+
 ## Governance
 
 ```
@@ -87,6 +101,7 @@ Before creating or updating any spec or arch spec, check whether `docs/constitut
 | "does the code follow the architecture?" | `pragmatic-arch-spec-check` |
 | "create a project constitution" / "set global rules" | `pragmatic-project-constitution` |
 | "update the constitution" / "add a global rule" | `pragmatic-project-constitution-update` |
+| "reverse engineer a spec from this code" / "generate a spec from existing code" / "document what this legacy code does" | `pragmatic-reverse-engineer` |
 
 ## Skill Invocation Rule
 

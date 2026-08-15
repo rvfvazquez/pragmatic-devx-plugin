@@ -217,3 +217,8 @@ docs/reverse-engineering/<session-slug>-<date>.report.md
   detection, confidence-tagging vocabulary, and the exact shape for
   presenting findings during handoff
 - **`references/report-template.md`** — session report template
+- **`examples/example-session-report.md`** — a complete session report for a
+  repo-wide Feature pass, showing a produced document, a document skipped
+  by the existing-file guard, unselected candidates, and a corrected
+  INFERRED item. Use as a calibration target for output structure and level
+  of detail.

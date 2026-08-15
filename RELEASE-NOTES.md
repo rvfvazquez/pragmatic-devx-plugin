@@ -1,5 +1,30 @@
 # Pragmatic DevX — Release Notes
 
+## v0.7.0 (2026-08-15)
+
+### New Skill — `pragmatic-reverse-engineer`
+
+Adds a 13th skill that generates a feature spec or architecture spec by
+scanning existing, undocumented code, instead of interviewing a human about
+something not yet built. It never creates or owns documents in
+`docs/specs/` or `docs/arch/` itself — it discovers, tags findings
+CONFIRMED (observable in code) or INFERRED (a guess about intent), and
+hands off to the existing `pragmatic-spec-create` / `pragmatic-arch-spec-create`
+skills, which run their normal constitution check and existing-file guard
+unmodified. Its only edit to the resulting document is a `## Provenance`
+append; it owns one file of its own, a session report at
+`docs/reverse-engineering/<session-slug>-<date>.report.md`.
+
+Always asks Architecture / Feature / Both before scanning — never inferred
+from wording, since it decides both the template and the downstream skill.
+When more than one target is found (e.g. repo-wide candidate discovery with
+no target named), each is scanned and handed off sequentially, one at a
+time, so the downstream interview never gets diluted by findings from other
+targets.
+
+Wired into `pragmatic-howto` (bootstrap skill map and quick-decision
+table), `GEMINI.md`, and `tests/skill-triggering/prompts/`.
+
 ## v0.6.1 (2026-07-17)
 
 ### Fixes

@@ -65,7 +65,7 @@ git clone https://github.com/rvfvazquez/pragmatic-devx-plugin.git ~/pragmatic-de
 gemini extension install ~/pragmatic-devx-plugin
 ```
 
-The extension is registered via `gemini-extension.json`. At session start, Gemini loads `GEMINI.md` which references all 12 skill files — no further configuration needed.
+The extension is registered via `gemini-extension.json`. At session start, Gemini loads `GEMINI.md` which references all 13 skill files — no further configuration needed.
 
 ---
 
@@ -155,6 +155,12 @@ LAYER 2 ── Feature Spec Track    (once per feature)
      │                              │         (and re-run)      │
      └──────────────────────────────┴────────────────────────────┘
 ```
+
+---
+
+### Reverse Engineering — an Alternate Entry Point
+
+When code already exists with no spec or arch spec at all, `pragmatic-reverse-engineer` is the entry point instead of starting a lifecycle interview from scratch. It scans the code, tags findings CONFIRMED (observable) or INFERRED (a guess), then hands off to `pragmatic-arch-spec-create` and/or `pragmatic-spec-create` — those two skills still author and own the documents; this is only a different way to arrive at their first step. See the dedicated section below.
 
 ---
 
@@ -498,6 +504,26 @@ Claude will read the spec, scan `docs/arch/` for applicable architecture rules (
 
 ---
 
+### `pragmatic-reverse-engineer`
+
+Generates a feature spec or architecture spec by scanning existing, undocumented code — instead of interviewing a human about something not yet built.
+
+Never creates or owns files in `docs/specs/` or `docs/arch/` itself: it discovers, tags findings by confidence, and hands off to `pragmatic-spec-create` / `pragmatic-arch-spec-create`, which run their normal steps (constitution check, existing-file guard) unmodified. Its only edit to the resulting document is a `## Provenance` append. It owns one file of its own: the session report at `docs/reverse-engineering/<session-slug>-<date>.report.md`.
+
+**Triggers when you say things like:**
+- "Reverse engineer a spec from this code"
+- "Generate a spec from the existing code"
+- "Document what this legacy module already does"
+- "This code has no spec — can you write one from what's actually there?"
+
+**Example:**
+
+> You: "This payments module has no docs at all. Reverse engineer a spec from the code."
+
+Claude asks whether this pass is about **Architecture**, **Feature**, or **Both** — never inferred from wording, since it decides which template and which downstream skill to use. For a Feature pass, it scans the module (problem/goal inferred, scope and tech stack confirmed, acceptance criteria drafted from existing tests), then hands the brief to `pragmatic-spec-create`, which confirms it with you and writes `docs/specs/payments.md` as usual. Claude then appends a `## Provenance` section to that file and writes a session report at `docs/reverse-engineering/payments-2026-08-15.report.md` summarizing confirmed vs. inferred findings. If no target is named, candidate module boundaries are discovered repo-wide and presented for you to pick one or several — each is then handed off and confirmed one at a time, never batched.
+
+---
+
 ## Project Structure
 
 ```
@@ -550,8 +576,15 @@ pragmatic-devx-plugin/
 │   │   └── SKILL.md
 │   ├── pragmatic-arch-spec-check/
 │   │   └── SKILL.md
-│   └── pragmatic-arch-spec-update/
-│       └── SKILL.md
+│   ├── pragmatic-arch-spec-update/
+│   │   └── SKILL.md
+│   └── pragmatic-reverse-engineer/
+│       ├── SKILL.md
+│       ├── references/
+│       │   ├── discovery-heuristics.md  # Component/feature boundary detection, confidence tagging
+│       │   └── report-template.md       # Session report template
+│       └── examples/
+│           └── example-session-report.md
 ├── assets/
 │   ├── logo.svg                   # 100×100 plugin logo
 │   └── icon-small.svg             # 32×32 compact icon
@@ -562,7 +595,7 @@ pragmatic-devx-plugin/
 │   └── skill-triggering/
 │       ├── run-test.sh            # Single-skill trigger test
 │       ├── run-all.sh             # Runs all prompts, reports PASS/FAIL
-│       └── prompts/               # 12 natural-language trigger prompts (one per skill)
+│       └── prompts/               # 13 natural-language trigger prompts (one per skill)
 ├── package.json                   # Pi/Antigravity manifest (pi.extensions + pi.skills)
 ├── AGENTS.md                      # Mirror of CLAUDE.md for Codex/OpenAI agents
 ├── CLAUDE.md                      # AI agent contributor guidelines

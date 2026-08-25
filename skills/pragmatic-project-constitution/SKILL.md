@@ -151,6 +151,32 @@ If any dependent question applies, ask it now via `AskUserQuestion` — **with a
 
 Run this check once. Proceed to Step 3 afterward regardless of whether a second round would still find more dependents — do not turn this into an unbounded loop.
 
+### Step 2.6 — Final Consistency Check
+
+Before generating the document, assemble every decision confirmed across Steps 2 and 2.5 into one list, grouped by area. Scan pairwise for **contradiction** — the constitution has no separate validate skill, so this is the only check that runs before the document (and the rules files derived from it) become active project-wide.
+
+Known contradiction shapes to check for:
+
+| Area A | Area B | Contradiction pattern |
+|---|---|---|
+| Project Identity (tenancy model) | Cross-Module Rules (shared resources) | A stated isolation model conflicts with a rule allowing shared access to a resource |
+| Project Identity (compliance) | AI Behavior Guardrails | A compliance requirement (e.g. LGPD) with no corresponding guardrail, or a guardrail that contradicts it |
+| Global Tech Stack | Cross-Module Rules | A rule assumes a technology not listed as permitted in Area 2 |
+
+If no contradiction is found, skip straight to the recap below.
+
+**If a contradiction is found, do not silently resolve it.** Present it explicitly and wait:
+
+> ⚠️ Possible contradiction: [Decision A, Area X] says "...", but [Decision B, Area Y] says "...". These look inconsistent because [reason]. Which should hold — or is there context I'm missing?
+
+Once no contradictions remain, present the full recap and require explicit confirmation:
+
+> Here's the complete picture before I write the constitution:
+> **Area 1:** ... **Area 2:** ... **Area 3:** ... **Area 4:** ...
+> Confirm this is complete, or tell me what's missing or wrong.
+
+**STOP. Do not proceed to Step 3 until the user explicitly confirms.**
+
 ---
 
 ### Step 3 — Generate `docs/constitution.md`

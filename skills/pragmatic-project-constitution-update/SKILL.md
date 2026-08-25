@@ -129,6 +129,30 @@ If any dependent question applies, ask it now via `AskUserQuestion` — **with a
 
 Run this check once. Proceed to Step 4 afterward regardless of whether a second round would still find more dependents — do not turn this into an unbounded loop.
 
+### Step 3.6 — Final Consistency Check
+
+Before applying any changes, check whether what was confirmed in Steps 3 and 3.5 contradicts anything in the **existing constitution content that is not being changed** (read in Step 1). Scan for contradiction only — the constitution has no separate validate skill, so this is the only check that runs before the update (and the regenerated rules files) become active project-wide.
+
+Known contradiction shapes to check for:
+
+| New/changed decision | Existing untouched content | Contradiction pattern |
+|---|---|---|
+| New or corrected rule | Untouched section of the same or another area | The new rule contradicts or silently supersedes an existing rule that wasn't marked as deprecated |
+| New AI guardrail | Existing Global Tech Stack decision | The guardrail implies a technology choice the stack section doesn't list as permitted |
+| Deprecated rule | Other rules referencing it | Another active rule still depends on the rule being deprecated |
+
+If no contradiction is found, skip straight to the recap below.
+
+**If a contradiction is found, do not silently resolve it.** Present it explicitly and wait:
+
+> ⚠️ Possible contradiction: this update says "...", but the existing constitution (section X, untouched) says "...". Which should hold — or should section X also be updated as part of this change?
+
+Once clear, present a short recap and require explicit confirmation before writing:
+
+> Here's what I'm about to change: [sections in scope, one line each]. Everything else in the constitution stays as-is. Confirm before I apply this?
+
+**STOP. Do not proceed to Step 4 until the user explicitly confirms.**
+
 ---
 
 ### Step 4 — Apply the Changes

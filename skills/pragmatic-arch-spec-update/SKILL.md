@@ -167,6 +167,30 @@ If any dependent question applies, ask it now via `AskUserQuestion` — **with a
 
 Run this check once. A second round should not itself spawn a third round unless the change is unusually broad — if it does, proceed to Step 3 anyway and leave the remainder as TODOs rather than turning the confirmation into an unbounded loop.
 
+### Step 2.7 — Final Consistency Check
+
+Before applying any changes, check whether what was confirmed in Steps 2.5, 2.6, and 2.65 contradicts anything in the **existing arch spec content that is not being changed** (read in Step 1) — component boundaries, dependency direction, or NFRs that weren't part of this update's scope. Scan for contradiction only, not completeness — that is `pragmatic-arch-spec-validate`'s job.
+
+Known contradiction shapes to check for:
+
+| New/changed decision | Existing untouched content | Contradiction pattern |
+|---|---|---|
+| New or updated ADR | Existing dependency direction rules (6.2) | The new decision implies a dependency the existing rules forbid |
+| New component boundary | Existing component diagram (4.1) not marked in scope | A component referenced elsewhere in the spec now has an inconsistent responsibility |
+| New NFR target | Existing constraint elsewhere in the spec | The new target conflicts with a constraint the update didn't touch |
+
+If no contradiction is found, skip straight to the recap below.
+
+**If a contradiction is found, do not silently resolve it.** Present it explicitly and wait:
+
+> ⚠️ Possible contradiction: this update says "...", but the existing spec (section X, untouched) says "...". Which should hold — or should section X also be updated as part of this change?
+
+Once clear, present a short recap and require explicit confirmation before writing:
+
+> Here's what I'm about to change: [sections in scope, one line each]. Everything else in the spec stays as-is. Confirm before I apply this?
+
+**STOP. Do not proceed to Step 3 until the user explicitly confirms.**
+
 ### Step 3 — Apply the Changes
 
 When modifying the arch spec:

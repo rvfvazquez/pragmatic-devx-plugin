@@ -236,6 +236,37 @@ If any dependent question applies, ask it now via `AskUserQuestion` — **with a
 
 Run this check once. A second round should not itself spawn a third round unless the feature is unusually deep — if it does, proceed to Step 5 anyway and leave the remainder as TODOs rather than turning the interview into an unbounded loop.
 
+### Step 4.6 — Final Consistency Check
+
+Before generating the document, assemble every decision confirmed across Steps 2, 2.5, 4, and 4.5 into one list, grouped by area. Scan pairwise across areas for **contradiction** — not completeness (that is `pragmatic-spec-validate`'s job) — only cases where one confirmed decision makes another confirmed decision incoherent, redundant, or impossible.
+
+Known contradiction shapes to check for:
+
+| Area A | Area B | Contradiction pattern |
+|---|---|---|
+| Non-Goals | Technology Decisions | A technology choice implements something explicitly marked out of scope |
+| Constraints (deadline) | Testing Strategy | Heavy test strategy (e2e + contract tests) against a tight, explicit deadline — worth flagging, not blocking |
+| Consumers | API/Interface | Consumers include external parties, but the interface choice is "internal service call" |
+| Success Definition | Acceptance Criteria hints | A stated success signal has no corresponding criterion discussed |
+
+If no contradiction is found, skip straight to the recap below — do not manufacture a check for its own sake, and do not re-ask anything already confirmed.
+
+**If a contradiction is found, do not silently resolve it.** Present it explicitly and wait:
+
+> ⚠️ Possible contradiction: [Decision A, with its section] says "...", but [Decision B, with its section] says "...". These look inconsistent because [reason]. Which should hold — or is there context I'm missing that makes both correct?
+
+Once no contradictions remain (or none were found), present the full recap and require explicit confirmation before writing anything:
+
+> Here's the complete picture before I write the spec:
+> **Problem & Goals:** [one-line summary]
+> **Non-Goals:** [one-line summary]
+> **Constraints:** [one-line summary]
+> **Technology Decisions:** [one-line summary per area from Step 4]
+>
+> Confirm this is complete, or tell me what's missing or wrong.
+
+**STOP. Do not proceed to Step 5 until the user explicitly confirms.**
+
 ### Step 5 — Generate the Spec Document
 
 If the directory `docs/specs/` does not exist, create it before writing the file.

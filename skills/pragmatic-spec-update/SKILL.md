@@ -143,6 +143,30 @@ If any dependent question applies, ask it now via `AskUserQuestion` — **with a
 
 Run this check once. A second round should not itself spawn a third round unless the update is unusually deep — if it does, proceed to Step 4 anyway and leave the remainder as TODOs rather than turning the confirmation into an unbounded loop.
 
+### Step 3.6 — Final Consistency Check
+
+Before applying any changes, check whether what was confirmed in Steps 3 and 3.5 contradicts anything in the **existing spec content that is not being changed** (read in Step 1) — not just the answers gathered this session. Scan for contradiction only, not completeness — that is `pragmatic-spec-validate`'s job.
+
+Known contradiction shapes to check for:
+
+| New/changed decision | Existing untouched content | Contradiction pattern |
+|---|---|---|
+| New Technology Decision | Non-Goals or Constraints (unchanged) | The new choice implements something explicitly marked out of scope |
+| New or corrected Acceptance Criterion | Existing Acceptance Criteria | The new criterion contradicts or supersedes one that wasn't marked for change |
+| New scope item | "Related Sections to Cascade" answer | A section the user said would NOT cascade actually depends on the change |
+
+If no contradiction is found, skip straight to the recap below.
+
+**If a contradiction is found, do not silently resolve it.** Present it explicitly and wait:
+
+> ⚠️ Possible contradiction: this update says "...", but the existing spec (section X, untouched) says "...". Which should hold — or should section X also be updated as part of this change?
+
+Once clear, present a short recap and require explicit confirmation before writing:
+
+> Here's what I'm about to change: [sections in scope, one line each]. Everything else in the spec stays as-is. Confirm before I apply this?
+
+**STOP. Do not proceed to Step 4 until the user explicitly confirms.**
+
 ### Step 4 — Apply the Changes
 
 When modifying the spec:

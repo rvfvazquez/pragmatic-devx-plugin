@@ -161,6 +161,32 @@ If any dependent question applies, ask it now via `AskUserQuestion` — **with a
 
 Run this check once. A second round should not itself spawn a third round unless the scope is unusually broad (e.g. `system`-level) — if it does, proceed to Step 2 anyway and leave the remainder as open ADR items rather than turning the interview into an unbounded loop.
 
+### Step 1.7 — Final Consistency Check
+
+Before generating the document, assemble every decision confirmed across Steps 1.5 and 1.6 into one list, grouped by area. Scan pairwise for **contradiction** — not completeness (that is `pragmatic-arch-spec-validate`'s job) — only cases where one confirmed decision makes another incoherent or impossible.
+
+Known contradiction shapes to check for:
+
+| Area A | Area B | Contradiction pattern |
+|---|---|---|
+| Quality Attributes (Cost) | Constraints / dependent decisions | A strict budget constraint alongside a recommendation that implies significant spend (e.g. multi-region failover) |
+| Current Pain Points (high operational cost) | Expected Evolution (major growth) | Growth answer worsens an already-flagged cost pain point — worth noting as a risk, not necessarily blocking |
+| Constraints (existing platform) | Technology-implying Quality Attributes | A stated platform constraint conflicts with what a chosen NFR target would require |
+
+If no contradiction is found, skip straight to the recap below.
+
+**If a contradiction is found, do not silently resolve it.** Present it explicitly and wait:
+
+> ⚠️ Possible contradiction: [Decision A] says "...", but [Decision B] says "...". These look inconsistent because [reason]. Which should hold — or is there context I'm missing?
+
+Once no contradictions remain, present the full recap and require explicit confirmation:
+
+> Here's the complete picture before I write the architecture spec:
+> **Purpose & Drivers:** ... **Quality Attributes:** ... **Constraints:** ... **Open Decisions:** ...
+> Confirm this is complete, or tell me what's missing or wrong.
+
+**STOP. Do not proceed to Step 2 until the user explicitly confirms.**
+
 ### Step 2 — Generate the Architecture Tech Spec
 
 Create the file at `docs/arch/<name>.arch.md` using the full template in `references/template.md`.

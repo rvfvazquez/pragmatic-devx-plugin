@@ -175,34 +175,66 @@ If a technology option the user proposes conflicts with the constitution, flag i
 
 Do not silently accept a decision that violates the constitution.
 
-Use `AskUserQuestion` to ask. Group questions by concern to avoid overwhelming the user. Example format:
+Use `AskUserQuestion` to ask. Group questions by concern to avoid overwhelming the user.
+
+**Every question must carry a recommended answer (`➡️`).** Derive it in this priority order:
+1. The project constitution, if it leans toward an option even without mandating it
+2. Patterns found in the codebase scan (Step 3) — e.g. an existing message broker, existing auth middleware, existing test pyramid
+3. A pragmatic default for the stack in use, stated as such (e.g. "no strong signal — defaulting to X because Y")
+
+Never present a bare menu with no recommendation — the user should be able to just confirm the `➡️` line instead of picking from scratch every time.
+
+Example format:
 
 ```
 Before I write the spec, I need to clarify a few technology decisions:
 
 **Data Layer**
 - Where will this data be stored? Options: PostgreSQL, DynamoDB, Redis, in-memory, existing DB
+  ➡️ PostgreSQL — codebase already uses the `pg` client in 3 other modules
 - Do you need a cache layer? (yes / no / undecided)
+  ➡️ No — nothing in scope suggests a read-heavy access pattern yet
 
 **API / Interface**
 - How should this be exposed? Options: REST endpoint, GraphQL mutation, internal service call, event/message
+  ➡️ REST endpoint — matches the existing `/api/*` convention in this repo
 - Any authentication/authorization requirement? (JWT, OAuth, API key, existing auth middleware)
+  ➡️ Existing auth middleware — already enforced on all `/api/*` routes
 
 **Async / Background Processing**
 - Does any part of this need to run asynchronously? Options: background job, queue (SQS/RabbitMQ/etc.), cron, synchronous only
+  ➡️ Synchronous only — no fan-out or long-running work described so far
 
 **Infrastructure / Deployment**
 - Are there constraints on where this runs? (Lambda, container, specific region, existing service)
+  ➡️ Same container as the rest of the service — no isolation requirement stated
 
 **Testing Strategy**
 - What test levels are expected for this feature? Options: unit only, unit + integration, unit + integration + e2e, contract tests, no automated tests
+  ➡️ Unit + integration — matches the project's existing test pyramid (found in Step 3)
 - Infer the testing framework from the codebase (Step 3) before asking — only ask if not evident
 - Are there coverage gates or quality requirements? (e.g., all acceptance criteria must have a corresponding integration test)
+  ➡️ State the repo's existing convention if one was found in Step 3, otherwise recommend "all acceptance criteria have a corresponding integration test"
 
-Answer what you know; for anything undecided, just say so and it will remain as an open question in the spec.
+Answer what you know, or just confirm the ➡️ recommendation. For anything undecided, say so and it will remain as an open question in the spec.
 ```
 
 Adapt the questions to what is actually relevant for the feature described. Skip categories that clearly don't apply. **STOP. Do not write the spec until this step is complete.** Technology decisions skipped here will appear as FAIL findings in `pragmatic-spec-validate`.
+
+### Step 4.5 — Follow-up Round for Dependent Decisions
+
+After the user answers Step 4, check whether any answer unlocks a **dependent decision** that could not have been asked before it (its options only make sense given the parent answer). Common triggers:
+
+| Parent answer | Dependent question to ask now |
+|---|---|
+| Queue (SQS/RabbitMQ/etc.) | Which queue? FIFO or standard? Dead-letter queue needed? |
+| REST endpoint | Sync or paginated response? Rate limiting? |
+| JWT / OAuth | Token lifetime? Refresh flow? Which claims are required? |
+| Background job | Retry policy? Max attempts? Idempotency key strategy? |
+
+If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 4** — instead of deferring it straight to `[TODO: decide]`. Only questions whose parent decision itself remained undecided should still become TODOs.
+
+Run this check once. A second round should not itself spawn a third round unless the feature is unusually deep — if it does, proceed to Step 5 anyway and leave the remainder as TODOs rather than turning the interview into an unbounded loop.
 
 ### Step 5 — Generate the Spec Document
 

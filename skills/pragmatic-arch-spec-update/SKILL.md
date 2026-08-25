@@ -125,7 +125,7 @@ Do **not** proceed to Step 2.6 until:
 
 **Apply this step when the update includes a new or updated ADR.**
 
-Use `AskUserQuestion` to ensure the ADR is fully documented:
+Use `AskUserQuestion` to ensure the ADR is fully documented. **Every question here must carry a recommended answer (`➡️`)**, derived in this priority order: (1) constraints or quality attributes already recorded elsewhere in this spec, (2) patterns evident in the codebase, (3) a pragmatic default stated as such.
 
 ```
 To document this architectural decision properly, I need a few more details:
@@ -135,19 +135,37 @@ To document this architectural decision properly, I need a few more details:
 
 **Options Considered**
 - What alternatives were evaluated before this decision?
+  ➡️ Draft from the spec's existing constraints — e.g. if section 3 already rules out vendor lock-in, list that as a rejected option
 
 **Rationale**
 - Why was this option chosen over the alternatives?
 - What constraints, quality attributes, or trade-offs drove this decision?
+  ➡️ Point at the specific NFR or constraint already documented in this spec that this decision satisfies
 
 **Consequences**
 - What are the known trade-offs or downsides of this decision?
 - What becomes easier or harder as a result?
+  ➡️ No strong signal — recommend stating at least one concrete trade-off rather than leaving it blank
 
-If any of these are unknown or still being debated, I'll mark them as open items.
+If any of these are unknown or still being debated, say so — or just confirm the ➡️ recommendation. I'll mark anything left open as an open item.
 ```
 
 Only skip this step if the update contains no new architectural decisions (e.g., pure wording corrections or TODO resolution with already-known content).
+
+### Step 2.65 — Follow-up Round for Dependent Decisions
+
+After Step 2.6, check whether the new/updated ADR unlocks a **dependent decision** that could not have been asked before it (its options only make sense given the ADR just captured). Common triggers:
+
+| Parent answer | Dependent question to ask now |
+|---|---|
+| New component boundary | Does the dependency direction table (6.2) need a new row? |
+| New external integration | Which protocol/contract? Retry and failure-handling strategy? |
+| ADR introduces async communication | Which broker? At-least-once or exactly-once delivery expected? |
+| ADR changes an NFR target (e.g. availability) | Does this require a new failover or redundancy decision? |
+
+If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 2.6** — instead of leaving it implicit or as a fresh `[TODO: ...]`. Only questions whose parent decision itself remained undecided should still become TODOs.
+
+Run this check once. A second round should not itself spawn a third round unless the change is unusually broad — if it does, proceed to Step 3 anyway and leave the remainder as TODOs rather than turning the confirmation into an unbounded loop.
 
 ### Step 3 — Apply the Changes
 

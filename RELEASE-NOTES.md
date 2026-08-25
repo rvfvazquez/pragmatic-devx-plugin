@@ -1,5 +1,46 @@
 # Pragmatic DevX — Release Notes
 
+## v0.8.0 (2026-08-25)
+
+### Structured Interviews Across All Six Create/Update Skills
+
+Every create/update skill in the constitution, spec, and arch-spec lifecycles
+(`pragmatic-project-constitution[-update]`, `pragmatic-spec-create[-update]`,
+`pragmatic-arch-spec-create[-update]`) asked technology and ADR questions as
+flat, single-round menus with no recommended default, so any dependent
+sub-decision unlocked by an answer (e.g. picking a queue, then needing FIFO
+vs. standard) had nowhere to go but a `[TODO: decide]` item — one that
+`pragmatic-spec-validate` / `pragmatic-arch-spec-validate` would then report
+as a FAIL/WARN. Found via structural comparison against the `grilling`
+skill's design-tree/frontier interview model (a recommended answer per
+question, and rounds that reopen based on prior answers).
+
+- **Recommended answers (`➡️`)** — every question with a concrete option
+  list now carries a recommendation, derived in priority order from the
+  project constitution or existing specs, the codebase scan, then a stated
+  pragmatic default.
+- **Follow-up rounds for dependent decisions** — a new round after each main
+  interview step asks dependent sub-decisions on the spot (queue type, token
+  lifetime, retry policy, compliance controls, dependency-table updates,
+  etc.) instead of deferring them to a TODO.
+- **Final Consistency Check** — a new step right before each document is
+  written recaps every decision confirmed so far, scans a short table of
+  known contradiction shapes specific to that document type, and requires
+  explicit user confirmation before proceeding. `-update` skills also check
+  the proposed change against the existing, untouched document content, not
+  just the current session's answers. Scoped to contradiction, not
+  completeness, so it does not duplicate `pragmatic-spec-validate` /
+  `pragmatic-arch-spec-validate`.
+- **`pragmatic-spec-build`** — the Step 0.5 execution-preference menu (test
+  strategy, scaffold order) also gained a recommendation, keyed on whether
+  the harness supports subagent dispatch.
+
+No skill `description`/trigger changed in this release, so
+`tests/skill-triggering/prompts/` behavior is unaffected. All platform
+adapters (`.codex-plugin`, `.cursor-plugin`, `GEMINI.md`) point at the same
+`./skills/` directory, so the change applies uniformly without any
+per-platform sync step.
+
 ## v0.7.0 (2026-08-15)
 
 ### New Skill — `pragmatic-reverse-engineer`

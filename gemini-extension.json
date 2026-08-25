@@ -1,6 +1,6 @@
 {
   "name": "pragmatic-devx-plugin",
   "description": "Structured specs, architecture documentation, and pragmatic engineering patterns.",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "contextFileName": "GEMINI.md"
 }

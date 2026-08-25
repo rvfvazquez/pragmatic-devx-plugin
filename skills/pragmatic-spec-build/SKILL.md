@@ -71,18 +71,22 @@ Use the inferred language for all output in this skill: task descriptions, comme
 
 ### Step 0.5 — Confirm Implementation Preferences
 
-Before reading any files, confirm two execution preferences with a single `AskUserQuestion` call.
+Before reading any files, confirm two execution preferences with a single `AskUserQuestion` call. **Both questions carry a recommended answer (`➡️`)**, based on whether this harness supports subagent dispatch (the `Agent` tool):
 
 **Test strategy:**
 - Interleaved: write one failing test then implement it, per acceptance criterion
+  ➡️ Recommended if the `Agent` tool is available — the only strategy that dispatches the `tdd-implementer` subagent, giving each criterion its own isolated red-green-refactor cycle
 - After each AC: implement the criterion then write its test
 - Stubs first: write all test stubs upfront, then implement all behavior
+  ➡️ Recommended if the `Agent` tool is not available — matches the manual 7a-7d flow this skill falls back to
 
 **Scaffold preference:**
 - Interface/type stubs first, then implement behavior
+  ➡️ Recommended if no subagent dispatch — matches the manual flow's own step order (7a scaffold, 7b types, 7c/7d behavior)
 - End-to-end per AC: type + logic + test together for each criterion
+  ➡️ Recommended if the `Agent` tool is available — pairs with Interleaved, since the `tdd-implementer` subagent already produces type + test + implementation together per criterion
 
-These preferences affect execution order in Step 7 only — all acceptance criteria and tests are required regardless of choice.
+These preferences affect execution order in Step 7 only — all acceptance criteria and tests are required regardless of choice. Answer what you know, or just confirm the ➡️ recommendation for this harness.
 
 If **Interleaved** is chosen and the harness supports dispatching subagents (the `Agent` tool is available), Step 7 dispatches the `tdd-implementer` agent per acceptance criterion instead of writing tests and code inline — see 7c/7d below. If the harness has no subagent dispatch, fall back to the manual flow in 7c/7d and apply red-green-refactor discipline yourself: write the test, run it, confirm it fails for the right reason, then implement.
 

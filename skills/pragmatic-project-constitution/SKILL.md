@@ -85,19 +85,29 @@ From this scan, build a preliminary picture of what the project already is. Brin
 
 Use `AskUserQuestion` to fill the four areas of the constitution. Only ask what is NOT already clear from the Step 1 scan. Adapt the questions to the project context.
 
+**Every question with a concrete option list must carry a recommended answer (`➡️`).** Derive it in this priority order:
+1. What the Step 1 scan already found in `docs/arch/`, `.claude/rules/`, `CLAUDE.md`, or `docs/specs/`
+2. A pragmatic default for the stated product type, stated as such (e.g. "no signal found — recommending X because Y")
+
+Never present a bare menu with no recommendation — the user should be able to just confirm the `➡️` line.
+
 **Area 1 — Project Identity**
 
 Ask about the project's nature and non-negotiable context:
 - What kind of product is it? (SaaS, internal tool, API platform, mobile backend, CLI, library...)
 - Who are the end users or customers?
 - Are there compliance requirements that are non-negotiable? (LGPD, GDPR, SOC2, PCI-DSS, HIPAA...)
+  ➡️ None found in Step 1 scan — recommend confirming explicitly rather than leaving it implicit
 - Is this multi-tenant? If yes, what is the tenancy model and isolation boundary?
+  ➡️ State the Step 1 scan finding if one exists; otherwise "no signal found — recommend confirming explicitly, this affects Area 3"
 
 **Area 2 — Global Tech Stack** (`multiSelect: true`)
 
 Ask which technology decisions apply to ALL modules — not just one:
 - Programming language(s) — is there more than one allowed?
+  ➡️ State the language(s) found across `docs/arch/` and `docs/specs/` in Step 1
 - Database engine(s) — which are permitted? Are any explicitly forbidden?
+  ➡️ State the engine found in Step 1 scan, or "no engine committed yet — recommend picking one now to avoid drift across modules"
 - Infrastructure constraints (cloud provider, runtime, deployment model)?
 - Project-wide library standards (ORM, HTTP client, job queue, auth library)?
 
@@ -105,6 +115,7 @@ Ask which technology decisions apply to ALL modules — not just one:
 
 Ask about rules that govern how modules interact with each other:
 - Is there a module that must be the single source of truth for a domain? (e.g., AuthModule owns all user identity — no module may maintain its own user store)
+  ➡️ Name the module already documented in `docs/arch/` as owning that domain, if found
 - Are there modules that must never communicate directly? (must use events, queue, or gateway)
 - Is there a module that all outbound calls (HTTP, email, SMS) must route through?
 - Are there shared resources (DB, cache, queue) with rules on how all modules access them?
@@ -113,12 +124,32 @@ Ask about rules that govern how modules interact with each other:
 
 Ask what the AI must ALWAYS stop and ask before deciding on its own:
 - Introducing a new third-party dependency?
+  ➡️ Yes — pragmatic default for any project with more than one contributor
 - Adding a new external service integration?
+  ➡️ Yes — same rationale
 - Creating a new database table or changing an existing schema?
 - Changing a public API contract (rename field, remove endpoint, change response shape)?
 - Choosing a technology not already in the project stack?
+  ➡️ Yes — keeps Area 2 decisions from drifting silently
 
-**STOP. Do not generate any files until Areas 1 and 2 have enough content to produce a meaningful constitution.** Areas 3 and 4 may be left as "none defined yet" if the user has no cross-module rules or guardrails to declare — but this must be an explicit answer, not a skipped step.
+Answer what you know, or just confirm the ➡️ recommendation. Areas 3 and 4 may be left as "none defined yet" if the user has no cross-module rules or guardrails to declare — but this must be an explicit answer, not a skipped step.
+
+**STOP. Do not generate any files until Areas 1 and 2 have enough content to produce a meaningful constitution.**
+
+### Step 2.5 — Follow-up Round for Dependent Decisions
+
+After the user answers Step 2, check whether any answer unlocks a **dependent decision** that could not have been asked before it (its options only make sense given the parent answer). Common triggers:
+
+| Parent answer | Dependent question to ask now |
+|---|---|
+| Multi-tenant: yes | Tenancy isolation model — schema-per-tenant, row-level security, separate DB per tenant? |
+| Compliance: LGPD/GDPR/HIPAA selected | Data residency requirement? Consent/retention policy owner? |
+| Database engine chosen | Migration tool standard? Connection pooling policy? |
+| "Module X is single source of truth for domain Y" | What must other modules do instead — event, API call, shared read replica? |
+
+If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 2** — instead of leaving it implicit. Only questions whose parent decision itself remained undecided should still become "none defined yet."
+
+Run this check once. Proceed to Step 3 afterward regardless of whether a second round would still find more dependents — do not turn this into an unbounded loop.
 
 ---
 

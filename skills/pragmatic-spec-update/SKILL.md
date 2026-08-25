@@ -109,12 +109,17 @@ Before I apply any changes, let me confirm my understanding of this update:
  requested change introduces new technology decisions. Omit for purely textual updates.]
 
 **Technology Decisions**
-- This spec has unresolved technology decisions. Let's lock them in:
+- This spec has unresolved technology decisions. Let's lock them in — every item carries a
+  recommended answer (➡️), derived in this priority order: (1) decisions already made elsewhere
+  in this spec or in the constitution, (2) patterns evident in the codebase, (3) a pragmatic
+  default stated as such:
   [TODO item 1 — e.g. Data storage] Options: A, B, C — which do you want, or keep open?
+    ➡️ A — consistent with the storage choice already made in section 5
   [TODO item 2 — e.g. Async processing] Options: SQS, background job, synchronous — which?
-- [If the requested change implies new tech choices, ask about them here]
+    ➡️ Synchronous — no fan-out described in this update; flag if that's wrong
+- [If the requested change implies new tech choices, ask about them here, with the same ➡️ rule]
 
-Answer what you know — for anything undecided, I'll leave it as an open item.
+Answer what you know, or just confirm the ➡️ recommendation — for anything undecided, I'll leave it as an open item.
 ```
 
 Do not proceed to Step 4 until:
@@ -122,6 +127,21 @@ Do not proceed to Step 4 until:
 - The motivation is understood
 - Sections to preserve vs. modify are clear
 - All technology decisions that can be resolved have been addressed
+
+### Step 3.5 — Follow-up Round for Dependent Decisions
+
+After the user answers Step 3, check whether any answer unlocks a **dependent decision** that could not have been asked before it (its options only make sense given the parent answer). Common triggers:
+
+| Parent answer | Dependent question to ask now |
+|---|---|
+| Queue (SQS/RabbitMQ/etc.) | Which queue? FIFO or standard? Dead-letter queue needed? |
+| REST endpoint | Sync or paginated response? Rate limiting? |
+| JWT / OAuth | Token lifetime? Refresh flow? Which claims are required? |
+| Background job | Retry policy? Max attempts? Idempotency key strategy? |
+
+If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 3** — instead of deferring it straight to a new `[TODO: decide]`. Only questions whose parent decision itself remained undecided should still become TODOs.
+
+Run this check once. A second round should not itself spawn a third round unless the update is unusually deep — if it does, proceed to Step 4 anyway and leave the remainder as TODOs rather than turning the confirmation into an unbounded loop.
 
 ### Step 4 — Apply the Changes
 

@@ -89,6 +89,13 @@ Adapt the questions to the scope and what is not already evident from the codeba
 - **Pain Points / Risks**: `multiSelect: true` — there are usually several concerns at once
 - **Architectural Goals**: `multiSelect: true` — multiple goals drive the same architecture
 
+**Every question with a concrete option list must carry a recommended answer (`➡️`).** Derive it in this priority order:
+1. Related architecture specs already in `docs/arch/` — reuse established quality targets or constraints
+2. Patterns evident in the codebase scan (Step 1) — e.g. current infra, current uptime posture
+3. A pragmatic default for the scope type, stated as such (e.g. "no strong signal — defaulting to X because Y")
+
+Never present a bare menu with no recommendation — the user should be able to just confirm the `➡️` line.
+
 Example format:
 
 ```
@@ -101,8 +108,10 @@ Before I write the architecture spec, I need to understand the broader context:
 **Quality Attributes (Non-Functional Requirements)** → multiSelect: true
 Which of these matter most? (select all that apply — provide targets where known)
 - Performance: expected throughput, latency targets
+  ➡️ No strong signal in the codebase — recommend stating a target explicitly rather than leaving it implicit
 - Scalability: peak load, growth projections
 - Availability: uptime requirements, acceptable downtime
+  ➡️ Match the uptime posture of related specs in docs/arch/, if any exist
 - Security: data sensitivity, compliance requirements (LGPD, SOC2, PCI-DSS, etc.)
 - Maintainability: how often will this change, and by what size team?
 - Cost: any budget constraints on infrastructure?
@@ -110,6 +119,7 @@ Which of these matter most? (select all that apply — provide targets where kno
 **Constraints** → multiSelect: true
 Which of these apply? (select all that apply)
 - Technology constraints (existing platform, team skills, vendor agreements)
+  ➡️ Existing platform — codebase already runs on [platform found in Step 1]
 - Integration constraints (systems that cannot change)
 - Organizational constraints (team structure, deployment pipeline, environment restrictions)
 
@@ -128,13 +138,28 @@ What is not working well today? (select all that apply)
 **Open Decisions**
 - Are there architectural decisions still being debated? Which options are on the table?
 
-Answer what you know — for anything undecided, I'll capture it as an open ADR item in the spec.
+Answer what you know, or just confirm the ➡️ recommendation — for anything undecided, I'll capture it as an open ADR item in the spec.
 ```
 
 **STOP. Do not generate the architecture document until all three conditions below are met.** Architecture specs written without this foundation will have FAIL findings in `pragmatic-arch-spec-validate`:
 - The purpose and main quality attributes are understood
 - Key constraints are captured
 - Major open decisions are identified
+
+### Step 1.6 — Follow-up Round for Dependent Decisions
+
+After the user answers Step 1.5, check whether any selected Quality Attribute or Constraint unlocks a **dependent decision** that could not have been asked before it (its options only make sense given the parent answer). Common triggers:
+
+| Parent answer | Dependent question to ask now |
+|---|---|
+| Security: LGPD/SOC2/PCI-DSS compliance | Data residency requirements? Encryption at rest/in transit? Audit logging required? |
+| Availability: high uptime target | Multi-region or multi-AZ failover? Acceptable RTO/RPO? |
+| Technology constraint: existing platform | Which specific platform/version? Any deprecation timeline to design around? |
+| Integration constraint: systems that cannot change | Which protocol/contract must be preserved exactly? |
+
+If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 1.5** — instead of leaving it as a vague open ADR item. Only questions whose parent decision itself remained undecided should still become `[TODO: ...]`.
+
+Run this check once. A second round should not itself spawn a third round unless the scope is unusually broad (e.g. `system`-level) — if it does, proceed to Step 2 anyway and leave the remainder as open ADR items rather than turning the interview into an unbounded loop.
 
 ### Step 2 — Generate the Architecture Tech Spec
 

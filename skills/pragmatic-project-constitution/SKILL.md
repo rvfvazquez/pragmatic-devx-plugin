@@ -9,7 +9,7 @@ Create a project-wide governance document that defines what every agent, develop
 
 ## Purpose
 
-Establish the rules that live above any individual arch spec or feature spec: project identity, non-negotiable tech stack decisions, cross-module constraints, and AI behavior guardrails. This document is loaded first — before any module arch spec or feature spec is read.
+Establish the rules that live above any individual arch spec or feature spec: project identity, non-negotiable tech stack decisions, the project security baseline, cross-module constraints, and AI behavior guardrails. This document is loaded first — before any module arch spec or feature spec is read.
 
 ## Lifecycle Position
 
@@ -83,7 +83,7 @@ From this scan, build a preliminary picture of what the project already is. Brin
 
 ### Step 2 — Discovery Interview
 
-Use `AskUserQuestion` to fill the four areas of the constitution. Only ask what is NOT already clear from the Step 1 scan. Adapt the questions to the project context.
+Use `AskUserQuestion` to fill the five areas of the constitution. Only ask what is NOT already clear from the Step 1 scan. Adapt the questions to the project context.
 
 **Every question with a concrete option list must carry a recommended answer (`➡️`).** Derive it in this priority order:
 1. What the Step 1 scan already found in `docs/arch/`, `.claude/rules/`, `CLAUDE.md`, or `docs/specs/`
@@ -99,7 +99,7 @@ Ask about the project's nature and non-negotiable context:
 - Are there compliance requirements that are non-negotiable? (LGPD, GDPR, SOC2, PCI-DSS, HIPAA...)
   ➡️ None found in Step 1 scan — recommend confirming explicitly rather than leaving it implicit
 - Is this multi-tenant? If yes, what is the tenancy model and isolation boundary?
-  ➡️ State the Step 1 scan finding if one exists; otherwise "no signal found — recommend confirming explicitly, this affects Area 3"
+  ➡️ State the Step 1 scan finding if one exists; otherwise "no signal found — recommend confirming explicitly, this affects Areas 3 and 4"
 
 **Area 2 — Global Tech Stack** (`multiSelect: true`)
 
@@ -111,7 +111,21 @@ Ask which technology decisions apply to ALL modules — not just one:
 - Infrastructure constraints (cloud provider, runtime, deployment model)?
 - Project-wide library standards (ORM, HTTP client, job queue, auth library)?
 
-**Area 3 — Cross-Module Rules** (`multiSelect: true`)
+**Area 3 — Security Baseline** (`multiSelect: true`)
+
+Ask which security decisions apply to ALL modules — not per feature. These become the assumptions every feature spec and arch spec inherits:
+- Authentication model — how does a caller prove identity? (OIDC / OAuth2, session cookie, JWT, mTLS, API key)
+  ➡️ State the mechanism found in `docs/arch/` or `docs/specs/` during Step 1; otherwise "no mechanism committed yet — recommend deciding now, every module needs it"
+- Authorization model — how is access to a specific resource decided? (RBAC, ABAC, per-resource ownership check, ACL)
+  ➡️ State the Step 1 finding, or "no signal — recommend per-resource ownership as the pragmatic default for any multi-user product"
+- Secrets management — where do credentials, API keys, and tokens live, and where are they forbidden?
+  ➡️ Yes to "secrets never in code or the repository — read them from a secrets manager or injected environment" — pragmatic default for any shared repo
+- Data classification — are there data categories (PII, financial, health) with rules on how every module stores, logs, and transmits them?
+  ➡️ State "yes" if Area 1 flagged LGPD / GDPR / HIPAA; otherwise recommend confirming explicitly rather than leaving it implicit
+- Security baseline reference — is there a standard the project holds itself to? (OWASP Top 10, OWASP ASVS L1/L2, CWE Top 25)
+  ➡️ No signal found — recommend OWASP Top 10 as a minimum shared reference
+
+**Area 4 — Cross-Module Rules** (`multiSelect: true`)
 
 Ask about rules that govern how modules interact with each other:
 - Is there a module that must be the single source of truth for a domain? (e.g., AuthModule owns all user identity — no module may maintain its own user store)
@@ -120,7 +134,7 @@ Ask about rules that govern how modules interact with each other:
 - Is there a module that all outbound calls (HTTP, email, SMS) must route through?
 - Are there shared resources (DB, cache, queue) with rules on how all modules access them?
 
-**Area 4 — AI Behavior Guardrails** (`multiSelect: true`)
+**Area 5 — AI Behavior Guardrails** (`multiSelect: true`)
 
 Ask what the AI must ALWAYS stop and ask before deciding on its own:
 - Introducing a new third-party dependency?
@@ -131,10 +145,12 @@ Ask what the AI must ALWAYS stop and ask before deciding on its own:
 - Changing a public API contract (rename field, remove endpoint, change response shape)?
 - Choosing a technology not already in the project stack?
   ➡️ Yes — keeps Area 2 decisions from drifting silently
+- Weakening an Area 3 security decision — adding a new inbound entry point, changing an authorization check, or storing a classified data category in a new place?
+  ➡️ Yes — an agent must never relax the security baseline on its own
 
-Answer what you know, or just confirm the ➡️ recommendation. Areas 3 and 4 may be left as "none defined yet" if the user has no cross-module rules or guardrails to declare — but this must be an explicit answer, not a skipped step.
+Answer what you know, or just confirm the ➡️ recommendation. Areas 4 and 5 may be left as "none defined yet" if the user has no cross-module rules or guardrails to declare — but this must be an explicit answer, not a skipped step. Area 3 should not be "none" for any product with a network surface or more than one user; if the user genuinely has no security decision to record, capture that as an explicit statement, not a skipped step.
 
-**STOP. Do not generate any files until Areas 1 and 2 have enough content to produce a meaningful constitution.**
+**STOP. Do not generate any files until Areas 1, 2, and 3 have enough content to produce a meaningful constitution.**
 
 ### Step 2.5 — Follow-up Round for Dependent Decisions
 
@@ -146,6 +162,9 @@ After the user answers Step 2, check whether any answer unlocks a **dependent de
 | Compliance: LGPD/GDPR/HIPAA selected | Data residency requirement? Consent/retention policy owner? |
 | Database engine chosen | Migration tool standard? Connection pooling policy? |
 | "Module X is single source of truth for domain Y" | What must other modules do instead — event, API call, shared read replica? |
+| Authentication model chosen (JWT / OIDC / session) | Token or session lifetime? Refresh / rotation policy? Where is it validated — gateway, each service, or both? |
+| Authorization model = RBAC / ABAC | Where are roles or attributes defined, and who is allowed to change them? |
+| Data classification includes PII / financial / health | Retention policy owner? Is that category ever allowed in application logs, or never? |
 
 If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 2** — instead of leaving it implicit. Only questions whose parent decision itself remained undecided should still become "none defined yet."
 
@@ -162,6 +181,10 @@ Known contradiction shapes to check for:
 | Project Identity (tenancy model) | Cross-Module Rules (shared resources) | A stated isolation model conflicts with a rule allowing shared access to a resource |
 | Project Identity (compliance) | AI Behavior Guardrails | A compliance requirement (e.g. LGPD) with no corresponding guardrail, or a guardrail that contradicts it |
 | Global Tech Stack | Cross-Module Rules | A rule assumes a technology not listed as permitted in Area 2 |
+| Security Baseline (authorization model) | Cross-Module Rules | One module is declared the single source of truth for identity, but another module is allowed to run its own permission check on that identity |
+| Security Baseline (data classification) | Global Tech Stack / Cross-Module Rules | A data category is barred from logs, but a stack decision or rule routes that data through a shared log, queue, or cache with no exception noted |
+| Security Baseline (secrets management) | AI Behavior Guardrails | Secrets are barred from the repository, but no guardrail stops the agent from adding one |
+| Security Baseline (authentication model) | Project Identity (compliance) | A compliance requirement implies an authentication strength (e.g. MFA) the stated model does not provide |
 
 If no contradiction is found, skip straight to the recap below.
 
@@ -172,7 +195,7 @@ If no contradiction is found, skip straight to the recap below.
 Once no contradictions remain, present the full recap and require explicit confirmation:
 
 > Here's the complete picture before I write the constitution:
-> **Area 1:** ... **Area 2:** ... **Area 3:** ... **Area 4:** ...
+> **Area 1 (Project Identity):** ... **Area 2 (Global Tech Stack):** ... **Area 3 (Security Baseline):** ... **Area 4 (Cross-Module Rules):** ... **Area 5 (AI Behavior Guardrails):** ...
 > Confirm this is complete, or tell me what's missing or wrong.
 
 **STOP. Do not proceed to Step 3 until the user explicitly confirms.**
@@ -210,7 +233,21 @@ Non-negotiable technology decisions that apply to every module. No spec or imple
 
 ---
 
-## 3. Cross-Module Rules
+## 3. Security Baseline
+
+Non-negotiable security decisions that apply to every module. No feature spec, arch spec, or implementation may weaken these without updating this constitution first. Every spec inherits these as its starting assumptions.
+
+| Decision | Value | Rationale |
+|---|---|---|
+| Authentication | <value> | <why> |
+| Authorization | <value> | <why> |
+| Secrets management | <value> | <why> |
+| Data classification | <value> | <why> |
+| Security baseline reference | <value> | <why> |
+
+---
+
+## 4. Cross-Module Rules
 
 Rules that govern interactions between modules. These rules do not belong to any single module's arch spec — they apply to all modules simultaneously.
 
@@ -218,7 +255,7 @@ Rules that govern interactions between modules. These rules do not belong to any
 
 ---
 
-## 4. AI Behavior Guardrails
+## 5. AI Behavior Guardrails
 
 Decisions the AI agent must NOT make autonomously. For each item, the agent must stop, present the situation clearly, and wait for explicit human approval before proceeding.
 
@@ -239,12 +276,13 @@ Fill every section with concrete content. Use `— none defined yet —` only fo
 
 ### Step 4 — Generate `.claude/rules/00-project-constitution.md`
 
-Extract only **concrete, actionable rules** from sections 2, 3, and 4 of the constitution. Do not copy prose — translate decisions into directive statements the agent can act on during any session.
+Extract only **concrete, actionable rules** from sections 2, 3, 4, and 5 of the constitution. Do not copy prose — translate decisions into directive statements the agent can act on during any session.
 
 Group the extracted rules into sections:
 
 - **Project Context** — a 1–2 sentence directive summarizing what the project is and its compliance context, plus the fixed bullet: "These rules take precedence over all module-specific arch rules."
 - **Global Stack Constraints** — e.g.: "Only PostgreSQL is permitted as a database engine. Never suggest SQLite, MongoDB, or any other engine."
+- **Security Baseline Constraints** — e.g.: "Authentication is the platform OIDC provider; no module implements its own credential check. Every endpoint returning a user-owned resource must verify ownership against the caller identity before responding. Secrets are never committed to the repository — read them from the injected environment. Never place PII in application logs."
 - **Cross-Module Constraints** — e.g.: "AuthModule is the single source of truth for user identity. No module may maintain its own user store or replicate identity data."
 - **AI Guardrails — Stop and Ask Before Deciding** — e.g.: "Never add a third-party dependency without listing: package name, purpose, license, and why an existing dependency does not cover it. Present this and wait for confirmation — do not modify package.json before approval."
 

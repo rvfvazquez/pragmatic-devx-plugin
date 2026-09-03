@@ -55,7 +55,9 @@ Apply the chosen language to all new or modified content. Existing unchanged con
 
 Read `docs/constitution.md` in full. Note:
 - Current `Last Updated` date and version (if present)
-- The content of each section: Project Identity, Global Tech Stack, Cross-Module Rules, AI Behavior Guardrails
+- The content of each section: Project Identity, Global Tech Stack, Security Baseline, Cross-Module Rules, AI Behavior Guardrails
+
+> A constitution created before the Security Baseline section existed will not have one. If the requested change is security-related (authentication, authorization, secrets, data classification) and no Security Baseline section is present, treat this update as **adding that section**, not editing an existing one — place it as section 3 and renumber Cross-Module Rules and AI Behavior Guardrails accordingly.
 - Existing changelog entries
 
 Also read `.claude/rules/00-project-constitution.md` if it exists — it will need to be regenerated after the update.
@@ -70,6 +72,7 @@ Analyze what needs to change. Classify the update by area:
 |---|---|
 | **Project Identity** | New compliance requirement (LGPD, GDPR), change in tenancy model, updated product scope |
 | **Global Tech Stack** | Add permitted technology, remove forbidden one, update a stack decision and rationale |
+| **Security Baseline** | New or changed authentication or authorization model, secrets-management rule, data-classification category, security baseline reference (OWASP ASVS, etc.) |
 | **Cross-Module Rules** | New inter-module constraint, updated ownership boundary, deprecated rule |
 | **AI Behavior Guardrails** | New action Claude must always ask before taking, removed guardrail, updated trigger condition |
 
@@ -91,8 +94,11 @@ Before I apply any changes, let me confirm my understanding:
 Which areas of the constitution are changing?
 - Section 1 — Project Identity
 - Section 2 — Global Tech Stack
-- Section 3 — Cross-Module Rules
-- Section 4 — AI Behavior Guardrails
+- Section 3 — Security Baseline
+- Section 4 — Cross-Module Rules
+- Section 5 — AI Behavior Guardrails
+
+> If the constitution predates the Security Baseline section, "Section 3 — Security Baseline" means creating it (see Step 1).
 
 **Nature of the Change** → multiSelect: true
 What kind of update is this?
@@ -124,6 +130,9 @@ After the user answers Step 3, check whether any answer unlocks a **dependent de
 | New compliance requirement added (LGPD/GDPR/HIPAA) | Does this also require a new AI guardrail — e.g. "always ask before logging or storing personal data"? |
 | New Cross-Module Rule added | Does an existing AI guardrail or tech-stack decision need to reference this rule? |
 | Tenancy model changed | Does this affect any existing Cross-Module Rule about shared resources? |
+| New authorization model or auth-provider decision | Does a Cross-Module Rule or AI guardrail need to reference it — e.g. "no module runs its own permission check"? |
+| New data-classification category (PII/financial/health) | Does this require a new AI guardrail — "always ask before logging or persisting data in category X"? |
+| Secrets-management rule added | Does an AI guardrail need to forbid the agent from committing a secret or adding one to config? |
 
 If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 3** — instead of leaving it implicit. Only questions whose parent decision itself remained undecided should still become an open item.
 
@@ -140,6 +149,7 @@ Known contradiction shapes to check for:
 | New or corrected rule | Untouched section of the same or another area | The new rule contradicts or silently supersedes an existing rule that wasn't marked as deprecated |
 | New AI guardrail | Existing Global Tech Stack decision | The guardrail implies a technology choice the stack section doesn't list as permitted |
 | Deprecated rule | Other rules referencing it | Another active rule still depends on the rule being deprecated |
+| New/changed Security Baseline decision | Untouched Cross-Module Rules or Global Tech Stack | The security decision assumes an entry point, provider, or storage rule the other sections do not establish — e.g. "all auth via the gateway" while a Cross-Module Rule lets a module be called directly |
 
 If no contradiction is found, skip straight to the recap below.
 
@@ -182,12 +192,13 @@ When modifying `docs/constitution.md`:
 
 ### Step 5 — Regenerate `.claude/rules/00-project-constitution.md`
 
-After updating `docs/constitution.md`, regenerate the rules from the updated sections 2, 3, and 4.
+After updating `docs/constitution.md`, regenerate the rules from the updated sections 2, 3, 4, and 5.
 
 Extract only **concrete, actionable directives** — not prose. Follow the same section grouping as the original generation:
 
 - **Project Context** — a 1–2 sentence directive summarizing what the project is and its compliance context, plus the fixed bullet: "These rules take precedence over all module-specific arch rules."
 - **Global Stack Constraints**
+- **Security Baseline Constraints**
 - **Cross-Module Constraints**
 - **AI Guardrails — Stop and Ask Before Deciding**
 
@@ -214,7 +225,7 @@ State:
 
 ```
 docs/constitution.md                              ← updated governance document
-.claude/rules/00-project-constitution.md          ← regenerated from updated sections 2, 3, 4
+.claude/rules/00-project-constitution.md          ← regenerated from updated sections 2, 3, 4, 5
 AGENTS.md                                         ← Codex CLI, Antigravity, and most other agentic tools
 .cursor/rules/project-constitution.mdc            ← Cursor
 .windsurf/rules/project-constitution.md           ← Windsurf

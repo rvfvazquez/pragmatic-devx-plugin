@@ -70,6 +70,8 @@ Analyze what needs to change:
 
 Map which sections are directly affected and which may be indirectly impacted — a change to a component boundary may also affect dependency direction rules, data flow descriptions, and NFRs.
 
+**Security cascade:** if the change adds an inbound entry point, moves or removes an authorization check, changes an external integration, or changes where a classified data category is stored, then section 4.3 (Trust Boundaries & Attack Surface) and the section 9 Security row are in scope even if the user did not name them — and the ADR's Consequences should name the STRIDE category it opens or closes.
+
 ### Step 2.5 — Confirm Scope and Intent Before Proceeding
 
 **This is a mandatory step.** Do not apply any changes until the full scope and intent of the update is clear.
@@ -95,12 +97,16 @@ Which sections of the arch spec are explicitly changing?
 - Architecture Patterns (naming conventions, communication style, error strategy)
 - Data Flows (new or changed flow)
 - External Integrations (new or changed integration)
+- Trust Boundaries & Attack Surface (section 4.3)
 - NFRs / Constraints (new non-functional requirement or constraint)
 - Open Decisions / TODOs (resolving a placeholder)
 
 **Related Sections to Cascade** → multiSelect: true
 Are there sections that should also be updated as a consequence?
 (e.g., if a component boundary changes → dependency direction rules may also change)
+- If the Step 2 security cascade applies: does section 4.3 need a new boundary row or an
+  updated attack surface, and does the section 9 Security row still hold?
+  ➡️ Yes if the change adds an inbound entry point or moves an authorization check
 
 **Motivation**
 - What triggered this change? (new decision, intentional deviation found in code, correction, requirement change)
@@ -159,9 +165,10 @@ After Step 2.6, check whether the new/updated ADR unlocks a **dependent decision
 | Parent answer | Dependent question to ask now |
 |---|---|
 | New component boundary | Does the dependency direction table (6.2) need a new row? |
-| New external integration | Which protocol/contract? Retry and failure-handling strategy? |
+| New external integration | Which protocol/contract? Retry and failure-handling strategy? Does section 4.3 gain a boundary row for the data leaving to it? |
 | ADR introduces async communication | Which broker? At-least-once or exactly-once delivery expected? |
 | ADR changes an NFR target (e.g. availability) | Does this require a new failover or redundancy decision? |
+| New inbound entry point or moved authorization check | What control is applied on that boundary, and does the section 9 Security row still hold? |
 
 If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 2.6** — instead of leaving it implicit or as a fresh `[TODO: ...]`. Only questions whose parent decision itself remained undecided should still become TODOs.
 
@@ -178,6 +185,7 @@ Known contradiction shapes to check for:
 | New or updated ADR | Existing dependency direction rules (6.2) | The new decision implies a dependency the existing rules forbid |
 | New component boundary | Existing component diagram (4.1) not marked in scope | A component referenced elsewhere in the spec now has an inconsistent responsibility |
 | New NFR target | Existing constraint elsewhere in the spec | The new target conflicts with a constraint the update didn't touch |
+| New inbound entry point | Section 4.3 attack surface (unchanged) | The change adds a route or listener but section 4.3 still lists the old attack surface, or the section 9 Security row assumes it |
 
 If no contradiction is found, skip straight to the recap below.
 

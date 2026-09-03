@@ -67,6 +67,7 @@ Analyze what needs to change:
 - If a description is provided, identify the relevant sections
 - If no description is given, scan for `[TODO: ...]` placeholders
 - Map which sections are directly affected and which may be indirectly impacted (a change to the data model may also affect the API and acceptance criteria)
+- **Security cascade:** if the change adds or modifies an endpoint or handler, an authentication or authorization check, or the data the feature touches (new PII, new user-owned resource), then section 8's Security item — and, when any sub-item becomes applicable, the section 7 security acceptance criterion — are in scope even if the user did not name them.
 
 ### Step 3 — Confirm Scope, Intent, and Technology Decisions
 
@@ -90,11 +91,16 @@ Before I apply any changes, let me confirm my understanding of this update:
 **Scope of the Update** → multiSelect: true
 - Which sections of the spec are explicitly in scope for this change?
   Options: Problem Statement, Goals/Non-Goals, Proposed Solution, Technology Decisions,
-           API/Interface, Data Model, Behavior & Logic, Acceptance Criteria, Open Questions
+           API/Interface, Data Model, Behavior & Logic, Acceptance Criteria,
+           Security (section 8 item), Open Questions
 
 **Related Sections to Cascade** → multiSelect: true
 - Are there related sections that should also be updated as a result?
   (e.g., if the API changes → should Acceptance Criteria also change?)
+- If the Step 2 security cascade applies: does section 8's Security item need a new or
+  changed entry (authorization, untrusted input, sensitive data, abuse case), and does
+  section 7 need a security acceptance criterion it doesn't have yet?
+  ➡️ Yes if the change adds an endpoint returning user-owned data or a new auth path
 
 **Motivation**
 - What triggered this change? (new requirement, correction, new decision, implementation feedback)
@@ -138,6 +144,8 @@ After the user answers Step 3, check whether any answer unlocks a **dependent de
 | REST endpoint | Sync or paginated response? Rate limiting? |
 | JWT / OAuth | Token lifetime? Refresh flow? Which claims are required? |
 | Background job | Retry policy? Max attempts? Idempotency key strategy? |
+| New endpoint returning a user-owned resource | What is the ownership/authorization check, and what does a non-owner receive (`403` / `404`)? Add the matching section 7 security criterion. |
+| New data category touched (PII, financial, health) | How is it stored, logged, transmitted? Does it need a `[TODO]` or a constitution Security Baseline check? |
 
 If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 3** — instead of deferring it straight to a new `[TODO: decide]`. Only questions whose parent decision itself remained undecided should still become TODOs.
 
@@ -154,6 +162,7 @@ Known contradiction shapes to check for:
 | New Technology Decision | Non-Goals or Constraints (unchanged) | The new choice implements something explicitly marked out of scope |
 | New or corrected Acceptance Criterion | Existing Acceptance Criteria | The new criterion contradicts or supersedes one that wasn't marked for change |
 | New scope item | "Related Sections to Cascade" answer | A section the user said would NOT cascade actually depends on the change |
+| New endpoint / auth change | Section 8 Security item (unchanged) | The change adds a user-owned resource path but section 8 still says Authorization is `N/A`, or has no abuse case for the new surface |
 
 If no contradiction is found, skip straight to the recap below.
 

@@ -59,14 +59,27 @@ graph TD
 
 ### 4.2 Component Boundaries
 
-| Component | Responsibility | Public Interface |
-|-----------|---------------|-----------------|
-| `payments/handler` | HTTP request handling, input validation, response mapping | `PaymentHandler` (HTTP handlers) |
-| `payments/service` | Orchestrates charge and refund flows, enforces business rules | `PaymentService` interface |
-| `payments/domain` | Transaction state machine, charge validation rules | `Transaction`, `ChargePolicy` types |
-| `payments/repository` | Persist and query transaction records | `TransactionRepository` interface |
-| `payments/gateway` | Anti-corruption layer for Stripe SDK | `PaymentGateway` interface |
-| `payments/outbox` | Reliable event publishing via transactional outbox | `OutboxPublisher` interface |
+| Component | Responsibility | Public Interface | Trust level |
+|-----------|---------------|-----------------|-------------|
+| `payments/handler` | HTTP request handling, input validation, response mapping | `PaymentHandler` (HTTP handlers) | untrusted edge — validates and authorizes every request before calling the service |
+| `payments/service` | Orchestrates charge and refund flows, enforces business rules | `PaymentService` interface | trusted core — assumes caller identity and input already validated |
+| `payments/domain` | Transaction state machine, charge validation rules | `Transaction`, `ChargePolicy` types | trusted core |
+| `payments/repository` | Persist and query transaction records | `TransactionRepository` interface | trusted core |
+| `payments/gateway` | Anti-corruption layer for Stripe SDK | `PaymentGateway` interface | boundary to external — treats every Stripe response as untrusted, maps it through the ACL |
+| `payments/outbox` | Reliable event publishing via transactional outbox | `OutboxPublisher` interface | trusted core |
+
+### 4.3 Trust Boundaries & Attack Surface
+
+The module has more than one trust level: it exposes an authenticated HTTP API, calls an external payment provider, and handles cardholder-adjacent data.
+
+| Boundary (from → to) | What crosses it | Control applied on crossing |
+|---|---|---|
+| Internet → `payments/handler` | HTTP charge / refund requests | platform authN middleware, request schema validation, per-actor authorization (a caller may only act on transactions belonging to their own account) |
+| `payments/gateway` ← Stripe API | webhook callbacks and SDK responses | Stripe signature verification on webhooks; every response re-validated and mapped through the ACL, never trusted as-is |
+| `payments/service` → PostgreSQL | transaction reads/writes | parameterized queries only; no raw SQL from request input |
+| `payments/outbox` → SQS | domain events | events carry no card data — only transaction id, status, amount |
+
+**Attack surface of this architecture:** the authenticated `POST /payments/charge` and `POST /payments/refund` endpoints, and the inbound Stripe webhook endpoint. No other external entry points.
 
 ## 5. Key Design Decisions
 
@@ -222,6 +235,7 @@ sequenceDiagram
 | Maintainability | Payment provider must be swappable in < 1 day | Anti-corruption layer (`payments/gateway`) |
 | Observability | All transaction state changes must be traceable | Structured logging with `transaction_id` on every log entry |
 | Performance | `POST /payments/charge` < 500ms p95 | Stripe is the bottleneck; no additional latency introduced by this module |
+| Security | Every boundary in 4.3 enforces its stated control; a caller can only act on its own account's transactions; no card data in events, logs, or the outbox; Stripe keys from injected env only | authZ check in `payments/handler`, Stripe webhook signature verification, parameterized queries, structured logging allow-list |
 
 ## 10. Open Questions
 

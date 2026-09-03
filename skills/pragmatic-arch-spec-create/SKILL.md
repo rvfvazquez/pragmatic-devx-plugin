@@ -9,7 +9,7 @@ Create a software architecture technical specification document for a system, mo
 
 ## Purpose
 
-Produce a thorough architecture tech spec that captures design decisions (ADRs), component boundaries, architecture patterns, data flows, and non-functional requirements. Specs live in `docs/arch/`.
+Produce a thorough architecture tech spec that captures design decisions (ADRs), component boundaries, architecture patterns, data flows, trust boundaries where they exist, and non-functional requirements. Specs live in `docs/arch/`.
 
 ## Scope Types
 
@@ -153,6 +153,7 @@ After the user answers Step 1.5, check whether any selected Quality Attribute or
 | Parent answer | Dependent question to ask now |
 |---|---|
 | Security: LGPD/SOC2/PCI-DSS compliance | Data residency requirements? Encryption at rest/in transit? Audit logging required? |
+| Security attribute selected, OR the system exposes a network endpoint or serves multiple actors | What are the trust boundaries — where does external or less-trusted input enter, and what validates it on the way in? Who are the untrusted actors? |
 | Availability: high uptime target | Multi-region or multi-AZ failover? Acceptable RTO/RPO? |
 | Technology constraint: existing platform | Which specific platform/version? Any deprecation timeline to design around? |
 | Integration constraint: systems that cannot change | Which protocol/contract must be preserved exactly? |
@@ -172,6 +173,8 @@ Known contradiction shapes to check for:
 | Quality Attributes (Cost) | Constraints / dependent decisions | A strict budget constraint alongside a recommendation that implies significant spend (e.g. multi-region failover) |
 | Current Pain Points (high operational cost) | Expected Evolution (major growth) | Growth answer worsens an already-flagged cost pain point — worth noting as a risk, not necessarily blocking |
 | Constraints (existing platform) | Technology-implying Quality Attributes | A stated platform constraint conflicts with what a chosen NFR target would require |
+| Security named as a top quality attribute | Trust boundaries (4.3) | Security is a driver but 4.3 is going to be marked "single trust domain" — one of the two is wrong |
+| Trust boundary identified (4.3) | Dependency Direction (6.2) / Component Boundaries (4.2) | A component on the trusted side is reachable directly from an untrusted entry point with no validation component between them |
 
 If no contradiction is found, skip straight to the recap below.
 
@@ -192,6 +195,18 @@ Once no contradictions remain, present the full recap and require explicit confi
 Create the file at `docs/arch/<name>.arch.md` using the full template in `references/template.md`.
 
 Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision.
+
+#### Trust boundaries (section 4.3) — assess applicability first
+
+Before writing section 4.3, decide whether this architecture spans more than one trust level. It does if **any** of these hold:
+- it exposes a network endpoint or receives input from outside its own process
+- it serves more than one tenant, customer, or actor role
+- it carries data across a process or host boundary from a less trusted zone
+- the project constitution defines a Security Baseline this scope must enforce
+
+If **yes**: fill section 4.3 with the real boundaries and the attack surface, add the **Trust level** column to section 4.2, and give the section 9 Security row a concrete strategy. Every boundary named here should have a matching validation or authorization control visible in section 6 or section 7.
+
+If **no** (internal library, single-trust-domain batch job, pure computation module): state that explicitly in one sentence in section 4.3, drop the Trust level column, and set the section 9 Security row to reference that statement. Do not invent boundaries that do not exist — a forced trust-boundary table for a single-trust-domain component is noise, not rigor.
 
 #### Diagram Guide
 

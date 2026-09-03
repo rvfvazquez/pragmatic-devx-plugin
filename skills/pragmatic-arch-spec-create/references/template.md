@@ -45,10 +45,37 @@ graph TD
 
 ### 4.2 Component Boundaries
 
-| Component | Responsibility | Public Interface |
-|-----------|---------------|-----------------|
-| `component-a` | ... | `ServiceA` |
-| `component-b` | ... | `RepositoryB` |
+| Component | Responsibility | Public Interface | Trust level |
+|-----------|---------------|-----------------|-------------|
+| `component-a` | ... | `ServiceA` | untrusted edge — validates all inbound input |
+| `component-b` | ... | `RepositoryB` | trusted core — assumes input already validated |
+
+> Include the **Trust level** column only if this architecture has more than one trust
+> level (see 4.3). If the whole system sits in a single trust domain, drop the column.
+
+### 4.3 Trust Boundaries & Attack Surface
+
+> **Assess applicability before writing this subsection.** This architecture has more
+> than one trust level if any of these hold:
+> - it exposes a network endpoint or receives input from outside its own process
+> - it serves more than one tenant, customer, or actor role
+> - it carries data across a process or host boundary from a less trusted zone
+> - the project constitution defines a Security Baseline this scope must enforce
+>
+> **If yes:** fill the table and the attack-surface line below.
+> **If no** (internal library, single-trust-domain batch job, pure computation module):
+> replace the table with one sentence stating that and why, and skip the rest. Do not
+> invent boundaries that do not exist.
+
+Each row is a point where control or data passes from a less trusted zone into a more trusted one.
+
+| Boundary (from → to) | What crosses it | Control applied on crossing |
+|---|---|---|
+| Internet → API Gateway | HTTP requests | authN, rate limiting, schema validation |
+| API → Worker (via queue) | job messages | payload validation, idempotency key |
+| Tenant context → shared store | queries | tenant-scoped filter enforced in the data layer |
+
+**Attack surface of this architecture:** <public endpoints, open ports, file/upload intake, inbound webhooks, admin interfaces — every way external input enters>.
 
 ## 5. Key Design Decisions
 
@@ -61,6 +88,12 @@ Document significant architectural decisions using ADR format:
 - **Decision**: What was decided?
 - **Rationale**: Why this option over alternatives?
 - **Consequences**: What are the trade-offs and implications?
+
+> If a decision changes the attack surface or a trust boundary (new inbound channel,
+> a moved or removed authorization check, a new place a classified data category is
+> stored), say so in **Consequences** and name the STRIDE category it opens or closes
+> — Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, or
+> Elevation of privilege.
 
 ### Decision 2: [Short title]
 
@@ -144,6 +177,10 @@ flowchart LR
 | Testability | Business logic must be unit-testable | Dependency inversion, pure functions |
 | Maintainability | Low coupling between components | Defined interfaces, bounded contexts |
 | Performance | < 200ms p95 response time | [TODO: define strategy] |
+| Security | Every trust boundary in 4.3 enforces its stated control; no component trusts data from outside its zone; no secret in source | Validation at the edge, typed domain models, ownership/authorization checks in the service layer, secrets via injected environment |
+
+> If 4.3 concluded this is a single trust domain, set the Security row to
+> "Single trust domain — no external attack surface (see 4.3)" rather than deleting it.
 
 ## 10. Open Questions
 

@@ -32,6 +32,31 @@ Use this skill when **no arch spec exists yet** for the system, module, or integ
 
 ## How to Create an Architecture Spec
 
+### Pre-condition 0 — Check for Project Constitution
+
+Before anything else, check whether `docs/constitution.md` exists.
+
+**If it does NOT exist:**
+
+Use `AskUserQuestion` to ask:
+
+> "No project constitution found at `docs/constitution.md`. A constitution defines the global tech stack, the project Security Baseline (authentication model, authorization model, secrets management, data classification), cross-module rules, and AI guardrails — an arch spec is meant to sit *below* the constitution and inherit those decisions. Writing this arch spec without one may produce component boundaries, integrations, or trust-boundary controls that conflict with undocumented global constraints.
+>
+> Would you like to create a constitution first, or continue without one?"
+
+Options:
+- **Create constitution first** — end this skill now and run `pragmatic-project-constitution`. Return here after the constitution is created.
+- **Continue without it** — proceed. Note that the global tech stack, Security Baseline, and cross-module constraints will not be available to anchor this arch spec.
+
+**If it EXISTS:**
+
+Load `docs/constitution.md` in full and hold it as active context for the rest of this skill. Use it to:
+- inherit Global Tech Stack decisions instead of re-deciding them in the discovery interview
+- treat the **Security Baseline** as the answer to the section 4.3 applicability test — if the constitution defines one, this scope must enforce it, so section 4.3 is not optional
+- flag any component, integration, or boundary decision that would conflict with a cross-module rule or guardrail
+
+---
+
 ### Pre-condition — Check for Existing Arch Spec
 
 Before anything else, determine the `<name>` from the user's message and check whether `docs/arch/<name>.arch.md` already exists.
@@ -74,6 +99,7 @@ Determine from the user's input:
 Before writing, scan the codebase for:
 - Existing code, README files, or prior specs that reveal current decisions and constraints
 - Related architecture specs in `docs/arch/`
+- The project constitution loaded in Pre-condition 0, if one exists — its Global Tech Stack, Security Baseline, and Cross-Module Rules constrain this arch spec and must not be re-litigated here
 
 ### Step 1.5 — Architecture Discovery Interview
 
@@ -90,9 +116,12 @@ Adapt the questions to the scope and what is not already evident from the codeba
 - **Architectural Goals**: `multiSelect: true` — multiple goals drive the same architecture
 
 **Every question with a concrete option list must carry a recommended answer (`➡️`).** Derive it in this priority order:
-1. Related architecture specs already in `docs/arch/` — reuse established quality targets or constraints
-2. Patterns evident in the codebase scan (Step 1) — e.g. current infra, current uptime posture
-3. A pragmatic default for the scope type, stated as such (e.g. "no strong signal — defaulting to X because Y")
+1. The project constitution, if loaded — a Global Tech Stack or Security Baseline decision is inherited, not asked. State it as such: "Authentication: platform OIDC (from project constitution — no choice needed)"
+2. Related architecture specs already in `docs/arch/` — reuse established quality targets or constraints
+3. Patterns evident in the codebase scan (Step 1) — e.g. current infra, current uptime posture
+4. A pragmatic default for the scope type, stated as such (e.g. "no strong signal — defaulting to X because Y")
+
+If a decision the user proposes conflicts with the constitution, flag it: "The constitution defines [X]. Choosing [Y] would conflict with it — update the constitution first via `pragmatic-project-constitution-update` to proceed with [Y]."
 
 Never present a bare menu with no recommendation — the user should be able to just confirm the `➡️` line.
 

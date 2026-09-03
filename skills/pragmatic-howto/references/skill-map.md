@@ -36,6 +36,7 @@ Complete reference for all skills in the pragmatic-devx plugin: purpose, outputs
 
 **Covers:**
 - Project identity and global technology stack decisions
+- Security Baseline (document section 3): authentication model, authorization model, secrets management, data classification, security baseline reference
 - Cross-module constraints and naming conventions
 - AI behavior guardrails: what Claude must always ask vs. can decide autonomously
 
@@ -66,8 +67,8 @@ All feature specs live in `docs/specs/<feature-slug>.md`.
 4. Proposed Solution
 5. Technology Decisions
 6. Detailed Design (API/Interface, Data Model, Behavior & Logic)
-7. Acceptance Criteria
-8. Technical Considerations
+7. Acceptance Criteria — includes a security acceptance criterion (negative assertion) when section 8's Security item applies
+8. Technical Considerations — includes a required **Security** item (untrusted input, authN, authZ, sensitive data, abuse case), inherited from the constitution Security Baseline where one exists
 9. Open Questions
 
 Changelog is not part of the initial document — it is appended later by `pragmatic-spec-update` on the first edit.
@@ -89,6 +90,7 @@ Changelog is not part of the initial document — it is appended later by `pragm
 - No open `[TODO: ...]` placeholders in critical sections
 - Technology decisions are explicit (no "TBD")
 - Acceptance criteria are testable and unambiguous
+- Section 8 Security item addressed (FAIL/WARN/PASS, not "mentioned"); security criteria are testable
 - Internal consistency (no contradictions between sections)
 - Changelog is present
 
@@ -141,8 +143,9 @@ Assert the block and instruct the user to run `pragmatic-spec-validate` + `pragm
 **Pre-conditions:** Spec exists + some implementation exists to check.
 
 **Behavior:**
-- Reads the spec's acceptance criteria (section 7), interfaces/types (6.1, 6.2), and open `[TODO: ...]` items.
+- Reads the spec's acceptance criteria (section 7), interfaces/types (6.1, 6.2), the section 8 Security item, and open `[TODO: ...]` items.
 - Reads the relevant implementation files.
+- Dimension 2 (Structural & Security-Control Adherence) verifies section 8 security controls exist in the code (ownership check, input validation, no hardcoded secret). A security-criterion FAIL is always `[code]` and blocks "done".
 - Reports each item individually with evidence (file path, line reference, or explanation of gap).
 - Recommended Actions are tagged `[code]` or `[pragmatic-spec-update]` depending on whether the fix belongs in the implementation or the spec.
 
@@ -174,8 +177,9 @@ Default scope when not specified: `module`.
 - Component boundaries and responsibilities
 - Architecture patterns (layered, hexagonal, CQRS, event-driven, etc.)
 - Data flows and key sequence diagrams
-- Non-functional requirements (latency, throughput, availability targets)
-- Architecture Decision Records (ADRs): options considered, rationale, consequences
+- Trust boundaries & attack surface (section 4.3) — conditional on the architecture having more than one trust level
+- Non-functional requirements (latency, throughput, availability targets), including a Security row
+- Architecture Decision Records (ADRs): options considered, rationale, consequences (with the STRIDE category a decision opens or closes)
 
 **Guard:** If an arch spec already exists at the target path, STOP. Offer `pragmatic-arch-spec-update` or `pragmatic-arch-spec-validate` instead.
 
@@ -227,6 +231,7 @@ Default scope when not specified: `module`.
 - Naming conventions from the spec appear in the code
 - Banned patterns (documented in ADRs as rejected) are not present
 - Layer isolation rules enforced
+- Trust Boundary Conformance (check H, conditional on section 4.3): boundary controls applied before the trusted core, no unguarded path to it, no hardcoded secrets, no undocumented network entry points
 
 **Behavior on VIOLATION:** Reports the specific file/location, the rule violated, and the ADR that defines the rule.
 
@@ -254,6 +259,10 @@ when invoked.
 - Tags every finding CONFIRMED (observable in code) or INFERRED (a guess
   about intent) — CONFIRMED items are stated to the downstream skill
   outright, INFERRED items are surfaced for the user to confirm or correct.
+- Runs a security pass and tags **SECURITY-GAP** findings (missing ownership
+  check, hardcoded secret, unauthenticated entry point, unparameterized
+  input, sensitive data in logs) — never fixed here, surfaced for the user
+  to confirm as intentional or record as a `[TODO]`.
 - Processes multiple discovery targets one at a time, never batched, so
   each downstream interview stays scoped to one target.
 - Appends a `## Provenance` section to each document the downstream skill

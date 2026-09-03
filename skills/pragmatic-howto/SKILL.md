@@ -79,11 +79,28 @@ pragmatic-project-constitution  →  pragmatic-project-constitution-update
 
 The constitution is not a spec — it has no acceptance criteria and is not validated against the codebase.
 
+## Security Across the Lifecycle
+
+Security is not a separate skill — it runs through the existing ones:
+
+| Stage | Where security shows up |
+|---|---|
+| `pragmatic-project-constitution` | **Security Baseline** section (document section 3): authentication model, authorization model, secrets management, data classification, baseline reference. Every spec inherits it. |
+| `pragmatic-spec-create` | Step 2 asks a **Security & Abuse** question (who must not do this; the worst a malicious authenticated user could try). Section 8 has a required **Security** item (untrusted input, authN, authZ, sensitive data, abuse case). Section 7 gets a **security acceptance criterion** — a negative assertion — when any of those apply. |
+| `pragmatic-spec-validate` | Real FAIL/WARN/PASS on the section 8 Security item; a "Security criteria testable" check. |
+| `pragmatic-arch-spec-create` | **Section 4.3 — Trust Boundaries & Attack Surface**, conditional: filled when the architecture spans more than one trust level, one sentence otherwise. |
+| `pragmatic-arch-spec-validate` | "Trust boundaries addressed" and "No unguarded path to the trusted core". |
+| `pragmatic-spec-build` | The section 8 Security item and the constitution Security Baseline are build constraints on every code path; security criteria are implemented test-first. |
+| `pragmatic-spec-check` / `pragmatic-arch-spec-check` | Verify security controls exist in the code — ownership checks, input validation, no hardcoded secrets, guarded trust boundaries. |
+| `pragmatic-reverse-engineer` | Flags **SECURITY-GAP** findings in legacy code (missing ownership check, hardcoded secret) for the user to confirm as intentional or record as a `[TODO]`. |
+
+A standalone security code-review tool belongs in a process plugin, not here — this plugin's job is that security decisions are captured in the documents and verified against the code.
+
 ## Rule: Check Constitution Before Any Spec Work
 
 Before creating or updating any spec or arch spec, check whether `docs/constitution.md` exists.
 
-- **If it exists:** load it in full before proceeding — it defines the tech stack decisions, cross-module constraints, and AI behavior guardrails that apply to every document in this project.
+- **If it exists:** load it in full before proceeding — it defines the tech stack decisions, the Security Baseline, cross-module constraints, and AI behavior guardrails that apply to every document in this project.
 - **If it does not exist:** offer to create it with `pragmatic-project-constitution` before continuing, or proceed with a disclaimer that global constraints will not be enforced.
 
 ## Quick-Decision Table

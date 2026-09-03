@@ -69,4 +69,5 @@ Notable patterns — not violations, but worth noting.
 - **Every warning must include a "How to address" block** with two options: fix the code to match the spec, or update the spec to reflect an intentional deviation
 - Group findings: NON-CONFORMANT → PARTIAL → INFO → CONFORMANT
 - If all checks pass, summarize the architectural strengths observed and confirm conformance
-- Be explicit about what could **not** be verified through static analysis (e.g., runtime behavior, performance NFRs) and flag those as outside the scope of this check
+- Be explicit about what could **not** be verified through static analysis (e.g., runtime behavior, performance NFRs, whether a trust-boundary control is *correct* — only that it is present) and flag those as outside the scope of this check
+- **Trust boundary and secrets findings (check H):** report a missing boundary control or an unguarded path to the trusted core as a NON-CONFORMANT violation, referencing section 4.3. When citing a hardcoded secret, give the file path and line number only — never reproduce the secret value, partial or full, anywhere in the report

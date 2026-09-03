@@ -89,12 +89,13 @@ For each spec in scope:
 1. Read the full `.arch.md` file
 2. Extract the following as explicit, checkable rules:
 
-   - **Components** — names, responsibilities, and documented public interfaces from the component boundaries table
+   - **Components** — names, responsibilities, and documented public interfaces from the component boundaries table; the **Trust level** column (section 4.2) if present
    - **Dependency direction** — which components may depend on which; which directions are forbidden
    - **Architecture patterns** — component structure conventions, naming conventions, communication style (sync/async/events), error handling strategy
    - **External integrations** — all documented external systems, services, or libraries and their integration approach
    - **Constraints** — technology or structural constraints that must hold in the code
    - **NFRs with structural implications** — e.g., "no direct DB access outside the repository layer"
+   - **Trust boundaries** — from section 4.3, if it lists any: each boundary (from → to), what crosses it, and the control that must be applied on crossing; the declared attack surface; the section 9 **Security** row. If section 4.3 states a single trust domain, record that and skip check H.
 
 3. Build a rule list before scanning the codebase. Each rule should be traceable to a specific section of the spec.
 
@@ -136,6 +137,17 @@ Use Glob and Grep to gather evidence from the codebase within the defined scope.
 - Are components declared as unit-testable in the spec actually isolated from external dependencies in code (no direct infrastructure imports inside domain/business layers)?
 - Do components that the spec identifies as requiring mocking expose interfaces or abstract types rather than concrete implementations?
 - For integrations documented as requiring contract or integration tests, is there evidence of test infrastructure in the codebase (test helpers, mock servers, test configs, test fixtures)?
+
+#### H. Trust Boundary Conformance
+
+**Skip this section entirely if section 4.3 of the spec states a single trust domain.** Otherwise, for the boundaries and attack surface extracted in Step 2:
+
+- For each trust boundary in section 4.3: does the component on the untrusted side actually apply the declared control — input validation, authentication, authorization, signature verification — *before* calling the component on the trusted side? A handler that passes the raw request body or an unverified identity straight into a component the spec marks "trusted core" is a violation.
+- Is any component the spec marks "trusted core" reachable from an untrusted entry point by a code path that skips the validation/authorization component?
+- **Secrets hygiene** — search the scanned scope for hardcoded credentials, API keys, tokens, private keys, or connection strings with embedded passwords. Any match is a violation against the section 9 Security row ("no secret in source") and the project constitution's Security Baseline if one exists. Cite the file and line; **never reproduce the secret value in the report.**
+- Are there network entry points in the code (routes, listeners, webhook handlers, message consumers exposed to external input) that do not appear in the section 4.3 attack surface?
+
+State plainly that this check is static only: it confirms a control is *present* on the path, not that the control is *correct* at runtime.
 
 ### Step 4 — Generate Conformance Report
 

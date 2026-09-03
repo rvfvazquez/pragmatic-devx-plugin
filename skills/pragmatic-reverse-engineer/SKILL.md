@@ -70,7 +70,9 @@ isn't a safe guess.
    repository if none was given.
 2. **Scan.** Follow `references/discovery-heuristics.md` ("Architecture
    Branch — Component & Dependency Discovery") to find components,
-   dependency directions, and the 1–3 most significant data flows.
+   dependency directions, and the 1–3 most significant data flows. Also run
+   the "Both Branches — Security Observations" pass and record any
+   SECURITY-GAP findings.
 3. **Reconstruct ADRs.** For each technology/pattern found, record the
    choice as CONFIRMED and the rationale as INFERRED (unless a
    comment/commit/doc states it — then cite the source).
@@ -90,7 +92,9 @@ isn't a safe guess.
    `references/discovery-heuristics.md` ("Feature Branch — Behavior
    Inference (Target Known)"): problem/goal (INFERRED), scope (CONFIRMED),
    tech stack (CONFIRMED), acceptance criteria drafted from tests where
-   they exist (tagged CONFIRMED-BY-TEST or INFERRED-NO-TEST).
+   they exist (tagged CONFIRMED-BY-TEST or INFERRED-NO-TEST). Also run the
+   "Both Branches — Security Observations" pass and record any SECURITY-GAP
+   findings for the handoff.
 3. **Hand off** to `pragmatic-spec-create`, once per target — see
    "Sequential Delegation" below before processing more than one.
 

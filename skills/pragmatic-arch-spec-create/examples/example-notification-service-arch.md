@@ -76,6 +76,21 @@ graph TD
 | `notification/repository` | Persists and queries notification history | `NotificationRepository` interface |
 | `notification/preferences` | Queries user channel preferences (opt-out, preferred channel) | `PreferencesRepository` interface |
 
+> No **Trust level** column: every component runs inside a single trust domain — the service has no inbound network surface (see 4.3).
+
+### 4.3 Trust Boundaries & Attack Surface
+
+This service has **no inbound network surface**. It is a background SQS consumer; its only input is domain events published by other first-party services, and SQS access is scoped by IAM. There is no authenticated request path and no multi-actor access to guard here.
+
+The one boundary worth naming is **outbound**: customer contact data (email address, push token) and order details — classified as PII — leave the trust domain when dispatched to SendGrid and Firebase FCM.
+
+| Boundary (from → to) | What crosses it | Control applied on crossing |
+|---|---|---|
+| `notification/channels/*` → SendGrid / FCM | customer email address, push token, order summary (PII) | TLS in transit; payload limited to the minimum fields the template needs; no internal identifiers or auth tokens included |
+| queue message → `notification/consumer` | domain event JSON | schema validation on parse; a message that fails validation goes to the DLQ, not reprocessing |
+
+**Attack surface of this architecture:** none externally reachable. The relevant risk is a malformed or poisoned queue message; mitigated by parse-time validation and the dead-letter queue.
+
 ## 5. Key Design Decisions
 
 ### Decision 1: Dispatcher Pattern with Channel Interface
@@ -230,6 +245,7 @@ flowchart LR
 | Data retention | Notification data retained for at most 90 days | Daily purge job on `notifications.created_at` |
 | Resilience | SendGrid failure must not stop queue processing | Consumer always acks; failures recorded for manual retry |
 | Observability | Metrics for sent/failed/skipped by channel and event type | Structured logging with `event_type`, `channel`, `status` |
+| Security | No inbound network surface (see 4.3); outbound PII to providers limited to the minimum template fields and sent over TLS; provider API keys from injected env only; contact data never written to logs | Log allow-list (`event_type`, `channel`, `status` only), IAM-scoped queue access, DLQ for malformed messages |
 
 ## 10. Open Questions
 

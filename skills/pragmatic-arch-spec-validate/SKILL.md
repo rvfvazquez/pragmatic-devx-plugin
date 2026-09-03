@@ -83,6 +83,10 @@ Evaluate each criterion below. Report **PASS**, **WARN**, or **FAIL** with a sho
 - **At least one ADR** — At least one key design decision is documented in ADR format
 - **Architecture patterns described** — Component structure, dependency direction, and communication style are defined
 - **Data flow described** — At least one primary data flow is described
+- **Trust boundaries addressed** — Section 4.3 is present and resolved one of two ways: it lists the trust boundaries (from → to, what crosses, control applied) and the attack surface, **or** it states in one sentence that the system is a single trust domain, with a reason.
+  - **PASS** — 4.3 lists the boundaries with controls, **or** credibly states a single trust domain (internal library, single-trust batch job, pure computation)
+  - **WARN** — 4.3 lists a boundary for which no matching validation or authorization control appears in section 6 or section 7
+  - **FAIL** — the spec describes network endpoints, external input, webhooks, or multi-tenant / multi-actor access, but section 4.3 is absent or empty, or dismisses trust boundaries as N/A against that evidence
 - **No unresolved TODOs** — No `[TODO: ...]` placeholders remain (WARN if present)
 
 #### B. Architectural Soundness
@@ -91,6 +95,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, or **FAIL** with a sho
 - **No bidirectional dependencies** — No two components are described as mutually depending on each other
 - **Public interfaces are defined** — Component boundaries expose explicit contracts, not implementation details
 - **Error strategy is defined** — How errors propagate across boundaries is described
+- **No unguarded path to the trusted core** — If section 4.3 identifies more than one trust level, no component on the trusted side is reachable directly from an untrusted entry point without a validation or authorization step between them (per sections 4, 6, and 7). Skip if 4.3 states a single trust domain.
 
 #### C. Clarity
 - **Unambiguous language** — No vague terms (e.g., "fast", "scalable") without measurable definitions
@@ -192,6 +197,7 @@ Map spec content to rule types:
 | Naming conventions (e.g., `*Service`, `*Repository`) | `Files in <path> must follow <pattern> naming` |
 | Component boundary (e.g., all external calls via ACL) | `<X> must not call <Y> directly — route through <Z>` |
 | Communication style (sync/async enforcement) | `<X> must communicate with <Y> via <mechanism>` |
+| Trust boundary control (section 4.3, e.g. inbound HTTP validated before the service is called) | `<untrusted component> must validate input before calling <trusted component>` |
 
 Group the extracted rules into sections — `Dependency Rules`, `Naming Conventions`, `Component Boundaries` — omitting any section with zero rules.
 

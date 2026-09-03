@@ -70,3 +70,16 @@ be wrong on this codebase.
 
 *(If nothing was corrected: "No corrections — all inferred items were
 confirmed as-is.")*
+
+## 7. Security Observations
+
+SECURITY-GAP findings from the scan (see
+`references/discovery-heuristics.md`) and what the user decided about each.
+Never include a secret value here — file and line only.
+
+| Location | Pattern | User's decision |
+|----------|---------|------------------|
+| `file:line` | missing ownership check / hardcoded secret / ... | intentional — documented in §8 / defect — `[TODO]` recorded / to fix separately |
+
+*(If the scan found nothing: "No security gaps observed in the scanned
+scope.")*

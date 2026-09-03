@@ -93,6 +93,43 @@ unknowingly duplicate work already done.
     code path alone, with no test backing it. Flag these as needing more
     scrutiny during confirmation than CONFIRMED-BY-TEST criteria.
 
+## Both Branches — Security Observations
+
+Legacy code is where authorization gaps live. While scanning, run a
+lightweight pass for the patterns below and record each as a **SECURITY-GAP**
+finding (a third label, alongside CONFIRMED and INFERRED — it is CONFIRMED
+about what the code does, but flagged because it looks like a weakness). Do
+**not** silently correct any of these in the spec — the spec documents what
+exists; the gap is surfaced for the user to confirm as intentional or not.
+
+- **Missing ownership / tenant check** — a handler looks up a resource by an
+  id from the request (`findById(params.id)`, `WHERE id = ?`) and returns or
+  mutates it with no visible comparison against the caller's identity or
+  tenant. The textbook IDOR shape.
+- **Hardcoded secret** — an API key, password, token, private key, or a
+  connection string with an embedded password, literal in source or a
+  committed config file. Record the file and line; **never copy the secret
+  value into the brief or the report.**
+- **Unauthenticated entry point** — a route, listener, or webhook handler
+  with no auth middleware/guard on its path while sibling routes have one.
+- **Unparameterized untrusted input** — request input concatenated into a
+  SQL string, shell command, file path, or template instead of a bound
+  parameter.
+- **Sensitive data in logs** — a log call whose arguments include a password,
+  token, full card/SSN, or a whole request/user object.
+
+Feed these into the handoff so the downstream skill can place them:
+- Feature branch → section 8 Security item of the spec, as the *current
+  state*, with the gap turned into `[TODO: describe — the current handler has
+  no ownership check on GET /invoices/{id}; confirm whether that is
+  intentional]`.
+- Architecture branch → section 4.3 attack surface as "currently unguarded",
+  and an ADR item to decide.
+
+If the scan finds no such patterns, say so explicitly in the brief — "no
+security gaps observed in the scanned scope" — rather than omitting the
+category.
+
 ## Presenting the Brief During Handoff
 
 When invoking the downstream create skill, state findings in this shape so
@@ -108,8 +145,15 @@ CONFIRMED:
 INFERRED — please confirm or correct:
 - <best guess> — <what would change if wrong>
 - ...
+
+SECURITY-GAP — confirm whether each is intentional:
+- <pattern> at <file:line> — <why it looks like a weakness>
+- (or: "no security gaps observed in the scanned scope")
 ```
 
 The downstream skill's own `AskUserQuestion` steps should only actually
 prompt for the INFERRED items and any genuine gaps neither branch above
-could resolve — CONFIRMED items are stated, not asked.
+could resolve — CONFIRMED items are stated, not asked. SECURITY-GAP items
+are always surfaced for confirmation: the user decides whether each is an
+intentional design choice (documented as such) or a defect (recorded as a
+`[TODO: ...]` in the spec's Security item, not fixed here).

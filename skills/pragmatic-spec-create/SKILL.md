@@ -278,7 +278,9 @@ Fill every section with concrete content:
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
 
-**Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then [observable result]`. Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion.
+**Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then [observable result]`. Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
+
+**Section 8 — Security item:** Fill every sub-item (untrusted input, authentication, authorization, sensitive data, abuse case) with concrete handling or `N/A — <reason>`. Never leave it as a bare "security considerations" line. For any feature exposing an endpoint or handler, touching user data or PII, or processing external input, at least one sub-item must be non-`N/A`.
 
 **Code blocks in sections 6.1 and 6.2:** The template uses Go as placeholder syntax. Always adapt code blocks to the project's actual programming language — inferred from Step 3 codebase scan or from the technology stack discussed in Step 4. For example: use TypeScript interfaces for a Node.js project, Python dataclasses or Protocol classes for a Python project, Java interfaces for a JVM project.
 

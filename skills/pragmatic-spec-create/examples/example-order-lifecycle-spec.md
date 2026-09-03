@@ -134,6 +134,7 @@ Any transition not listed above returns `ErrInvalidTransition`.
 ## 8. Technical Considerations
 
 - **Concurrency:** two simultaneous requests may attempt to transition the same order. Mitigation: use `SELECT FOR UPDATE` when loading the order before applying the transition.
+- **Security:** `N/A — internal state machine with no network surface of its own. Callers (already-authorized order handlers) pass an order and a target state; no untrusted input, no PII handled here, no authentication or authorization decision made at this layer.`
 - **Breaking changes:** the `status` field on the `Order` type must become private (accessible only via `StateMachine`). This breaks direct readers — all callers must be migrated.
 - **Dependencies:** no new external dependencies.
 - **Testability:** `OrderStateMachine` has no external dependencies — can be tested with 100% coverage without mocks.

@@ -102,13 +102,32 @@ Each criterion must follow **Given/When/Then** format and be specific enough to 
 - [ ] **Given** [context], **When** [action], **Then** [observable result]
 
 > Include at minimum: 1 happy-path criterion and 1 error or edge-case criterion.
+>
+> **Security criterion (conditional):** if the Security item in section 8 has any
+> applicable (non-`N/A`) entry — authorization, sensitive data, untrusted input, or
+> an abuse case — include at least one criterion asserting a *negative* outcome:
+> a non-owner receiving `404`, an unauthorized role receiving `403`, malformed input
+> rejected. State the exact status code and that no protected data appears in the
+> response body.
 
 ## 8. Technical Considerations
 
-- Performance implications
-- Security considerations
-- Dependencies and integrations
-- Breaking changes (if any)
+- **Performance implications**
+- **Security** — required. For each item below, describe the handling or write `N/A — <reason>`:
+  - *Untrusted input* — where external input (request body, path/query params, uploads, headers) enters and how it is validated or sanitized
+  - *Authentication* — which check gates this feature; behavior with missing or invalid credentials
+  - *Authorization* — who may invoke it; the per-resource (ownership) or per-role check and where in the flow it runs
+  - *Sensitive data* — PII, credentials, tokens, or financial data touched, and how it is stored, logged, and transmitted
+  - *Abuse case* — one malicious-use scenario and how the design resists it. Common shapes:
+    - **IDOR** (Insecure Direct Object Reference) — a caller swaps an `id` in the request to read or modify a resource that belongs to someone else, because the handler looks it up by `id` alone and never checks ownership
+    - **Enumeration** — a caller probes sequential or guessable `id`s / emails and tells valid from invalid apart by a different status code, error body, or response time
+    - **Replay** — a caller captures a valid request (or token) and resends it to repeat an effect that should happen only once
+    - **Injection** — untrusted input is interpolated into a query, command, path, or template instead of being passed as a bound parameter
+- **Dependencies and integrations**
+- **Breaking changes (if any)**
+
+> If the Security item has any applicable (non-`N/A`) entry, section 7 must contain the
+> matching security acceptance criterion.
 
 ## 9. Open Questions
 

@@ -100,7 +100,8 @@ Read the entire spec document. Extract and record:
 - **Technology decisions** (section 5) — the definitive tech stack for this feature; do not re-ask or override
 - **Interfaces, types, and endpoint definitions** (sections 6.1 and 6.2) — the contracts to implement
 - **Behavior and logic** (section 6.3) — including any Mermaid diagrams; these define the execution model
-- **Acceptance criteria** (section 7) — each criterion is a discrete implementation task and its own test case
+- **Acceptance criteria** (section 7) — each criterion is a discrete implementation task and its own test case. Tag which criteria are **security criteria** (negative assertions — non-owner blocked, unauthorized role blocked, malformed input rejected); these are implemented test-first with the negative assertion, never as an afterthought.
+- **Security item** (section 8) — each non-`N/A` entry (authentication, authorization, untrusted-input validation, sensitive-data handling, abuse-case mitigation) is a **build constraint that every relevant code path must satisfy**, not just documentation. An ownership check the Security item requires is mandatory even if no acceptance criterion names it.
 - **Dependencies** (section 8) — external integrations and services that must be wired up
 - **Open questions** (section 9) — any items not yet decided; note them but do not block on them unless they affect the acceptance criteria directly
 
@@ -133,6 +134,7 @@ Read each matching rule file and extract:
 - Forbidden import rules
 - Naming convention rules
 - Component boundary rules
+- **Security Baseline constraints** — from `00-project-constitution.md` if present (authentication provider, authorization model, "verify ownership before returning a user-owned resource", "no secret in source", "no PII in logs"). These bind every code path in this build.
 
 Merge these with the arch spec rules gathered in Step 2. If a rule file contradicts an arch spec, flag the conflict explicitly and ask the user to resolve it before proceeding.
 
@@ -148,7 +150,8 @@ The brief must answer:
 3. **What naming patterns must be followed?** — types, functions, files
 4. **What is the communication model?** — sync/async, events, direct calls
 5. **What external dependencies must be wired?** — from spec section 8
-6. **What are the acceptance criteria, in order?** — implementation priority
+6. **What are the acceptance criteria, in order?** — implementation priority; which of them are security criteria
+7. **What security controls must every code path honor?** — from the spec section 8 Security item and the constitution Security Baseline: the authentication check, the per-resource authorization/ownership check and where it runs, input validation at the boundary, secrets from injected env only, no protected data category in logs
 
 If any of these questions cannot be answered from spec + arch + rules, use `AskUserQuestion` to ask — but only for genuinely missing information, not for decisions already captured.
 
@@ -194,7 +197,8 @@ Follow naming conventions from the constraint brief exactly.
 
 **If the Step 0.5 test strategy is Interleaved and the `Agent` tool is available:** dispatch the `tdd-implementer` subagent for this task instead of doing 7c/7d manually. Pass it, self-contained (it has no access to this conversation):
 - The acceptance criterion's full Given/When/Then text and its index (e.g. `AC-3`)
-- The constraint brief items relevant to this criterion: target file/directory, allowed and forbidden imports, naming conventions, communication model, and the technology decisions from spec section 5
+- Whether this is a **security criterion** (a negative assertion) — if so, the red test must assert the negative outcome (the blocked status code, no protected data in the response body), not the happy path
+- The constraint brief items relevant to this criterion: target file/directory, allowed and forbidden imports, naming conventions, communication model, the technology decisions from spec section 5, and the **security controls from brief item 7** that apply to this code path (ownership check, input validation, secret handling)
 - The test framework and file-naming convention detected from the codebase scan
 
 The subagent writes a real (non-stub) failing test, runs it, confirms it fails for the right reason, implements the minimal code to pass, and reruns to confirm green. Its report includes the file paths touched and verbatim red/green run output — treat that output as the evidence the criterion is implemented. Do not mark the task complete without it.
@@ -214,7 +218,7 @@ For each acceptance criterion in Given/When/Then format, generate a test functio
 // Then:  [expected result from criterion]
 ```
 
-Leave the test body empty after the comments — the developer completes the assertion. Do not implement test logic that cannot be derived directly from the criterion text.
+Leave the test body empty after the comments — the developer completes the assertion. Do not implement test logic that cannot be derived directly from the criterion text. **For a security criterion, the stub's asserted outcome is the negative one** (the blocked status, the absence of protected data), and it is written before any happy-path code for the same handler exists.
 
 **7d — Implement the behavior**
 
@@ -223,8 +227,9 @@ Implement the logic described in spec section 6.3, following:
 - The dependency direction rules — never import across forbidden boundaries
 - The error propagation model from the arch spec
 - The technology decisions from spec section 5 (do not substitute or improvise)
+- **The security controls from constraint brief item 7** — apply the authentication check, the per-resource ownership/authorization check, and boundary input validation on every relevant path. These are mandatory even where no acceptance criterion names them; a handler that returns a user-owned resource without checking ownership is not a valid implementation of this spec.
 
-If a behavior requires an integration with an external dependency listed in spec section 8, wire the dependency according to the arch spec's communication style. Do not create ad-hoc integrations that bypass documented boundaries.
+If a behavior requires an integration with an external dependency listed in spec section 8, wire the dependency according to the arch spec's communication style. Do not create ad-hoc integrations that bypass documented boundaries. Read secrets from the injected environment only — never hardcode a credential, even temporarily.
 
 #### 7e — Mark the task complete
 

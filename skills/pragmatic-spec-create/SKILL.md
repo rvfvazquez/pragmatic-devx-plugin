@@ -31,17 +31,17 @@ Before anything else, check whether `docs/constitution.md` exists.
 
 Use `AskUserQuestion` to ask:
 
-> "No project constitution found at `docs/constitution.md`. A constitution defines cross-module rules, global stack decisions, and AI guardrails that apply to every spec — writing this feature spec without one may produce decisions that conflict with undocumented global constraints.
+> "No project constitution found at `docs/constitution.md`. A constitution defines the global tech stack, the project **Security Baseline** (authentication model, authorization model, secrets management, data classification), cross-module rules, and AI guardrails that apply to every spec — writing this feature spec without one means its Technology Decisions and its section 8 Security item start from a blank slate instead of inheriting project-wide decisions.
 >
 > Would you like to create a constitution first, or continue without one?"
 
 Options:
 - **Create constitution first** — end this skill now and run `pragmatic-project-constitution`. Return here after the constitution is created.
-- **Continue without it** — proceed. Note that global tech stack and cross-module constraints will not be enforced for this spec.
+- **Continue without it** — proceed. Note that the global tech stack, Security Baseline, and cross-module constraints will not be available to anchor this spec.
 
 **If it EXISTS:**
 
-Load `docs/constitution.md` in full and hold it as active context for the rest of this skill. It will be used in Step 4 to skip questions already answered globally and to flag any decisions that conflict with the constitution.
+Load `docs/constitution.md` in full and hold it as active context for the rest of this skill. It will be used in Step 4 to skip technology questions already answered globally, in Step 5 to fill the section 8 Security item from the constitution's **Security Baseline**, and throughout to flag any decision that conflicts with the constitution.
 
 ---
 
@@ -117,6 +117,12 @@ Before I scan the codebase and ask about technology choices, let me confirm my u
 **Constraints & Non-Negotiables** → multiSelect: true
 - Are there any hard constraints? (deadlines, compliance, existing contracts, performance targets)
 
+**Security & Abuse** → multiSelect: true
+- Who must **not** be able to do this? (other users / other tenants / unauthenticated callers / lower-privilege roles)
+- What is the worst thing a malicious *authenticated* user could try here? (read or modify someone else's data, replay a request, enumerate ids, smuggle input into a query or template)
+- Does this touch data that has handling rules — PII, credentials, financial, health?
+  Skip this group only if the feature has no external input, no persistence of user data, and no network surface — and say so explicitly.
+
 **Success Definition** → multiSelect: true
 - How will we know this feature is working correctly? (select all that apply)
   Options: e2e flows passing, performance SLA met, staging approval, acceptance tests passing, etc.
@@ -124,10 +130,13 @@ Before I scan the codebase and ask about technology choices, let me confirm my u
 Answer what you know — for anything undecided, just say so and we'll handle it as an open item.
 ```
 
-**STOP. Do not proceed to Step 2.5 until all three conditions below are met.** A spec written without this confirmation will have gaps that `pragmatic-spec-validate` will FAIL:
+The **Security & Abuse** answers feed section 8's Security item and, when any is applicable, the mandatory security acceptance criterion in section 7. If a project constitution is loaded, cross-check these answers against its Security Baseline rather than asking from scratch.
+
+**STOP. Do not proceed to Step 2.5 until all four conditions below are met.** A spec written without this confirmation will have gaps that `pragmatic-spec-validate` will FAIL:
 - The problem and goal are clearly understood
 - The scope boundaries are defined
 - Any hard constraints are captured
+- The Security & Abuse group is answered, or explicitly established as not applicable
 
 ### Step 2.5 — Scope Validation
 
@@ -168,6 +177,10 @@ Note any technology already committed to in the codebase — these don't need to
 **If a project constitution was loaded in Pre-condition 0:** Before asking any question in this step, check whether the constitution already answers it. If it does, do not ask — state the decision as inherited:
 
 > "Database: PostgreSQL (from project constitution — no choice needed)"
+> "Authentication: platform OIDC provider (from project constitution Security Baseline — no choice needed)"
+> "Authorization: per-resource ownership check (from project constitution Security Baseline)"
+
+The constitution's **Security Baseline** (authentication model, authorization model, secrets management, data classification) is inherited the same way the tech stack is — do not re-ask it, and carry it into the section 8 Security item in Step 5.
 
 If a technology option the user proposes conflicts with the constitution, flag it immediately:
 
@@ -261,6 +274,7 @@ Once no contradictions remain (or none were found), present the full recap and r
 > **Problem & Goals:** [one-line summary]
 > **Non-Goals:** [one-line summary]
 > **Constraints:** [one-line summary]
+> **Security & Abuse:** [who must not do this; the abuse case; data sensitivity — or "not applicable because ..."]
 > **Technology Decisions:** [one-line summary per area from Step 4]
 >
 > Confirm this is complete, or tell me what's missing or wrong.
@@ -280,7 +294,7 @@ Fill every section with concrete content:
 
 **Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then [observable result]`. Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
 
-**Section 8 — Security item:** Fill every sub-item (untrusted input, authentication, authorization, sensitive data, abuse case) with concrete handling or `N/A — <reason>`. Never leave it as a bare "security considerations" line. For any feature exposing an endpoint or handler, touching user data or PII, or processing external input, at least one sub-item must be non-`N/A`.
+**Section 8 — Security item:** Fill every sub-item (untrusted input, authentication, authorization, sensitive data, abuse case) with concrete handling or `N/A — <reason>`. Never leave it as a bare "security considerations" line. For any feature exposing an endpoint or handler, touching user data or PII, or processing external input, at least one sub-item must be non-`N/A`. Populate it from, in order: (1) the constitution's Security Baseline if one was loaded — state the inherited decision, e.g. "Authentication: platform OIDC (from constitution)"; (2) the Step 2 Security & Abuse answers — the "worst thing a malicious authenticated user could try" becomes the *Abuse case*; (3) the feature's own design.
 
 **Code blocks in sections 6.1 and 6.2:** The template uses Go as placeholder syntax. Always adapt code blocks to the project's actual programming language — inferred from Step 3 codebase scan or from the technology stack discussed in Step 4. For example: use TypeScript interfaces for a Node.js project, Python dataclasses or Protocol classes for a Python project, Java interfaces for a JVM project.
 

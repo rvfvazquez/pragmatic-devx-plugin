@@ -1,5 +1,68 @@
 # Pragmatic DevX — Release Notes
 
+## v0.9.0 (2026-09-03)
+
+### A Security Lens Across the Documentation Lifecycle
+
+Nothing in the constitution, feature-spec, or arch-spec flows forced a security
+decision. A feature spec for `GET /resource/{id}` documented authentication but
+never per-resource ownership — the textbook IDOR gap — and passed
+`pragmatic-spec-validate` as long as security was "at least mentioned"; a
+faithful build produced `WHERE id = ?` with no ownership check and every
+acceptance criterion still passed. The constitution had no home for the
+project-wide auth, secrets, and data-handling rules that every spec should
+inherit. Arch specs never named where untrusted input crosses into the trusted
+core. Reported by plugin users; verified with before/after reproductions on a
+`GET /invoices/{id}/pdf` spec and a sample LGPD SaaS constitution. Three
+independent changes (PRs #48, #49, #50) land together in this release.
+
+**Feature specs — `pragmatic-spec-create` / `pragmatic-spec-validate`** (#48)
+
+- The single "Security considerations" bullet in the spec template becomes a
+  required **Security** item with five sub-items: untrusted input,
+  authentication, authorization, sensitive data, and an abuse case. Each is
+  handled concretely or marked `N/A — <reason>`. For any feature that exposes an
+  endpoint or handler, touches user data or PII, or processes external input, at
+  least one sub-item must be non-`N/A`.
+- When any Security sub-item is applicable, section 7 must contain a security
+  acceptance criterion asserting a *negative* outcome (non-owner → `404`,
+  unauthorized role → `403`, malformed input rejected) with an explicit status.
+- `pragmatic-spec-validate` "Security considerations addressed" gets real
+  FAIL/WARN/PASS conditions instead of "at least mentioned", plus a new
+  "Security criteria testable" check and a tighter N/A condition.
+
+**Project constitution — `pragmatic-project-constitution` / `-update`** (#49)
+
+- New **Security Baseline** section (document section 3; Cross-Module Rules and
+  AI Behavior Guardrails renumber to 4 and 5). The discovery interview asks for
+  the authentication model, authorization model, secrets management, data
+  classification, and a security baseline reference — each with a recommended
+  answer.
+- Follow-up round and consistency check gain security dependent-decisions and
+  contradiction shapes; the derived `.claude/rules/00-project-constitution.md`
+  gains a **Security Baseline Constraints** group.
+- `-update` handles constitutions created before the section existed: a
+  security-related change means *creating* section 3 and renumbering.
+
+**Architecture specs — `pragmatic-arch-spec-create` / `-validate`** (#50)
+
+- New **section 4.3 — Trust Boundaries & Attack Surface**, *conditional*: the
+  model assesses whether the architecture spans more than one trust level
+  (network endpoint, external input, multiple actors, or a constitution Security
+  Baseline to enforce). If not — an internal library, a single-trust batch job —
+  it states that in one sentence and moves on. Section 4.2 gains an optional
+  **Trust level** column; section 9 gains a **Security** row; ADR guidance asks
+  for the STRIDE category a decision opens or closes.
+- `pragmatic-arch-spec-validate` gains "Trust boundaries addressed"
+  (single-trust-domain is a valid PASS) and "No unguarded path to the trusted
+  core" (conditional).
+
+No skill `description`/trigger changed in this release, so
+`tests/skill-triggering/prompts/` behavior is unaffected; the triggering tests
+for all six affected skills were run before and after and still PASS. All
+platform adapters (`.codex-plugin`, `.cursor-plugin`, `GEMINI.md`) point at the
+same skill sources, so the change applies uniformly.
+
 ## v0.8.0 (2026-08-25)
 
 ### Structured Interviews Across All Six Create/Update Skills

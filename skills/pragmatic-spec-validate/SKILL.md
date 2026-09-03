@@ -73,7 +73,8 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 | Criteria are testable | N/A if the spec has no acceptance criteria (see row above) |
 | Interface matches design | N/A if sections 6.1/6.2 are absent |
 | Breaking changes flagged | N/A for brand-new features with no prior API surface |
-| Security considerations addressed | N/A for purely internal tooling or non-networked features where security is genuinely not applicable |
+| Security considerations addressed | N/A only if ALL hold: no network surface, no persistence of user or third-party data, no external input. Must be asserted explicitly in the report, not assumed. |
+| Security criteria testable | N/A if section 8's Security item has no applicable entries (all `N/A — <reason>`) |
 | Single feature focus | N/A if the spec explicitly documents a bounded context that intentionally includes multiple related subsystems |
 
 #### Completeness
@@ -93,6 +94,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 #### Consistency
 - **Criteria are testable** — Each acceptance criterion specifies an actor, an action, and an observable result. FAIL if any criterion uses vague language ("the system should work correctly", "it should be fast") without measurable definitions. WARN if criteria are not in Given/When/Then format but are otherwise unambiguous. *(may be N/A — see table above)*
 - **Error/edge cases covered** — At least one acceptance criterion addresses an error path, boundary condition, or edge case (not only happy path). *(may be N/A — see table above)*
+- **Security criteria testable** — If section 7 contains security criteria, each names an actor, an action, and an observable result (an HTTP status code, the absence of protected data in the response). FAIL if a security criterion is vague ("must be secure", "unauthorized access is blocked" with no status). *(N/A if section 8's Security item has no applicable entries)*
 - **Interface matches design** — If APIs/interfaces are defined, they align with the described behavior *(may be N/A — see table above)*
 - **No contradictions** — Goals do not contradict the proposed solution or acceptance criteria
 
@@ -105,7 +107,12 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 #### Technical
 - **Dependencies identified** — External dependencies and integrations are listed
 - **Breaking changes flagged** — Any breaking changes are explicitly noted *(may be N/A — see table above)*
-- **Security considerations addressed** — Security implications are at least mentioned *(may be N/A — see table above)*
+- **Security considerations addressed** — Evaluate the Security item in section 8:
+  - **FAIL** if the spec exposes an endpoint or handler, touches user data or PII, or processes external input, and the Security item is absent or every sub-item is `N/A` without a stated reason
+  - **FAIL** if the Security item has an applicable entry (authorization, sensitive data, untrusted input, abuse case) but section 7 has no corresponding security acceptance criterion
+  - **WARN** if the Security item is present but the *Abuse case* sub-item is empty or unaddressed
+  - **PASS** if every sub-item is addressed (handled or `N/A — <reason>`) and, where applicable, section 7 contains at least one testable security criterion
+  *(may be N/A — see table above)*
 
 #### Scope
 - **Single feature focus** — Section 7 (acceptance criteria) describes one cohesive feature. WARN if criteria span multiple independent user workflows with no shared data model or flow — such a spec is better split into separate documents. *(may be N/A — see table above)*

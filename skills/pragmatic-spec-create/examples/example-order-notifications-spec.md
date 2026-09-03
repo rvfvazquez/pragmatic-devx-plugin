@@ -116,6 +116,11 @@ flowchart LR
 ## 8. Technical Considerations
 
 - **Idempotency:** if the same SQS message is delivered more than once (at-least-once), duplicate emails may be sent. Mitigation: check `order_id + status` in `order_notifications` before sending.
+- **Security:**
+  - *Untrusted input* — `N/A — the consumer reads only internally-published order events from the queue; no user-facing input.`
+  - *Authentication / Authorization* — `N/A — background consumer with no inbound request surface. Queue access is scoped by IAM.`
+  - *Sensitive data* — the notification payload contains the customer email and order details (PII). It is passed to SendGrid over TLS and is not written to application logs; only `order_id`, `customer_id`, and `status` are logged.
+  - *Abuse case* — a poisoned or malformed queue message could cause repeated send failures. Mitigation: messages that fail parsing or repeatedly error are routed to the dead-letter queue rather than retried indefinitely.
 - **Data retention:** the `order_notifications` history must respect the customer data retention policy. Include `customer_id` to support deletion requests.
 - **Dependencies:** SendGrid SDK (`github.com/sendgrid/sendgrid-go`), AWS SDK for SQS — both already in `go.mod`.
 - **Breaking changes:** none — the order service only needs to publish events to the existing queue. No existing contracts are changed.

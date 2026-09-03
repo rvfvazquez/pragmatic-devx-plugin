@@ -2,7 +2,7 @@
   "name": "pragmatic-devx-plugin",
   "displayName": "Pragmatic DevX",
   "description": "Structured specs, architecture documentation, and pragmatic engineering patterns.",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "author": {
     "name": "rvfvazquez"
   },

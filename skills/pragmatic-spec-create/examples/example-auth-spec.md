@@ -162,8 +162,13 @@ sequenceDiagram
 
 ## 8. Technical Considerations
 
-- **Security**: Never log passwords or token secrets. Return generic error messages on auth failure to prevent enumeration.
 - **Performance**: bcrypt at cost 12 takes ~200ms on current hardware — acceptable for a login endpoint (not called at high frequency).
+- **Security**:
+  - *Untrusted input* — `email` and `password` from the request body are validated (`required,email` / `required,min=8`) before any DB lookup; no other external input.
+  - *Authentication* — this feature *is* the authentication mechanism: `POST /auth/login` on credentials, `Authorization: Bearer` middleware on protected routes. Missing/invalid/expired token → `401`.
+  - *Authorization* — `N/A — RBAC is an explicit Non-Goal; this spec covers authentication only. Every authenticated user has identical access.`
+  - *Sensitive data* — passwords, password hashes, and `AUTH_JWT_SECRET` are never logged. The secret is read from an environment variable, never hardcoded. Tokens travel only in the `Authorization` header, never in URLs or logs.
+  - *Abuse case* — **email enumeration**: "email not found" and "wrong password" both return `401 invalid_credentials` with an identical body, so an attacker cannot probe which emails are registered.
 - **Dependencies**: Requires `github.com/golang-jwt/jwt/v5` and `golang.org/x/crypto/bcrypt` — both already in `go.mod`.
 - **Breaking changes**: None — new endpoint and middleware; existing unauthenticated behavior unchanged until middleware is applied to routes.
 - **Environment**: `AUTH_JWT_SECRET` must be added to ECS task definition secrets.

@@ -37,6 +37,10 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 
 > This dimension maps each item from section 7 of the spec to test evidence in the codebase.
 > It is NEVER N/A — every spec must have at least some verifiable criteria.
+>
+> A FAIL on a security criterion (a negative assertion — non-owner blocked, unauthorized role
+> blocked, malformed input rejected) is always a [code] action and blocks "done". Never downgrade
+> it to WARN, and name it explicitly in Recommended Actions.
 
 **Status:** `PASS | WARN | FAIL`
 
@@ -57,25 +61,30 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 
 ---
 
-### Dimension 2 — Structural Adherence
+### Dimension 2 — Structural & Security-Control Adherence
 
 > This dimension verifies that interfaces, structs, type definitions, and endpoints defined in
-> spec sections 6.1 and 6.2 exist in the code with the expected signatures.
+> spec sections 6.1 and 6.2 exist in the code with the expected signatures, **and** that each
+> non-`N/A` control in the spec's section 8 Security item (authentication, authorization,
+> untrusted-input validation, sensitive-data handling) is present on the relevant code path.
+> A control already fully expressed by a section 7 criterion is checked under Dimension 1, not here.
 >
-> Mark dimension as N/A when sections 6.1 and 6.2 are absent or contain no verifiable elements.
+> Mark dimension as N/A only when sections 6.1 and 6.2 have no verifiable elements AND the
+> section 8 Security item has no applicable entry.
 
 **Status:** `PASS | WARN | FAIL | N/A`
-
-> N/A when sections 6.1 and 6.2 are absent or contain no verifiable elements.
 
 | Element | Status | Finding |
 |---------|--------|---------|
 | `AuthService.Login` interface | PASS | `service.go:12` — signature matches spec |
 | `LoginRequest.Password` validation | WARN | Field present in `types.go:34` but missing `validate:"min=8"` tag — spec requires it |
 | `POST /auth/login` endpoint | FAIL | Route not registered in `routes.go` |
+| Security §8 — Authorization: ownership check before resource returned | FAIL | `handler.go:53` loads the invoice by `id` and returns it with no comparison against the caller identity — spec section 8 requires a per-resource ownership check |
+| Security §8 — Sensitive data: no secret in source | PASS | grep of the scanned scope found no hardcoded credential; keys read from env in `config.go:11` |
 
 > For WARN rows: always specify what deviates and what the spec expects.
 > For FAIL rows: confirm the element truly doesn't exist (search exhaustively before marking FAIL).
+> For a hardcoded-secret finding: cite file and line only — never reproduce the secret value.
 
 ---
 

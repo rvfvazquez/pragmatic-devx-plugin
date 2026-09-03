@@ -17,7 +17,7 @@
 **Overall Status:** WARN
 
 ### Summary
-- Passed:   9 checks
+- Passed:   10 checks
 - Warnings: 4 checks
 - Failed:   1 check
 - N/A:      0 checks
@@ -40,7 +40,7 @@
 
 ---
 
-### Dimension 2 — Structural Adherence
+### Dimension 2 — Structural & Security-Control Adherence
 **Status:** WARN
 
 | Element | Status | Finding |
@@ -51,6 +51,9 @@
 | `LoginResponse` struct with `access_token` and `expires_at` | PASS | `types.go:41` — matches spec |
 | `Claims` struct embedding `jwt.RegisteredClaims` | PASS | `types.go:48` — matches spec |
 | `POST /auth/login` endpoint registered | PASS | `routes.go:22` — route registered with correct method and path |
+| Security §8 — Sensitive data: passwords and token secrets never logged | PASS | grep for `log.*password` / `log.*secret` across `internal/auth/` found no match; auth failures log only `email` and `outcome` (`handler.go:71`) |
+
+> Note: section 8 "Authorization" is `N/A` in this spec (RBAC is an explicit Non-Goal), so no ownership check is expected. "Untrusted input" and "Authentication" controls are covered by section 7 criteria and reported under Dimension 1.
 
 ---
 

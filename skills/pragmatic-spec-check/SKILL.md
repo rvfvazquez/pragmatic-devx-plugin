@@ -64,11 +64,12 @@ If none of the above is available, use `AskUserQuestion` to ask. If multiple spe
 ### Step 2 — Extract Verifiable Elements
 
 Before scanning code, map everything that will be verified:
-- **Acceptance criteria** — all items from section 7
+- **Acceptance criteria** — all items from section 7. Tag which ones are *security criteria*: a negative assertion about authorization, ownership, or rejected input (non-owner → `404`, unauthorized role → `403`, malformed input rejected).
 - **Interfaces, structs, type definitions, endpoints** — from sections 6.1 and 6.2
+- **Security controls** — each non-`N/A` entry in the section 8 Security item (authentication, authorization, untrusted-input validation, sensitive-data handling). Skip any control already fully expressed by a section 7 criterion — it is covered under Dimension 1.
 - **Open TODOs** — all `[TODO: ...]` items from any section
 
-If sections 6.1 and 6.2 are absent or contain no verifiable elements → mark Dimension 2 as `N/A`.
+Mark Dimension 2 as `N/A` only if sections 6.1 and 6.2 are absent or contain no verifiable elements **and** the section 8 Security item has no applicable (non-`N/A`) entry.
 If no open `[TODO: ...]` items exist in the spec → mark Dimension 3 as `N/A`.
 
 ### Step 3 — Scan Implementation
@@ -78,6 +79,8 @@ For each element extracted in Step 2:
 - **Acceptance criteria** → search test files for test cases that exercise the criterion. Common patterns by language: Go (`*_test.go`, `*_integration_test.go`), TypeScript/JavaScript (`*.test.ts`, `*.spec.ts`, `*.test.js`, `**/__tests__/*`), Python (`*.test.py`, `*_test.py`, `test_*.py`, `tests/`), Java/Kotlin (`*Test.java`, `*Tests.java`, `*Test.kt`), Rust (`*_test.rs`, `tests/`), C# (`*Tests.cs`, `*Test.cs`), Ruby (`*_spec.rb`, `*_test.rb`), Scala (`*Spec.scala`, `*Suite.scala`). If the project's test naming convention is not in this list, detect it from existing test files before scanning. A criterion is PASS if a test clearly covers it, WARN if only indirectly covered, FAIL if no test is found.
 
 - **Interfaces, structs, endpoints** → search source files for type definitions, function signatures, and route registrations. PASS if matches spec exactly, WARN if present but deviates in a minor way (with details), FAIL if not found.
+
+- **Security controls** → for each section 8 Security entry mapped in Step 2, search source for the control on the relevant path: an auth middleware or guard (authentication), an ownership or role comparison against the caller identity before the resource is returned (authorization), request validation or a schema check (untrusted input), redaction or an allow-list in logging and a secrets-manager / env read (sensitive data). PASS if the control is present on the path, WARN if partial or ambiguous, FAIL if absent. Report these under Dimension 2. **Never reproduce a secret value found during this scan — cite file and line only.**
 
 - **Open TODOs** → search source files and config files for evidence of resolution (a decision implemented, a comment resolving the question). PASS if clear evidence found, WARN if partial or ambiguous, FAIL if no evidence found.
 
@@ -106,13 +109,14 @@ See `references/report-format.md` for the annotated format. The report structure
 | Criterion | Status | Finding |
 |-----------|--------|---------|
 
-### Dimension 2 — Structural Adherence
+### Dimension 2 — Structural & Security-Control Adherence
 **Status:** PASS | WARN | FAIL | N/A
 
 | Element | Status | Finding |
 |---------|--------|---------|
 
-> N/A when sections 6.1 and 6.2 are absent or contain no verifiable elements.
+> N/A only when sections 6.1 and 6.2 have no verifiable elements AND the section 8 Security item has no applicable entry.
+> Security controls from section 8 not already covered by a section 7 criterion are verified here.
 
 ### Dimension 3 — Open Items Resolved
 **Status:** PASS | WARN | FAIL | N/A
@@ -142,6 +146,8 @@ Overall Status:
 - `PASS` if all evaluated dimensions are PASS or N/A
 
 **Finding column:** Always populate, even for passing rows (e.g., cite the test file and line number). Empty findings are not acceptable.
+
+**Security criteria:** A FAIL on a security criterion in Dimension 1 (a negative assertion — non-owner blocked, unauthorized role blocked, malformed input rejected) is always a `[code]` action and blocks "done". Never downgrade it to WARN because the happy path works, and never aggregate it away — call it out by name in Recommended Actions.
 
 **Recommended Actions rules:**
 - FAILs listed before WARNs

@@ -1,35 +1,24 @@
 # Pragmatic DevX — Release Notes
 
-## v0.9.0 (2026-09-03)
+## v0.9.0 (2026-09-04)
 
 ### A Security Lens Across the Documentation Lifecycle
 
 Nothing in the constitution, feature-spec, or arch-spec flows forced a security
 decision. A feature spec for `GET /resource/{id}` documented authentication but
-never per-resource ownership — the textbook IDOR gap — and passed
-`pragmatic-spec-validate` as long as security was "at least mentioned"; a
-faithful build produced `WHERE id = ?` with no ownership check and every
-acceptance criterion still passed. The constitution had no home for the
-project-wide auth, secrets, and data-handling rules that every spec should
-inherit. Arch specs never named where untrusted input crosses into the trusted
-core. Reported by plugin users; verified with before/after reproductions on a
-`GET /invoices/{id}/pdf` spec and a sample LGPD SaaS constitution. Three
-independent changes (PRs #48, #49, #50) land together in this release.
+never per-resource ownership — the textbook IDOR (Insecure Direct Object
+Reference) gap — and passed `pragmatic-spec-validate` as long as security was
+"at least mentioned"; a faithful build produced `WHERE id = ?` with no ownership
+check and every acceptance criterion still passed. The constitution had no home
+for the project-wide auth, secrets, and data-handling rules that every spec
+should inherit. Arch specs never named where untrusted input crosses into the
+trusted core. Reported by plugin users; verified with before/after
+reproductions on a `GET /invoices/{id}/pdf` spec and a sample LGPD SaaS
+constitution.
 
-**Feature specs — `pragmatic-spec-create` / `pragmatic-spec-validate`** (#48)
-
-- The single "Security considerations" bullet in the spec template becomes a
-  required **Security** item with five sub-items: untrusted input,
-  authentication, authorization, sensitive data, and an abuse case. Each is
-  handled concretely or marked `N/A — <reason>`. For any feature that exposes an
-  endpoint or handler, touches user data or PII, or processes external input, at
-  least one sub-item must be non-`N/A`.
-- When any Security sub-item is applicable, section 7 must contain a security
-  acceptance criterion asserting a *negative* outcome (non-owner → `404`,
-  unauthorized role → `403`, malformed input rejected) with an explicit status.
-- `pragmatic-spec-validate` "Security considerations addressed" gets real
-  FAIL/WARN/PASS conditions instead of "at least mentioned", plus a new
-  "Security criteria testable" check and a tighter N/A condition.
+This release weaves security through every skill that already exists, rather
+than adding a security skill. It landed as eleven one-problem-per-PR changes
+(#48–#58); they are grouped by lifecycle stage below.
 
 **Project constitution — `pragmatic-project-constitution` / `-update`** (#49)
 
@@ -37,31 +26,101 @@ independent changes (PRs #48, #49, #50) land together in this release.
   AI Behavior Guardrails renumber to 4 and 5). The discovery interview asks for
   the authentication model, authorization model, secrets management, data
   classification, and a security baseline reference — each with a recommended
-  answer.
-- Follow-up round and consistency check gain security dependent-decisions and
-  contradiction shapes; the derived `.claude/rules/00-project-constitution.md`
-  gains a **Security Baseline Constraints** group.
+  answer. Follow-up round and consistency check gain security
+  dependent-decisions and contradiction shapes; the derived
+  `.claude/rules/00-project-constitution.md` gains a **Security Baseline
+  Constraints** group.
 - `-update` handles constitutions created before the section existed: a
   security-related change means *creating* section 3 and renumbering.
 
-**Architecture specs — `pragmatic-arch-spec-create` / `-validate`** (#50)
+**Feature spec authoring — `pragmatic-spec-create` / `-validate`** (#48, #54)
+
+- The single "Security considerations" bullet in the spec template becomes a
+  required **Security** item with five sub-items — untrusted input,
+  authentication, authorization, sensitive data, and an abuse case (with a short
+  glossary: IDOR, enumeration, replay, injection). Each is handled concretely or
+  marked `N/A — <reason>`; for any feature with an endpoint, user data, or
+  external input, at least one sub-item must be non-`N/A`.
+- When any sub-item is applicable, section 7 must contain a security acceptance
+  criterion asserting a *negative* outcome (non-owner → `404`, unauthorized
+  role → `403`, malformed input rejected) with an explicit status.
+- The Step 2 discovery interview gains a **Security & Abuse** question group
+  (who must not do this; the worst a malicious authenticated user could try;
+  data sensitivity). When a constitution is loaded, its Security Baseline is
+  *inherited* into the section 8 item — stated as "Authentication: platform OIDC
+  (from constitution)", not re-decided.
+- `pragmatic-spec-validate` "Security considerations addressed" gets real
+  FAIL/WARN/PASS conditions instead of "at least mentioned", plus a new
+  "Security criteria testable" check and a tighter N/A condition.
+
+**Feature spec build — `pragmatic-spec-build`** (#55)
+
+- The section 8 Security item and the constitution's Security Baseline
+  Constraints become **constraint-brief item 7** — the security controls every
+  code path must honor (auth check, per-resource ownership check, boundary
+  validation, secrets from env, no PII in logs), mandatory even where no
+  acceptance criterion names them.
+- The `tdd-implementer` subagent is told whether a criterion is a security
+  criterion; its red test asserts the *blocked* outcome first, and the brief's
+  security controls are part of "minimal", not extra scope.
+
+**Feature spec conformance — `pragmatic-spec-check`** (#53)
+
+- Dimension 2 becomes **Structural & Security-Control Adherence**: it verifies
+  each non-`N/A` section 8 Security control against the code (ownership check,
+  input validation, log redaction + env-read for secrets).
+- A FAIL on a security criterion is always a `[code]` action, blocks "done", is
+  never downgraded to WARN, and is named explicitly in Recommended Actions.
+  Secret values found during the scan are never reproduced — file and line only.
+
+**Architecture specs — `pragmatic-arch-spec-create` / `-validate` / `-update`** (#50, #51, #57)
 
 - New **section 4.3 — Trust Boundaries & Attack Surface**, *conditional*: the
-  model assesses whether the architecture spans more than one trust level
-  (network endpoint, external input, multiple actors, or a constitution Security
-  Baseline to enforce). If not — an internal library, a single-trust batch job —
-  it states that in one sentence and moves on. Section 4.2 gains an optional
-  **Trust level** column; section 9 gains a **Security** row; ADR guidance asks
-  for the STRIDE category a decision opens or closes.
+  model assesses whether the architecture spans more than one trust level. If
+  not — an internal library, a single-trust batch job — it says so in one
+  sentence and moves on. Section 4.2 gains an optional **Trust level** column;
+  section 9 gains a **Security** row; ADR guidance asks for the STRIDE category
+  a decision opens or closes.
+- `pragmatic-arch-spec-create` now has a **Pre-condition 0 — Check for Project
+  Constitution** (it previously never read the constitution at all, unlike
+  `pragmatic-spec-create`); the Security Baseline answers the 4.3 applicability
+  test.
 - `pragmatic-arch-spec-validate` gains "Trust boundaries addressed"
   (single-trust-domain is a valid PASS) and "No unguarded path to the trusted
-  core" (conditional).
+  core".
+- `pragmatic-arch-spec-update` (and `pragmatic-spec-update`) treat **security as
+  a cascade category**: a change to an endpoint, an auth check, an inbound entry
+  point, or where classified data is stored puts the section 8 Security item /
+  section 4.3 + section 9 Security row in scope even when unnamed.
+
+**Architecture conformance — `pragmatic-arch-spec-check`** (#52)
+
+- New **check H — Trust Boundary Conformance**, skipped when section 4.3 states
+  a single trust domain. Otherwise: each declared boundary control is applied on
+  the untrusted side before the trusted core; no code path reaches the core
+  while skipping validation/authorization; a **secrets-hygiene** grep for
+  hardcoded credentials; network entry points in code that are absent from the
+  4.3 attack surface. Static-only, and hardcoded-secret findings cite file and
+  line, never the value.
+
+**Reverse engineering — `pragmatic-reverse-engineer`** (#56)
+
+- A **Security Observations** scan pass tags **SECURITY-GAP** findings in legacy
+  code — missing ownership/tenant check, hardcoded secret, unauthenticated entry
+  point, unparameterized untrusted input, sensitive data in logs. Never silently
+  corrected: surfaced for the user to confirm as intentional or record as a
+  `[TODO]` in the spec's Security item / the arch spec's attack surface.
+
+**Guide — `pragmatic-howto`** (#58)
+
+- New **"Security Across the Lifecycle"** section mapping each stage to where
+  security shows up, plus per-skill security bullets in the skill map.
 
 No skill `description`/trigger changed in this release, so
 `tests/skill-triggering/prompts/` behavior is unaffected; the triggering tests
-for all six affected skills were run before and after and still PASS. All
-platform adapters (`.codex-plugin`, `.cursor-plugin`, `GEMINI.md`) point at the
-same skill sources, so the change applies uniformly.
+for every affected skill were run before and after and still PASS. All platform
+adapters (`.codex-plugin`, `.cursor-plugin`, `GEMINI.md`) point at the same
+skill sources, so the change applies uniformly.
 
 ## v0.8.0 (2026-08-25)
 

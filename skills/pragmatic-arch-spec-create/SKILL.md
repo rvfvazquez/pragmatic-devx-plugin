@@ -107,6 +107,8 @@ Before writing, scan the codebase for:
 
 After identifying the name/scope and scanning the codebase, use `AskUserQuestion` to conduct a focused architecture discovery. The goal is to understand the "why" behind the architecture — decisions only make sense in context.
 
+**Facts vs. decisions:** if the answer is discoverable by exploring the environment — the codebase (Step 1), the constitution, or a related arch spec — look it up instead of asking. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer.
+
 Adapt the questions to the scope and what is not already evident from the codebase.
 
 **`multiSelect` rules for this step — always follow these:**

@@ -1,5 +1,20 @@
 # Pragmatic DevX — Release Notes
 
+## v0.9.1 (2026-09-13)
+
+### Naming the Facts-vs-Decisions Principle
+
+The discovery interviews in `pragmatic-arch-spec-create` and `pragmatic-spec-create`
+have always scanned the codebase and inherited constitution/spec decisions
+*before* asking `AskUserQuestion`, but the plugin never named that ordering as
+a standing principle — a comparative review against other interview-style
+skills for Claude Code surfaced the gap. CLAUDE.md gains a "Discovered Facts
+vs. User Decisions" section documenting the rule (and the required recommendation
+priority: constitution → related specs → codebase → stated default); both
+skills gain an explicit one-line reminder ahead of their discovery-interview
+step. No triggering, guard, or template behavior changes — verified by
+re-running `tests/skill-triggering/run-test.sh` for both skills after the edit.
+
 ## v0.9.0 (2026-09-04)
 
 ### A Security Lens Across the Documentation Lifecycle

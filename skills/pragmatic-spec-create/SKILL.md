@@ -174,6 +174,8 @@ Note any technology already committed to in the codebase — these don't need to
 
 **This is a mandatory step.** Ask the user targeted questions about technology decisions that are not already evident from the codebase. Do not make assumptions — let the user choose.
 
+**Facts vs. decisions:** if the answer is discoverable by exploring the environment — the codebase (Step 3), the constitution, or a related spec — look it up instead of asking. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer.
+
 **If a project constitution was loaded in Pre-condition 0:** Before asking any question in this step, check whether the constitution already answers it. If it does, do not ask — state the decision as inherited:
 
 > "Database: PostgreSQL (from project constitution — no choice needed)"

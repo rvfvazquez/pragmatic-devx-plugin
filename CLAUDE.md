@@ -20,6 +20,10 @@ Before opening a PR, you MUST:
 
 Pragmatic DevX provides skills for two documentation lifecycles — feature specs and architecture specs — governed by a project constitution. Skills are invoked before spec work begins, not after. The document hierarchy (`constitution → arch spec → feature spec`) is the core design decision everything else flows from.
 
+### Design Principle: Discovered Facts vs. User Decisions
+
+Every `*-create` skill scans the codebase, the constitution, and related specs *before* running its discovery interview (see `pragmatic-arch-spec-create` Step 1 → Step 1.5) — never re-ask via `AskUserQuestion` what a tool, the constitution, or an existing spec can already answer. `AskUserQuestion` is reserved for genuine decisions: choices with no single objectively correct answer, which is why every recommended answer (`➡️`) in an interview must be sourced in this order — constitution, then related specs, then a codebase pattern, then a stated pragmatic default — never invented ungrounded. This is the same fact-vs-decision split named explicitly by unrelated interview-style skills elsewhere (e.g. "if a fact can be found by exploring the environment, look it up rather than asking me"); this plugin has always followed it through the Step 1 → Step 1.5 ordering but had never named it as a standing principle. Keep this ordering — scan first, ask only what remains a real decision — when adding or editing any discovery/interview step.
+
 ## What Belongs Here
 
 - Skills that operate on `docs/specs/`, `docs/arch/`, or `docs/constitution.md`

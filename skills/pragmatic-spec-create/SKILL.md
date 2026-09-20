@@ -78,6 +78,24 @@ In which language would you like the spec document to be generated?
 
 Record the chosen language and use it consistently for **all content** in the generated document — section headings, descriptions, acceptance criteria, TODO comments, and the changelog.
 
+### Step 0.5 — Interview Depth (Full or Lean)
+
+Decide how much of the discovery interview to run, using the same three-tier precedence as Step 0. Check tier 1 now; if it doesn't resolve the choice, complete Step 1 first and finalize tiers 2-3 immediately after, before proceeding to Step 2:
+1. **Detect an explicit signal in the user's message** — words like "quick", "simple", "small", "rápido", "simples" suggest **lean**; words like "detailed", "thorough", "in depth", "completo", "a fundo" suggest **full**. If found, use it without asking.
+2. **Infer from scope evidence** — once Step 1 extracts the initial input, a single-file or single-endpoint change with no new external dependency suggests lean; a new subsystem, multiple integrations, or multiple consumers suggests full.
+3. **Ask only if inconclusive** — use `AskUserQuestion`:
+
+```
+Quick lean pass or full discovery interview for this spec?
+
+1. Lean — fewer questions; skip Scope Validation and the dependent-decisions follow-up round, filling those from the constitution/codebase/defaults instead. Best for a small, well-understood change.
+2. Full — the complete interview below. Best for a new subsystem or anything touching multiple integrations.
+```
+
+Record the choice. **Lean mode changes how many questions get asked — it never changes what the generated document must contain.** Every section of `references/template.md` is still filled in full, and the Step 4.6 Final Consistency Check and every `pragmatic-spec-validate` gate apply identically in both modes.
+
+**If Lean was chosen:** skip Step 2.5 (Scope Validation) unless the description itself obviously spans multiple subsystems even without deeper questioning, and skip Step 4.5 (Follow-up Round for Dependent Decisions) — resolve any dependent decision using the same recommendation-priority order Step 4 already uses (constitution → codebase pattern → pragmatic default) instead of asking.
+
 ### Step 1 — Understand the Input
 
 Extract from the user's message or conversation context:
@@ -139,6 +157,8 @@ The **Security & Abuse** answers feed section 8's Security item and, when any is
 - The Security & Abuse group is answered, or explicitly established as not applicable
 
 ### Step 2.5 — Scope Validation
+
+**Skip this step if Lean mode was chosen in Step 0.5**, unless the scope obviously spans multiple subsystems even without deeper questioning (see the "and"-joining sign below) — that case is flagged regardless of mode.
 
 Evaluate whether the described scope is cohesive or spans multiple independent subsystems.
 
@@ -238,6 +258,8 @@ Adapt the questions to what is actually relevant for the feature described. Skip
 
 ### Step 4.5 — Follow-up Round for Dependent Decisions
 
+**Skip this step if Lean mode was chosen in Step 0.5** — resolve any dependent decision using Step 4's recommendation-priority order (constitution → codebase pattern → pragmatic default) instead of asking, and note it as an inherited/assumed decision in the generated document rather than leaving it a bare `[TODO: decide]`.
+
 After the user answers Step 4, check whether any answer unlocks a **dependent decision** that could not have been asked before it (its options only make sense given the parent answer). Common triggers:
 
 | Parent answer | Dependent question to ask now |
@@ -294,7 +316,7 @@ Fill every section with concrete content:
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
 
-**Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then [observable result]`. Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
+**Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then the system SHALL [observable result]`. The **SHALL** in the Then clause is required (EARS notation) — it states the behavior as a mandatory system obligation, not a soft expectation ("should"/"will"). Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
 
 **Section 8 — Security item:** Fill every sub-item (untrusted input, authentication, authorization, sensitive data, abuse case) with concrete handling or `N/A — <reason>`. Never leave it as a bare "security considerations" line. For any feature exposing an endpoint or handler, touching user data or PII, or processing external input, at least one sub-item must be non-`N/A`. Populate it from, in order: (1) the constitution's Security Baseline if one was loaded — state the inherited decision, e.g. "Authentication: platform OIDC (from constitution)"; (2) the Step 2 Security & Abuse answers — the "worst thing a malicious authenticated user could try" becomes the *Abuse case*; (3) the feature's own design.
 

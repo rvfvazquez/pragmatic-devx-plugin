@@ -95,11 +95,11 @@ sequenceDiagram
 
 ## 7. Acceptance Criteria
 
-Each criterion must follow **Given/When/Then** format and be specific enough to implement as a direct test case without interpretation.
+Each criterion must follow **Given/When/Then** format and be specific enough to implement as a direct test case without interpretation. The **Then** clause states the system's obligation with **SHALL** (EARS notation), not "should" or "will" — this removes ambiguity about whether the behavior is mandatory.
 
-- [ ] **Given** [context], **When** [action], **Then** [observable result]
-- [ ] **Given** [context], **When** [action], **Then** [observable result]
-- [ ] **Given** [context], **When** [action], **Then** [observable result]
+- [ ] **Given** [context], **When** [action], **Then** the system **SHALL** [observable result]
+- [ ] **Given** [context], **When** [action], **Then** the system **SHALL** [observable result]
+- [ ] **Given** [context], **When** [action], **Then** the system **SHALL** [observable result]
 
 > Include at minimum: 1 happy-path criterion and 1 error or edge-case criterion.
 >

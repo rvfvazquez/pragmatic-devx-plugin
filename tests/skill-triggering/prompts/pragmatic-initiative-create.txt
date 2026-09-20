@@ -1,0 +1,1 @@
+We need to roll out multi-tenant support — tenant data isolation, per-tenant billing, and admin role management all need to land together, and it's way too much for a single spec. Can you break this down into the features we'll need and figure out what order to build them in, before we write any actual specs?

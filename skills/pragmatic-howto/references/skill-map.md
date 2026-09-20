@@ -44,6 +44,49 @@ Complete reference for all skills in the pragmatic-devx plugin: purpose, outputs
 
 ---
 
+## Initiatives
+
+All initiatives live in `docs/initiatives/<initiative-slug>.md`. Use this layer only when a problem is too large for a single feature spec — a single feature should go straight to `pragmatic-spec-create`.
+
+---
+
+### pragmatic-initiative-create
+
+**Purpose:** Decompose a large, multi-feature problem into a dependency-ordered breakdown before creating any feature spec or arch spec.
+
+**Output:** `docs/initiatives/<initiative-slug>.md` (Status: Charted)
+
+**Pre-conditions:**
+- No initiative file exists for this slug yet.
+- `docs/constitution.md` checked first (load if present).
+
+**Behavior:**
+- Reuses `pragmatic-spec-create` Step 2.5's over-broad-scope test — but where that step recommends splitting, here the same signal means architecture work is needed before any feature.
+- Orders the Features table topologically; a dependency cycle stops the skill rather than picking an arbitrary order.
+- Records a one-time `autonomous execution: yes/no` setting in `## Notes`, read by `pragmatic-initiative-deliver` and never re-asked per feature.
+
+**Guard:** If an initiative already exists at the target path, STOP. Offer `pragmatic-initiative-deliver` instead. Only replace if the user explicitly confirms.
+
+---
+
+### pragmatic-initiative-deliver
+
+**Purpose:** Walk an existing initiative's feature table end-to-end, creating, validating, and building each feature's spec in dependency order.
+
+**Output:** Updated `docs/initiatives/<initiative-slug>.md` (running log) plus every feature spec and arch spec it dispatches `pragmatic-spec-create`/`pragmatic-arch-spec-create` to produce.
+
+**Pre-conditions:** Initiative exists at `docs/initiatives/<initiative-slug>.md`.
+
+**Behavior:**
+- Dispatches `pragmatic-arch-spec-create` first if `## Architecture` names one that doesn't exist yet.
+- Per feature, in table order: `pragmatic-spec-create` (Lean mode) → `pragmatic-spec-validate` → (`pragmatic-spec-update` once, only on FAIL) → `pragmatic-spec-build` → `pragmatic-spec-check`.
+- Uses the internal `pragmatic-initiative-status` skill (`disable-model-invocation: true`, never user-invoked) to decide readiness at each step.
+- `autonomous execution: yes` treats `Status: Review` + a clean validate as sufficient to proceed to build, without a human setting `Approved`; `autonomous execution: no` pauses for approval before every build.
+
+**Guard:** Never bypasses `pragmatic-spec-build`'s own HARD-GATE or any other dispatched skill's gate — the autonomy setting only changes who is allowed to treat those conditions as met. A blocker that survives one `pragmatic-spec-update` retry stops the whole walk rather than skipping ahead.
+
+---
+
 ## Feature Specs
 
 All feature specs live in `docs/specs/<feature-slug>.md`.

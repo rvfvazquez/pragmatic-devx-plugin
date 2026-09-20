@@ -524,6 +524,42 @@ Claude asks whether this pass is about **Architecture**, **Feature**, or **Both*
 
 ---
 
+### `pragmatic-initiative-create`
+
+Charts the path for a problem too large for a single feature spec — decomposes it into a dependency-ordered list of features, decides whether architecture work is needed first, and records a one-time autonomy setting for delivery. Creates no feature spec, arch spec, or code itself.
+
+**Triggers when you say things like:**
+- "This is too big for one spec, help me break it down"
+- "Plan this initiative"
+- "Figure out what specs we need for the billing overhaul"
+- "Chart the path for this large effort"
+
+**Example:**
+
+> You: "We need to add multi-tenant support — billing, admin roles, and data isolation all at once. Break it down."
+
+Claude confirms the destination, detects that this spans multiple trust boundaries and needs `docs/arch/multi-tenant.arch.md` first, decomposes the rest into dependency-ordered features (e.g. `tenant-data-isolation` before `tenant-billing`), asks whether delivery should be autonomous or supervised, and writes `docs/initiatives/multi-tenant-support.md` with the full breakdown. Nothing is built yet — that's `pragmatic-initiative-deliver`'s job.
+
+---
+
+### `pragmatic-initiative-deliver`
+
+Walks an existing initiative's feature table end-to-end — creating, validating, and building each feature's spec in dependency order via the existing lifecycle skills — until every feature is checked or a real blocker is hit.
+
+**Triggers when you say things like:**
+- "Deliver this initiative"
+- "Build out all the features in the multi-tenant initiative"
+- "Run the initiative"
+- "Go execute the plan for X"
+
+**Example:**
+
+> You: "Deliver docs/initiatives/multi-tenant-support.md."
+
+Claude dispatches `pragmatic-arch-spec-create` for the named arch spec first, then walks the feature table: `pragmatic-spec-create` (Lean mode) → `pragmatic-spec-validate` → `pragmatic-spec-build` → `pragmatic-spec-check` per feature, updating the initiative document's Status/Build columns after every step. If the initiative was charted as autonomous, it proceeds through validated specs without waiting for a human to set `Approved`; every `HARD-GATE` in the dispatched skills still applies exactly as it would if you ran them one by one.
+
+---
+
 ## Project Structure
 
 ```
@@ -540,7 +576,7 @@ pragmatic-devx-plugin/
 ├── .pi/
 │   └── extensions/
 │       └── pragmatic-devx.ts      # Antigravity (agy) Pi extension
-├── GEMINI.md                      # Gemini skill index (12 @./skills/ references)
+├── GEMINI.md                      # Gemini skill index (16 @./skills/ references)
 ├── gemini-extension.json          # Gemini extension manifest
 ├── hooks/
 │   ├── hooks.json                 # SessionStart hook definition
@@ -578,13 +614,24 @@ pragmatic-devx-plugin/
 │   │   └── SKILL.md
 │   ├── pragmatic-arch-spec-update/
 │   │   └── SKILL.md
-│   └── pragmatic-reverse-engineer/
-│       ├── SKILL.md
-│       ├── references/
-│       │   ├── discovery-heuristics.md  # Component/feature boundary detection, confidence tagging
-│       │   └── report-template.md       # Session report template
-│       └── examples/
-│           └── example-session-report.md
+│   ├── pragmatic-reverse-engineer/
+│   │   ├── SKILL.md
+│   │   ├── references/
+│   │   │   ├── discovery-heuristics.md  # Component/feature boundary detection, confidence tagging
+│   │   │   └── report-template.md       # Session report template
+│   │   └── examples/
+│   │       └── example-session-report.md
+│   ├── pragmatic-initiative-create/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       └── template.md        # Initiative document template
+│   ├── pragmatic-initiative-deliver/
+│   │   └── SKILL.md
+│   └── pragmatic-initiative-status/
+│       └── SKILL.md               # disable-model-invocation: true — internal use only
+├── agents/
+│   ├── tdd-implementer.md         # Dispatched by pragmatic-spec-build (Interleaved strategy)
+│   └── fact-finder.md             # Dispatched by *-create skills for external fact lookups
 ├── assets/
 │   ├── logo.svg                   # 100×100 plugin logo
 │   └── icon-small.svg             # 32×32 compact icon
@@ -595,7 +642,7 @@ pragmatic-devx-plugin/
 │   └── skill-triggering/
 │       ├── run-test.sh            # Single-skill trigger test
 │       ├── run-all.sh             # Runs all prompts, reports PASS/FAIL
-│       └── prompts/               # 13 natural-language trigger prompts (one per skill)
+│       └── prompts/               # Natural-language trigger prompts (one per user-facing skill)
 ├── package.json                   # Pi/Antigravity manifest (pi.extensions + pi.skills)
 ├── AGENTS.md                      # Mirror of CLAUDE.md for Codex/OpenAI agents
 ├── CLAUDE.md                      # AI agent contributor guidelines

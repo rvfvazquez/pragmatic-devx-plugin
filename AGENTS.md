@@ -20,7 +20,7 @@ Before opening a PR, you MUST:
 
 ## What This Plugin Is
 
-Pragmatic DevX provides skills for two documentation lifecycles — feature specs and architecture specs — governed by a project constitution. Skills are invoked before spec work begins, not after. The document hierarchy (`constitution → arch spec → feature spec`) is the core design decision everything else flows from.
+Pragmatic DevX provides skills for two documentation lifecycles — feature specs and architecture specs — governed by a project constitution, plus an optional initiative layer that decomposes a problem too large for one feature spec into a dependency-ordered set of feature specs (and architecture work, when needed) before any of them exist. Skills are invoked before spec work begins, not after. The document hierarchy (`constitution → arch spec → feature spec`, with `initiative` fanning out into multiple feature specs when a single one won't do) is the core design decision everything else flows from.
 
 ### Design Principle: Discovered Facts vs. User Decisions
 
@@ -28,7 +28,7 @@ Every `*-create` skill scans the codebase, the constitution, and related specs *
 
 ## What Belongs Here
 
-- Skills that operate on `docs/specs/`, `docs/arch/`, or `docs/constitution.md`
+- Skills that operate on `docs/specs/`, `docs/arch/`, `docs/constitution.md`, or `docs/initiatives/`
 - Guards, pre-conditions, and lifecycle transitions in those skill flows
 - Multi-platform adapters (`.claude-plugin`, `.codex-plugin`, `.cursor-plugin`, `GEMINI.md`) for existing skills
 - Improvements to skill-triggering that are verifiable with the test suite in `tests/skill-triggering/`
@@ -45,7 +45,7 @@ Every `*-create` skill scans the codebase, the constitution, and related specs *
 
 **Exception — internal fact-lookup subagent for discovery interviews.** A `*-create` skill's discovery interview may dispatch a narrowly-scoped internal subagent to resolve a *fact* that requires knowledge outside this repo — a compliance requirement, a third-party API's behavior, a current best practice — never to make or influence a decision on the user's behalf. This is a separate, narrower exception than the `pragmatic-spec-build` one above and does not permit process or judgment subagents: the subagent must not be exposed as a standalone top-level skill, must return only externally-verifiable facts with sources (never an opinion, a trade-off, or a recommendation — that boundary belongs behind `AskUserQuestion`, not this subagent), and any change to it needs the same evidence (a specific session where a fact was guessed or punted to the human instead of looked up, before/after behavior) as a skill change under "Skill Changes Require Evidence".
 
-**Duplicate lifecycle coverage.** Each lifecycle step (create → validate → update → build → check) has one skill. Do not add a second create skill for a different output format without first discussing whether a new parameter in the existing skill is sufficient.
+**Duplicate lifecycle coverage.** Each lifecycle step (create → validate → update → build → check) has one skill. Do not add a second create skill for a different output format without first discussing whether a new parameter in the existing skill is sufficient. The initiative layer (`pragmatic-initiative-create` / `-deliver`) is intentionally narrower than the feature-spec and arch-spec lifecycles — it has no `-validate`/`-update`/`-check` of its own by design, since `pragmatic-initiative-deliver` dispatches the existing feature-spec and arch-spec skills (which already have their own validate/update/check) rather than duplicating them at the initiative level. Follow the same restraint `pragmatic-project-constitution` did before its own `-update` was added: grow this layer only from a demonstrated need, not preemptively.
 
 ## Skill Changes Require Evidence
 

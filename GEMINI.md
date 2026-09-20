@@ -11,3 +11,6 @@
 @./skills/pragmatic-arch-spec-validate/SKILL.md
 @./skills/pragmatic-arch-spec-check/SKILL.md
 @./skills/pragmatic-reverse-engineer/SKILL.md
+@./skills/pragmatic-initiative-create/SKILL.md
+@./skills/pragmatic-initiative-deliver/SKILL.md
+@./skills/pragmatic-initiative-status/SKILL.md

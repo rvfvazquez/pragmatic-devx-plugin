@@ -1,0 +1,1 @@
+We already have the multi-tenant initiative charted at docs/initiatives/multi-tenant-support.md with the feature breakdown and architecture decided. Can you go ahead and build it out end to end — create and implement each feature spec in order until the whole thing is done?

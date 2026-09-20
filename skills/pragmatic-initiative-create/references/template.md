@@ -25,6 +25,20 @@ Ordered by dependency — a feature never appears above one it depends on.
 | 1 | <name> | — | not created yet | Not started | Not started |
 | 2 | <name> | #1 | not created yet | Not started | Not started |
 
+The table is an index. Detail for each feature lives below, one subsection per row.
+
+### 1. <name>
+
+<2-4 sentences: what this feature does and why it's needed>
+
+**Watch for:** <optional — a concern already known at the breakdown level that this feature's own spec should take seriously; omit the line entirely if there is none>
+
+### 2. <name>
+
+<2-4 sentences: what this feature does and why it's needed>
+
+**Watch for:** <optional>
+
 ## Decisions So Far
 
 <!-- one line per resolved breakdown decision, added by pragmatic-initiative-create and pragmatic-initiative-deliver as the initiative progresses -->

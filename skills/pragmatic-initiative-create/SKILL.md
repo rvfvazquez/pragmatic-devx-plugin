@@ -55,20 +55,25 @@ If triggered, name which `docs/arch/<name>.arch.md` this initiative depends on (
 
 If no such signal applies, record `## Architecture` as "None needed — <one-line reason>".
 
+**Facts vs. decisions:** unlike `pragmatic-spec-create`/`pragmatic-arch-spec-create`, this skill does not scan a codebase — the breakdown works from what the user has already described. If the architecture-scoping decision above, or a feature's cohesion in Step 4, turns on a fact that needs knowledge outside what's already been said — a compliance requirement, a third-party API's behavior, a current best practice — dispatch the `fact-finder` subagent to resolve it before asking the user or guessing. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer.
+
 ### Step 4 — Break Down Into Features
 
 Decompose the destination into a list of features. Each one must pass the same cohesion test a single feature spec should pass on its own: removing it would still leave every other feature a complete, independently shippable capability.
 
 For each feature, capture:
 - A short name
-- A one-line description — not a full spec; that's `pragmatic-spec-create`'s job later
+- A short description (2-4 sentences) — what it does and why it's needed; enough context that `pragmatic-spec-create` doesn't have to re-derive intent from scratch later, but still not a full spec
 - Its dependencies on other features in this same breakdown, if any
+- Optionally, a **Watch for** note — anything already known at the breakdown level that this feature's own spec interview should take seriously (e.g. "touches PII, handle retention carefully" or "highest-risk feature in this set — consider Full interview mode even if others run Lean")
 
 **Order the table topologically** — a feature never appears above a feature it depends on. If a dependency cycle is detected, stop and ask the user to resolve it before proceeding; do not silently pick an order.
 
 ### Step 5 — Autonomy Setting
 
-Use `AskUserQuestion`:
+Decide the autonomy setting using the same explicit-signal-first precedence `pragmatic-spec-create` Step 0.5 uses for interview depth:
+1. **Detect an explicit signal** — either in the skill's own `args` (e.g. `autonomous-execution=yes`), or in the user's request itself ("build it all automatically, don't stop for approval" vs. "I want to approve every build"). If found, do not ask — but do not silently assume it either: state it back in one line ("Recording this initiative as autonomous execution, as requested") so it's visible before anything is written.
+2. **Ask only if no explicit signal was given** — use `AskUserQuestion`:
 
 ```
 Once a feature's spec reaches Review status and passes pragmatic-spec-validate, should
@@ -78,11 +83,11 @@ pragmatic-initiative-deliver build it automatically, or pause for your approval 
 2. Supervised — pause before build on every feature, waiting for explicit approval
 ```
 
-Record the answer in the initiative's `## Notes` section as `autonomous execution: yes` or `autonomous execution: no`. This is decided once, here, looking at the whole breakdown — `pragmatic-initiative-deliver` never re-asks it per feature.
+Record the result in the initiative's `## Notes` section as `autonomous execution: yes` or `autonomous execution: no`. This is decided once, here, looking at the whole breakdown — `pragmatic-initiative-deliver` never re-asks it per feature.
 
 ### Step 6 — Generate the Initiative Document
 
-Create `docs/initiatives/<initiative-slug>.md` using the template in `references/template.md`. Every feature row starts at `Spec: not created yet`, `Status: Not started`, `Build: Not started`.
+Create `docs/initiatives/<initiative-slug>.md` using the template in `references/template.md`. Every feature row starts at `Spec: not created yet`, `Status: Not started`, `Build: Not started`. Below the table, write one subsection per feature with the description and any `Watch for` note captured in Step 4 — the table stays a scannable index; the subsections hold the context.
 
 ### Step 7 — Output Summary
 

@@ -1,5 +1,48 @@
 # Pragmatic DevX — Release Notes
 
+## v0.10.0 (2026-09-20)
+
+### Fact-Finder Subagent and Sharpened Open Questions
+
+A review of `wayfinder` (a planning skill that separates AFK fact-lookup from
+HITL decisions) surfaced a gap already visible once the "Facts vs. decisions"
+principle existed (v0.9.1): the interview only knew how to look up facts
+*locally* (codebase, constitution, related specs). A fact needing outside
+knowledge — a compliance requirement, a third-party API's behavior, a current
+best practice — had no resolution path except guessing or punting to the
+human as a `[TODO: describe]`.
+
+- **New `fact-finder` subagent** (`agents/fact-finder.md`) — dispatched by
+  `pragmatic-spec-create` Step 4 and `pragmatic-arch-spec-create` Step 1.5
+  when a question needs external knowledge. Tools are `WebSearch`/`WebFetch`
+  only — no filesystem or code access — and it is instructed to report facts
+  with sources, never decisions or recommendations; a question that turns out
+  to be a decision in disguise gets bounced back to the dispatching skill
+  rather than answered.
+- **New CLAUDE.md exception** — "internal fact-lookup subagent for discovery
+  interviews," separate from and narrower than the existing
+  `pragmatic-spec-build` subagent exception. It explicitly forbids process or
+  judgment subagents and requires the same before/after evidence discipline
+  for any future change to `fact-finder`.
+- **Sharpened Section 9/10 (Open Questions).** Both `*-create` templates had
+  an "Open Questions" section that no `SKILL.md` ever explained or referenced
+  — confirmed by direct inspection, not assumed. It now holds concerns too
+  vague to phrase as `[TODO: decide — <options>]` yet, using an explicit test
+  ("can you state the question precisely right now?") to keep it from
+  absorbing decisions that are already sharp enough to ticket inline. The
+  Output Summary steps now list section 9/10 entries separately from
+  `[TODO: ...]` items.
+- `AGENTS.md` re-synced from `CLAUDE.md` via `scripts/sync-agents.sh` — it had
+  drifted since v0.9.1's edit skipped that step.
+
+None of these changes has the incident-based evidence CLAUDE.md's "Skill
+Changes Require Evidence" section normally requires — they were proposed from
+a comparative review of another skill (`wayfinder`), not a reported failed
+session. Proceeding without that evidence, and adding the new governance
+exception itself, was an explicit call by the repo owner. Verified with
+`tests/skill-triggering/run-test.sh` for both `pragmatic-spec-create` and
+`pragmatic-arch-spec-create` after the edits — both still trigger correctly.
+
 ## v0.9.2 (2026-09-19)
 
 ### Lean Interview Mode and EARS-Style Acceptance Criteria

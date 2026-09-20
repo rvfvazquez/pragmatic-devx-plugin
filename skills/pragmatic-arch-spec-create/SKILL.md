@@ -107,7 +107,7 @@ Before writing, scan the codebase for:
 
 After identifying the name/scope and scanning the codebase, use `AskUserQuestion` to conduct a focused architecture discovery. The goal is to understand the "why" behind the architecture — decisions only make sense in context.
 
-**Facts vs. decisions:** if the answer is discoverable by exploring the environment — the codebase (Step 1), the constitution, or a related arch spec — look it up instead of asking. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer.
+**Facts vs. decisions:** if the answer is discoverable by exploring the environment — the codebase (Step 1), the constitution, or a related arch spec — look it up instead of asking. If it's a fact that needs knowledge outside this repo — a compliance requirement, a third-party API's actual behavior, a current best practice — dispatch the `fact-finder` subagent to resolve it before asking the user or guessing; not being locally discoverable doesn't make it a decision. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer.
 
 Adapt the questions to the scope and what is not already evident from the codebase.
 
@@ -225,7 +225,7 @@ Once no contradictions remain, present the full recap and require explicit confi
 
 Create the file at `docs/arch/<name>.arch.md` using the full template in `references/template.md`.
 
-Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision.
+Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision. Section 10 (Open Questions) holds concerns you can't yet phrase precisely enough for an inline `[TODO: ...]` — don't force premature options onto something still vague.
 
 #### Trust boundaries (section 4.3) — assess applicability first
 
@@ -262,6 +262,7 @@ After creating the file:
 1. State the file path created
 2. Summarize the key architectural decisions documented
 3. List any `[TODO: ...]` items that remain open
+4. If section 10 has entries, list them separately from the `[TODO: ...]` items — they're concerns still being sharpened, not pending decisions
 
 ---
 

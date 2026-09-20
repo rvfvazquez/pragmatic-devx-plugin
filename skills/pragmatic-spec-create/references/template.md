@@ -131,4 +131,4 @@ Each criterion must follow **Given/When/Then** format and be specific enough to 
 
 ## 9. Open Questions
 
-List unresolved questions that require decisions before or during implementation.
+List concerns too vague to phrase as a `[TODO: decide — <options>]` yet — you can tell the question is coming, but not sharp enough to list options. The test: can you state the question precisely right now? If yes, it belongs inline as a `[TODO: decide — <options>]` in its relevant section, not here. If no, one line here is enough; sharpen it into an inline TODO once it's askable.

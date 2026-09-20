@@ -47,15 +47,19 @@ Use `AskUserQuestion` to confirm your understanding of the destination and surfa
 
 **STOP. Do not proceed to Step 3 until the destination is confirmed.**
 
-### Step 3 — Scope the Architecture
+### Step 3 — Domain Research and Architecture Scoping
 
-Apply the same over-broad-scope test `pragmatic-spec-create` Step 2.5 already uses: the description joins independent capabilities with "and"; the eventual acceptance criteria would span multiple distinct workflows with no shared entry point; the effort spans more than one trust boundary. Where Step 2.5 treats that signal as a reason to split into separate specs and stop, here it means something different: **architecture work is needed before any feature spec is written.**
+**Proactive research (once per initiative).** Unlike `pragmatic-spec-create`/`pragmatic-arch-spec-create`, this skill has no codebase to scan — the breakdown works only from what the user has described, and a large, multi-feature effort benefits from relevant domain facts *before* the breakdown is drawn, not just when a specific question happens to surface one. Dispatch `fact-finder` **once**, not per feature, asking: "What compliance requirements, established best practices, or common pitfalls are relevant to `<the destination>`?" Use whatever it returns, with its sources, to inform the scoping test and the breakdown in Step 4 — a returned fact becomes context for a feature's `Watch for` note, or a reason the scope test below triggers, not a feature by itself. Record any fact that materially shaped the breakdown as one line in `## Decisions So Far`, citing the source.
+
+Skip this research only if the user's own description already demonstrates deep domain expertise (they stated exact regulatory requirements or standards themselves, precisely) — don't re-research what was already told to you with confidence.
+
+**Scope test.** Apply the same over-broad-scope test `pragmatic-spec-create` Step 2.5 already uses: the description joins independent capabilities with "and"; the eventual acceptance criteria would span multiple distinct workflows with no shared entry point; the effort spans more than one trust boundary — now informed by whatever the research above surfaced, in addition to the user's own description. Where Step 2.5 treats that signal as a reason to split into separate specs and stop, here it means something different: **architecture work is needed before any feature spec is written.**
 
 If triggered, name which `docs/arch/<name>.arch.md` this initiative depends on (existing, or new) and record it in the initiative's `## Architecture` section. Do not create the arch spec here — `pragmatic-initiative-deliver` dispatches `pragmatic-arch-spec-create` for it, in its own Step 1, before any feature.
 
 If no such signal applies, record `## Architecture` as "None needed — <one-line reason>".
 
-**Facts vs. decisions:** unlike `pragmatic-spec-create`/`pragmatic-arch-spec-create`, this skill does not scan a codebase — the breakdown works from what the user has already described. If the architecture-scoping decision above, or a feature's cohesion in Step 4, turns on a fact that needs knowledge outside what's already been said — a compliance requirement, a third-party API's behavior, a current best practice — dispatch the `fact-finder` subagent to resolve it before asking the user or guessing. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer.
+**Facts vs. decisions (reactive fallback).** The proactive pass above won't catch everything — if a feature's cohesion in Step 4 turns on a fact the initial research didn't cover, dispatch `fact-finder` again for that specific gap before asking the user or guessing. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer, never for something `fact-finder` could have answered.
 
 ### Step 4 — Break Down Into Features
 

@@ -13,6 +13,26 @@ Claude Code plugin focused on Developer Experience — structured specs, archite
 > build → check` — against a single fictional domain, with every step as its own commit/PR so
 > you can read the actual diff each skill produced.
 
+## Skills at a Glance
+
+| Skill | What it does |
+|---|---|
+| [`pragmatic-howto`](#pragmatic-howto) | Skill map and workflow guide — where to start |
+| [`pragmatic-initiative-create`](#pragmatic-initiative-create) | Chart a multi-feature breakdown for a problem too big for one spec |
+| [`pragmatic-initiative-deliver`](#pragmatic-initiative-deliver) | Walk an existing initiative's breakdown to delivery |
+| [`pragmatic-project-constitution`](#pragmatic-project-constitution) | Create the project-wide constitution (tech stack, security baseline, guardrails) |
+| [`pragmatic-project-constitution-update`](#pragmatic-project-constitution-update) | Apply targeted changes to an existing constitution |
+| [`pragmatic-arch-spec-create`](#pragmatic-arch-spec-create) | Document a system/module/layer/integration's architecture |
+| [`pragmatic-arch-spec-validate`](#pragmatic-arch-spec-validate) | Quality review of an existing arch spec |
+| [`pragmatic-arch-spec-update`](#pragmatic-arch-spec-update) | Apply new ADRs or corrections to an existing arch spec |
+| [`pragmatic-arch-spec-check`](#pragmatic-arch-spec-check) | Verify the codebase conforms to the documented architecture |
+| [`pragmatic-spec-create`](#pragmatic-spec-create) | Create a structured feature/story spec from scratch |
+| [`pragmatic-spec-validate`](#pragmatic-spec-validate) | Quality review of an existing spec |
+| [`pragmatic-spec-update`](#pragmatic-spec-update) | Apply targeted changes to an existing spec |
+| [`pragmatic-spec-build`](#pragmatic-spec-build) | Implement an approved spec, guided by arch rules and constitution |
+| [`pragmatic-spec-check`](#pragmatic-spec-check) | Verify the implementation matches the spec's acceptance criteria |
+| [`pragmatic-reverse-engineer`](#pragmatic-reverse-engineer) | Generate a spec/arch spec from existing undocumented code |
+
 ## Installation
 
 ### Claude Code
@@ -294,6 +314,25 @@ These are **context-triggered skills**, not slash commands. Just describe what y
 
 ---
 
+### `pragmatic-howto`
+
+The skill map and workflow guide — no output document of its own, just orientation. Establishes the document hierarchy (`constitution → arch spec → feature spec`, plus the optional initiative layer above them) and routes to the right skill for what you're trying to do.
+
+**Triggers when you say things like:**
+- "What pragmatic skills are available?"
+- "How do I use this plugin?"
+- "Show me the skill map"
+- "Which skill should I use to document a feature?"
+- Starting a session with no clear skill to invoke yet
+
+**Example:**
+
+> You: "I'm new to this plugin — what's the workflow for documenting a new module?"
+
+Claude explains the document hierarchy, points to `pragmatic-project-constitution` if none exists yet, then walks through the arch-spec and feature-spec tracks — without writing anything itself.
+
+---
+
 ### `pragmatic-spec-create`
 
 Creates a structured technical specification document for a feature, story, or module.
@@ -382,6 +421,26 @@ Generates two artifacts: `docs/constitution.md` (human-readable governance docum
 > You: "Create a project constitution — we use TypeScript and PostgreSQL everywhere, AuthModule owns all user identity, and the AI must never add a new dependency without asking first."
 
 Claude will scan existing `docs/arch/`, `.claude/rules/`, and `CLAUDE.md` for decisions already in force, run a discovery interview for anything not yet documented, then generate `docs/constitution.md` with all four sections (project identity, global tech stack, cross-module rules, AI guardrails) and extract concrete directives into `.claude/rules/00-project-constitution.md` — loaded automatically in every future session.
+
+---
+
+### `pragmatic-project-constitution-update`
+
+Applies targeted changes to an existing constitution — new rules, corrected decisions, deprecated constraints — without replacing the whole document.
+
+Preserves every existing rule; a deprecated one gets struck through with a reference to its replacement rather than being deleted. Regenerates `.claude/rules/00-project-constitution.md` from only the active rules, and appends a changelog entry with the date, summary, and motivation.
+
+**Triggers when you say things like:**
+- "Update the constitution — we're adding a new compliance requirement"
+- "Add a global rule about API versioning"
+- "Change the tech stack decision in the constitution"
+- "Deprecate the old naming convention rule"
+
+**Example:**
+
+> You: "Update the constitution — we now require SOC2-compliant logging for every service that touches customer data."
+
+Claude confirms the scope (this is project-wide, affecting every existing and future spec), adds the new rule to `docs/constitution.md` with a changelog entry, and regenerates `.claude/rules/00-project-constitution.md` so the directive is active in every session from then on.
 
 ---
 
@@ -520,6 +579,26 @@ The definition of done is explicit: `pragmatic-spec-check` returning PASS.
 > You: "Implement docs/specs/user-authentication.md — the spec is approved."
 
 Claude will read the spec, scan `docs/arch/` for applicable architecture rules (dependency direction, naming conventions, forbidden imports), read `.claude/rules/` for project-level constraints, then build a constraint brief before writing any code. Implementation proceeds criterion by criterion, each tracked as a todo task, with test stubs generated in Given/When/Then format. Ends with an explicit prompt to run `pragmatic-spec-check` as the conformance gate.
+
+---
+
+### `pragmatic-spec-check`
+
+Verifies that an existing implementation actually matches its spec's acceptance criteria — the conformance gate `pragmatic-spec-build` ends by pointing to.
+
+Reads the spec's acceptance criteria, interfaces, and section 8 Security item, then compares each against the real implementation with file/line evidence — never a summary judgment without a pointer to back it up. Reports across three independent dimensions (Acceptance Criteria Coverage, Structural Adherence, Open Items Resolved), each PASS/WARN/FAIL/N/A, rolled up into one Overall Status.
+
+**Triggers when you say things like:**
+- "Does the code match the notifications spec?"
+- "Check conformance with docs/specs/user-authentication.md"
+- "Verify the acceptance criteria were implemented"
+- "Is the payment flow implementation done?"
+
+**Example:**
+
+> You: "Check if the user-authentication implementation matches the spec."
+
+Claude reads every acceptance criterion, locates the corresponding code, and reports each as PASS (with the file/line that satisfies it) or FAIL (with what's missing and which skill fixes it — `[code]` for an implementation gap, `[pragmatic-spec-update]` if the spec itself needs to change), then rolls it up into one Overall Status.
 
 ---
 

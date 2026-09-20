@@ -1,5 +1,57 @@
 # Pragmatic DevX — Release Notes
 
+## v0.11.0 (2026-09-20)
+
+### Initiative Layer — Multi-Feature Breakdown and Delivery
+
+A comparative review of `wayfinder` (a planning skill that charts a map of
+decision tickets, then walks it) surfaced a real gap: nothing in this plugin
+handled a problem too large for a single feature spec. The only guidance was
+`pragmatic-spec-create` Step 2.5 telling the user to run the skill separately
+per subsystem — a manual, unmanaged fan-out with no tracked breakdown and no
+end-to-end delivery.
+
+This release adds an optional layer above the feature-spec lifecycle,
+following the same chart-then-walk split `wayfinder` uses, expressed as
+pragmatic document artifacts rather than issue-tracker tickets:
+
+- **`pragmatic-initiative-create`** — charts the path. Decomposes a large
+  problem into a dependency-ordered list of features, reusing
+  `pragmatic-spec-create` Step 2.5's own over-broad-scope test to decide
+  whether architecture work is needed first. Records a one-time
+  `autonomous execution: yes/no` setting. Creates no feature spec, arch spec,
+  or code — produces only `docs/initiatives/<slug>.md`.
+- **`pragmatic-initiative-deliver`** — walks the chart. Dispatches, per
+  feature in dependency order, `pragmatic-spec-create` (Lean mode) →
+  `pragmatic-spec-validate` → `pragmatic-spec-build` → `pragmatic-spec-check`
+  (and `pragmatic-arch-spec-create` first, if named), updating the initiative
+  document as the running log. Never bypasses any dispatched skill's own
+  gate — the autonomy setting only changes who is allowed to treat a gate's
+  conditions as met.
+- **`pragmatic-initiative-status`** (internal, `disable-model-invocation: true`)
+  — read-only aggregation of Status/`[TODO:]`/Open-Questions across one or
+  more documents, used by `-deliver` to decide readiness at each step.
+  Never invoked directly.
+
+The initiative layer is deliberately narrower than the feature-spec and
+arch-spec lifecycles: no `-validate`/`-update`/`-check` of its own, since
+`-deliver` dispatches the existing skills that already have those. CLAUDE.md
+documents this restraint explicitly, following the same precedent
+`pragmatic-project-constitution` set before its own `-update` was added.
+
+Also: `README.md`'s project-structure tree never listed `agents/` at all
+(a pre-existing gap from the `tdd-implementer`/`fact-finder` additions) —
+fixed while touching the tree for the three new skill directories. `GEMINI.md`
+and `AGENTS.md` updated/re-synced to match.
+
+None of this has the incident-based evidence CLAUDE.md's "Skill Changes
+Require Evidence" section normally requires — proposed from a comparative
+review of `wayfinder`, not a reported failed session. Proceeding without
+that evidence was an explicit call by the repo owner. Verified with
+`tests/skill-triggering/run-test.sh` for `pragmatic-initiative-create`,
+`pragmatic-initiative-deliver`, and `pragmatic-howto` (regression check,
+since its content changed) — all three still trigger correctly.
+
 ## v0.10.0 (2026-09-20)
 
 ### Fact-Finder Subagent and Sharpened Open Questions

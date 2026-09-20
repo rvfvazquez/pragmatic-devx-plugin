@@ -12,6 +12,10 @@ Pragmatic DevX provides two parallel skill lifecycles for engineering documentat
 ```
 docs/constitution.md              ← Project Constitution (global rules, governs everything)
       │
+      ├── docs/initiatives/       ← Initiatives (optional — a problem too big for one spec)
+      │     └── <initiative-slug>.md
+      │           fans out into ↓
+      │
       ├── docs/arch/              ← Architecture Specs (system / module / layer / integration)
       │     └── <name>.arch.md
       │
@@ -51,6 +55,26 @@ pragmatic-arch-spec-create  →  pragmatic-arch-spec-validate  →  pragmatic-ar
 | `pragmatic-arch-spec-validate` | Arch spec exists — quality/completeness review |
 | `pragmatic-arch-spec-update` | Arch spec needs new ADRs, corrections, or boundary changes |
 | `pragmatic-arch-spec-check` | Verify codebase matches documented architecture decisions |
+
+## Initiatives — Multi-Feature Efforts
+
+When a problem is too large for a single feature spec — several related but independently shippable capabilities — `pragmatic-initiative-create` charts the path first: it decomposes the problem into a dependency-ordered list of features, decides whether architecture work is needed before any of them, and records an autonomy setting for delivery. It creates no feature spec, arch spec, or code itself.
+
+`pragmatic-initiative-deliver` then walks that breakdown end-to-end, dispatching `pragmatic-arch-spec-create` (if named) and, per feature in dependency order, `pragmatic-spec-create` (Lean mode) → `pragmatic-spec-validate` → `pragmatic-spec-build` → `pragmatic-spec-check` — using `pragmatic-initiative-status` (internal use only) to decide readiness at each step and updating the initiative document as the running record.
+
+```
+pragmatic-initiative-create  →  pragmatic-initiative-deliver
+                                        │
+                       (dispatches, per feature, the existing
+                        feature-spec and arch-spec lifecycles above)
+```
+
+| Skill | When to invoke |
+|---|---|
+| `pragmatic-initiative-create` | A problem is too large for one spec — chart the feature breakdown before creating anything |
+| `pragmatic-initiative-deliver` | An initiative already exists — build it out end-to-end |
+
+Every gate that already exists in `pragmatic-spec-build` and the other lifecycle skills still applies during delivery — the initiative's autonomy setting only changes who is allowed to treat those gates as satisfied, never removes them.
 
 ## Reverse Engineering Entry Point
 
@@ -119,6 +143,8 @@ Before creating or updating any spec or arch spec, check whether `docs/constitut
 | "create a project constitution" / "set global rules" | `pragmatic-project-constitution` |
 | "update the constitution" / "add a global rule" | `pragmatic-project-constitution-update` |
 | "reverse engineer a spec from this code" / "generate a spec from existing code" / "document what this legacy code does" | `pragmatic-reverse-engineer` |
+| "this is too big for one spec, break it down" / "plan this initiative" | `pragmatic-initiative-create` |
+| "deliver this initiative" / "build out all the features in X" | `pragmatic-initiative-deliver` |
 
 ## Skill Invocation Rule
 

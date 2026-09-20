@@ -85,7 +85,7 @@ git clone https://github.com/rvfvazquez/pragmatic-devx-plugin.git ~/pragmatic-de
 gemini extension install ~/pragmatic-devx-plugin
 ```
 
-The extension is registered via `gemini-extension.json`. At session start, Gemini loads `GEMINI.md` which references all 13 skill files — no further configuration needed.
+The extension is registered via `gemini-extension.json`. At session start, Gemini loads `GEMINI.md` which references all 16 skill files — no further configuration needed.
 
 ---
 

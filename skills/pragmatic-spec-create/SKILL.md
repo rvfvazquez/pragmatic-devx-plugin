@@ -194,7 +194,7 @@ Note any technology already committed to in the codebase — these don't need to
 
 **This is a mandatory step.** Ask the user targeted questions about technology decisions that are not already evident from the codebase. Do not make assumptions — let the user choose.
 
-**Facts vs. decisions:** if the answer is discoverable by exploring the environment — the codebase (Step 3), the constitution, or a related spec — look it up instead of asking. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer.
+**Facts vs. decisions:** if the answer is discoverable by exploring the environment — the codebase (Step 3), the constitution, or a related spec — look it up instead of asking. If it's a fact that needs knowledge outside this repo — a compliance requirement, a third-party API's actual behavior, a current best practice — dispatch the `fact-finder` subagent to resolve it before asking the user or guessing; not being locally discoverable doesn't make it a decision. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer.
 
 **If a project constitution was loaded in Pre-condition 0:** Before asking any question in this step, check whether the constitution already answers it. If it does, do not ask — state the decision as inherited:
 
@@ -315,6 +315,7 @@ Fill every section with concrete content:
 - Capture all technology decisions made in Step 4 in section **5. Technology Decisions**
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
+- Section 9 (Open Questions) holds concerns you can't yet phrase precisely enough for `[TODO: decide — <options>]` — don't force premature options onto something still vague
 
 **Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then the system SHALL [observable result]`. The **SHALL** in the Then clause is required (EARS notation) — it states the behavior as a mandatory system obligation, not a soft expectation ("should"/"will"). Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
 
@@ -340,6 +341,7 @@ After writing the file:
 1. State the file path created
 2. Summarize the key decisions captured, especially technology choices
 3. List any `[TODO: ...]` items that remain open, indicating who needs to decide
+4. If section 9 has entries, list them separately from the `[TODO: ...]` items — they're concerns still being sharpened, not pending decisions
 
 ---
 

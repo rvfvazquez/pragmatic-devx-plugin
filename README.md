@@ -13,6 +13,28 @@ Claude Code plugin focused on Developer Experience — structured specs, archite
 > build → check` — against a single fictional domain, with every step as its own commit/PR so
 > you can read the actual diff each skill produced.
 
+## Skills at a Glance
+
+| Skill | What it does |
+|---|---|
+| `pragmatic-howto` | Skill map and workflow guide — where to start |
+| `pragmatic-initiative-create` | Chart a multi-feature breakdown for a problem too big for one spec |
+| `pragmatic-initiative-deliver` | Walk an existing initiative's breakdown to delivery |
+| `pragmatic-project-constitution` | Create the project-wide constitution (tech stack, security baseline, guardrails) |
+| `pragmatic-project-constitution-update` | Apply targeted changes to an existing constitution |
+| `pragmatic-arch-spec-create` | Document a system/module/layer/integration's architecture |
+| `pragmatic-arch-spec-validate` | Quality review of an existing arch spec |
+| `pragmatic-arch-spec-update` | Apply new ADRs or corrections to an existing arch spec |
+| `pragmatic-arch-spec-check` | Verify the codebase conforms to the documented architecture |
+| `pragmatic-spec-create` | Create a structured feature/story spec from scratch |
+| `pragmatic-spec-validate` | Quality review of an existing spec |
+| `pragmatic-spec-update` | Apply targeted changes to an existing spec |
+| `pragmatic-spec-build` | Implement an approved spec, guided by arch rules and constitution |
+| `pragmatic-spec-check` | Verify the implementation matches the spec's acceptance criteria |
+| `pragmatic-reverse-engineer` | Generate a spec/arch spec from existing undocumented code |
+
+Full detail — triggers, examples, outputs — for each one is in [Skills](#skills) below.
+
 ## Installation
 
 ### Claude Code

@@ -1,5 +1,36 @@
 # Pragmatic DevX — Release Notes
 
+## v0.9.2 (2026-09-19)
+
+### Lean Interview Mode and EARS-Style Acceptance Criteria
+
+A comparative review against other open-source spec-driven-development skills
+(`tlc-spec-driven`/`tlc-spec-lean` from the `tech-leads-club/agent-skills`
+registry) surfaced two adoptable, stack-agnostic patterns for `pragmatic-spec-create`:
+
+- **EARS-style acceptance criteria.** The Given/When/Then criteria in section 7
+  now require the Then clause to state the system's obligation with **SHALL**
+  ("the system SHALL ...") instead of a soft "should"/"will" — removing
+  ambiguity about whether a behavior is mandatory. Updated in both
+  `pragmatic-spec-create/SKILL.md` (Step 5) and `references/template.md`.
+- **Lean interview mode.** A new Step 0.5 decides, using the same three-tier
+  precedence already used for language selection in Step 0 (explicit signal in
+  the user's message → inferred from scope evidence → ask only if
+  inconclusive), whether to run the full discovery interview or a lean pass.
+  Lean mode skips Step 2.5 (Scope Validation) and Step 4.5 (Follow-up Round for
+  Dependent Decisions), resolving those via Step 4's existing
+  recommendation-priority order instead of asking. Lean mode changes how many
+  questions get asked — it never changes what the generated document must
+  contain: every template section and every `pragmatic-spec-validate` gate
+  still apply in full.
+
+Neither change has the incident-based evidence CLAUDE.md's "Skill Changes
+Require Evidence" section normally requires — both were proposed from a
+comparative framework review, not a reported failed session. Proceeding
+without that evidence was an explicit call by the repo owner for both changes.
+Verified with `tests/skill-triggering/run-test.sh pragmatic-spec-create` after
+each edit — still triggers correctly.
+
 ## v0.9.1 (2026-09-13)
 
 ### Naming the Facts-vs-Decisions Principle

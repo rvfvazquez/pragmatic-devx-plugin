@@ -95,15 +95,34 @@ Antigravity reads `package.json` → `"pi"` section, loads `.pi/extensions/pragm
 
 ## Skill Lifecycle
 
-The plugin organizes its skills into three layers. Each layer builds on the one above it — but you can start at any layer that matches your current need.
+The plugin organizes its skills into three core layers, plus an optional initiative layer above them for problems too large for a single feature. Each layer builds on the one above it — but you can start at any layer that matches your current need.
 
 ```
+LAYER -1 (optional) ── Initiative         (once per large, multi-feature effort)
 LAYER 0 ── Project Constitution  (once per project)
 LAYER 1 ── Arch Spec Track       (once per module)
 LAYER 2 ── Feature Spec Track    (once per feature)
 ```
 
+### Layer -1 — Initiative (Optional)
+
+Only needed when a problem is too large for a single feature spec — several related but independently shippable capabilities at once.
+
+```
+pragmatic-initiative-create → pragmatic-initiative-deliver
+                                        │
+                     fans out into N runs of the Arch + Feature
+                     Spec Track flow below, one per feature —
+                     dependency-ordered, not parallel
+```
+
+> "We need multi-tenant support — billing, admin roles, and data isolation all at once. Break it down."
+
+`pragmatic-initiative-create` charts the breakdown into `docs/initiatives/<slug>.md` — dependency-ordered features, whether architecture work is needed first, and a one-time autonomy setting. `pragmatic-initiative-deliver` then walks that chart, running the exact same Arch Spec Track and Feature Spec Track flows described below, once per feature, until every row is checked. See the dedicated sections further down for how each individual feature's spec is created, validated, built, and checked — the initiative layer doesn't change any of that, it only sequences it across more than one feature.
+
 ### Big Picture
+
+Both tracks below can also be entered via `pragmatic-reverse-engineer` when code already exists with no spec or arch spec at all — see [Reverse Engineering — an Alternate Entry Point](#reverse-engineering--an-alternate-entry-point) further down. The diagram starts from a description of something not yet built; reverse engineering starts from the code instead and hands off into the same `arch-spec-create` / `spec-create` boxes shown here.
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗

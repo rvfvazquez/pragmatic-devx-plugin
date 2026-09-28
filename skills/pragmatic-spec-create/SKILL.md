@@ -335,9 +335,20 @@ Add a Mermaid diagram to section **6.3 (Behavior & Logic)** when the behavior be
 
 Do **not** add a diagram for simple single-step operations or when the prose is already unambiguous without it. One diagram per distinct flow — do not combine multiple flows into a single diagram.
 
+### Step 5.5 — Self-Review the Written Document
+
+After writing the file in Step 5, read it back with fresh eyes before summarizing it to the user. Check for:
+
+1. **Placeholder leakage** — any literal template example text (e.g. "e.g. PostgreSQL (existing users DB)", "Interface definitions go here — adapt to project language") left in instead of this feature's real content. This is different from `[TODO: describe ...]` / `[TODO: decide — <options>]`, which are intentional and stay.
+2. **Internal consistency** — does section 6 (Detailed Design) match section 5's technology decisions? Does section 7 (Acceptance Criteria) cover every Goal listed in section 3? Does section 8's Security item align with the Step 2 Security & Abuse answers?
+3. **TODO / Open Questions placement** — every `[TODO: decide — <options>]` lists real options, not a bare TODO; nothing in section 9 is precise enough that it should have been an inline TODO instead (per `references/template.md`'s own rule for that section).
+4. **Diagram correctness** — if a Mermaid diagram was added, its type matches the "When to add diagrams" table above and the syntax is valid.
+
+Fix anything found directly in the file. No need to re-run this check after fixing — fix and move on.
+
 ### Step 6 — Output Summary
 
-After writing the file:
+After the self-review:
 1. State the file path created
 2. Summarize the key decisions captured, especially technology choices
 3. List any `[TODO: ...]` items that remain open, indicating who needs to decide
@@ -347,7 +358,9 @@ After writing the file:
 
 > **Spec created** — `docs/specs/<feature-slug>.md` (Status: Draft).
 >
-> **Next step:** Run `pragmatic-spec-validate` to check completeness before sharing with the team or starting implementation.
+> Please review the file and let me know if anything needs to change.
+>
+> **Next step, once you're satisfied with it:** Run `pragmatic-spec-validate` to check completeness before sharing with the team or starting implementation.
 > FAIL or WARN items → resolve with `pragmatic-spec-update` → re-validate until PASS → then proceed to `pragmatic-spec-build`.
 
 ## Output Location

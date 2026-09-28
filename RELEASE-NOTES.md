@@ -1,5 +1,57 @@
 # Pragmatic DevX — Release Notes
 
+## v0.12.0 (2026-09-27)
+
+### Self-Review Gate in spec-create, Build Log + Commit Discipline in spec-build
+
+A comparative review of superpowers' `brainstorming` and `writing-plans` skills
+surfaced two gaps in the feature-spec lifecycle:
+
+- `pragmatic-spec-create` wrote the spec file and moved straight to a
+  one-way "next step" message — no inline self-check of the document it had
+  just written, and no explicit invitation for the human to review it before
+  treating it as ready for `pragmatic-spec-validate`. `brainstorming` does
+  both (a placeholder/consistency self-review, then an explicit "please
+  review the spec file" pause) before handing off to `writing-plans`.
+- `pragmatic-spec-build` decomposed acceptance criteria into `TodoWrite`
+  tasks only — an in-conversation list with no persisted, reviewable record
+  and no checkpoint before implementation started. `writing-plans` commits
+  a plan file up front and its tasks each end with their own git commit.
+
+Changes:
+
+- **`pragmatic-spec-create` Step 5.5 (new) — Self-Review the Written
+  Document.** After Step 5 writes the file, re-reads it for placeholder
+  leakage from the template, cross-section consistency, correct
+  `[TODO: ...]`/Open-Questions placement, and diagram correctness — fixing
+  anything found inline. Step 6's closing message now explicitly invites the
+  user to review the file before recommending `pragmatic-spec-validate`,
+  instead of only stating the next step.
+- **`pragmatic-spec-build` Step 6 — Build Log.** The same task breakdown
+  `TodoWrite` tracks is now also persisted as a `## Build Log` table
+  appended to the spec file (task → AC → target files → status) — generated
+  by this skill, not part of `references/template.md`, so
+  `pragmatic-spec-validate` does not check it. The skill now **stops and
+  asks the user to confirm the task breakdown and file targets** before
+  Step 7 starts implementing — the one checkpoint this lifecycle previously
+  had nowhere between an approved spec and code being written.
+- **`pragmatic-spec-build` Step 7e — commit per task.** Each task now ends
+  with its own commit (files touched by that task only, never a broad
+  `git add -A`) and its Build Log row is updated to `done`, mirroring
+  `writing-plans`' per-task commit discipline. Step 8's summary now points
+  to the Build Log as the persisted record, since `TodoWrite` itself clears
+  when the session ends.
+
+None of this has the incident-based evidence CLAUDE.md's "Skill Changes
+Require Evidence" section normally requires — proposed from a comparative
+review of superpowers, not a reported failed session. Proceeding without
+that evidence was an explicit call by the repo owner, following the same
+precedent set for the v0.11.0 initiative layer and the v0.9.2
+`lean-improvements` PR (#61). Verified with
+`tests/skill-triggering/run-test.sh` for both `pragmatic-spec-create` and
+`pragmatic-spec-build` — both still trigger correctly before and after each
+change.
+
 ## v0.11.0 (2026-09-20)
 
 ### Initiative Layer — Multi-Feature Breakdown and Delivery

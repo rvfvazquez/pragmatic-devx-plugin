@@ -1,5 +1,49 @@
 # Pragmatic DevX — Release Notes
 
+## v0.13.0 (2026-10-01)
+
+### Dependency Edges Between Build Tasks
+
+A comparative review of `mattpocock/skills`' `to-tickets` (breaks a spec into
+tracer-bullet tickets, each declaring the tickets that **block** it, then
+quizzes the user on whether the granularity and blocking edges are right)
+surfaced a gap in the v0.12.0 Build Log: tasks were listed and executed in
+spec section 7's order, with no representation of which task actually
+depends on which. Section 7 is written for readability (happy path first),
+not for build order — a later acceptance criterion can silently depend on
+an earlier one's output with nothing checking that the two line up.
+
+Changes to `pragmatic-spec-build`:
+
+- **Step 6 — dependency inference.** For each task, checks whether its
+  Given/When/Then text or its interfaces (spec sections 6.1/6.2) rely on
+  something another task produces that doesn't exist yet, and records the
+  earliest such task(s) as its **Depends On** — grounded in the spec text,
+  left blank when nothing is evident, never forced.
+- **Step 6 — topological task order.** The task list (and the `## Build Log`
+  rows) are now ordered so every task follows everything in its Depends On;
+  section 7's order is only the tie-breaker between tasks with no
+  dependency relation to each other.
+- **Step 6 gate — now also asks about dependencies.** The existing
+  stop-and-confirm before Step 7 (added in v0.12.0) now also surfaces the
+  inferred dependencies and asks whether any look wrong or any task looks
+  independent — mirroring `to-tickets`' own "are the blocking edges
+  correct?" quiz.
+- **Step 7 — executes in dependency order**, not in the order Step 0.5's
+  preferences implied. Step 0.5 still governs how each individual task is
+  executed (scaffold-first vs. end-to-end, manual vs. subagent dispatch),
+  not the order between tasks.
+
+None of this has the incident-based evidence CLAUDE.md's "Skill Changes
+Require Evidence" section normally requires — proposed from a comparative
+review of `to-tickets`, not a reported failed session. Proceeding without
+that evidence was an explicit call by the repo owner, same category as
+v0.11.0, v0.12.0, and PR #61. Verified with
+`tests/skill-triggering/run-test.sh` for `pragmatic-spec-build` — PASS
+after the edit (no change to the skill's frontmatter description, and the
+pre-edit content was already verified PASS as part of the v0.12.0 commit
+this builds on).
+
 ## v0.12.0 (2026-09-27)
 
 ### Self-Review Gate in spec-create, Build Log + Commit Discipline in spec-build

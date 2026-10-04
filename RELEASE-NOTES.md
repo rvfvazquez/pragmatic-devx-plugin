@@ -1,5 +1,66 @@
 # Pragmatic DevX — Release Notes
 
+## v0.14.0 (2026-10-04)
+
+### Independent Per-Task Review, Escalation Ladder, and Parallel Waves in spec-build
+
+A comparative review of superpowers' subagent prompts
+(`task-reviewer-prompt.md`, `re-review-prompt.md`,
+`dispatching-parallel-agents`) against this plugin's two agents surfaced
+three gaps in `pragmatic-spec-build`:
+
+- **Nobody audited the implementer.** `tdd-implementer`'s report (verbatim
+  red/green output) was accepted as the evidence a task was done. The only
+  independent check was `pragmatic-spec-check` after *every* task — so a
+  wrong task 1 was found only after tasks 2–N had been built on it.
+- **No protocol for a failing task.** The final gate said "fix and re-run"
+  with no bound, no change of approach, and no way to tell a blocking
+  finding from one that could be recorded and moved past.
+- **Independent tasks ran one at a time.** v0.13.0 added the Depends On
+  column, which made independence detectable, but Step 7 still ran
+  everything sequentially.
+
+Changes:
+
+- **New agent `task-reviewer`** (`agents/task-reviewer.md`, read-only —
+  Read/Grep/Glob/Bash, no Write/Edit). Dispatched by `pragmatic-spec-build`
+  after each task. Treats the implementer's report as claims to verify:
+  reads the diff, re-runs the test itself, checks spec compliance
+  (missing / extra / misunderstood), constraint-brief and security-control
+  conformance, and test quality. Returns `APPROVED` or `CHANGES_REQUIRED`
+  with findings classified Critical/Important/Minor and
+  load-bearing/non-load-bearing, each with `file:line`.
+- **Step 7e — independent review gate.** A task is `done` only after
+  `task-reviewer` approves (or, without subagent dispatch, after a
+  diff-based self-review checklist, flagged as weaker). The former 7e
+  (mark complete and commit) is now 7f.
+- **Escalation ladder (3 fix rounds).** Rounds 1–2 re-dispatch
+  `tdd-implementer` with the reviewer's findings verbatim; round 3 uses a
+  fresh implementer on the most capable selectable model. Afterwards each
+  remaining finding is adjudicated: any load-bearing one → STOP, task set
+  to `blocked` in the Build Log, dependents stay pending, user decides;
+  all non-load-bearing → recorded in a `### Parked Findings` table under
+  `## Build Log` and surfaced in the Step 8 summary. Nothing is dropped
+  silently.
+- **Parallel waves.** Step 6 groups tasks into waves — tasks whose
+  Depends On are all in earlier waves and whose Target File(s) don't
+  overlap (capped at 3) — and the existing confirm gate now shows them.
+  Step 7 dispatches a wave's `tdd-implementer`s in one message, then runs
+  review and commit per task in Build Log order, then the full test suite
+  once per wave. Only active for Interleaved + `Agent` tool; otherwise
+  every wave is one task.
+- `tdd-implementer` documents how to handle reviewer findings on a fix
+  round. `plugin.json` registers the new agent; README tree updated.
+
+`task-reviewer` is a new subagent under CLAUDE.md's `pragmatic-spec-build`
+internal-subagent exception: not a standalone skill, not invoked by any
+documentation skill. None of this has the incident-based evidence
+CLAUDE.md's "Skill Changes Require Evidence" section normally requires —
+proposed from a comparative review, not a reported failed session.
+Proceeding without it was an explicit call by the repo owner, same
+category as v0.11.0–v0.13.0 and PR #61. Verified with
+`tests/skill-triggering/run-test.sh` for `pragmatic-spec-build`.
+
 ## v0.13.0 (2026-10-01)
 
 ### Dependency Edges Between Build Tasks

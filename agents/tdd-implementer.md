@@ -17,6 +17,10 @@ Your dispatcher must give you:
 
 If any of these is missing or ambiguous, stop and report exactly what is missing rather than guessing.
 
+## If your prompt includes reviewer findings
+
+On a fix round, your dispatcher also passes findings from an independent reviewer (each with a `file:line`). Fix exactly those findings and nothing else. Keep red-green discipline: if a finding means the test was wrong or too weak, correct the test first and show it failing against the current code before changing the implementation. Do not argue a finding down in your report — if you believe one is wrong, fix what you can and state the disagreement and your evidence; the dispatcher decides.
+
 ## Red-Green-Refactor, strictly
 
 1. **Red** — Write a real test for the criterion (not a stub, not a placeholder assertion). The test must exercise the behavior described in Given/When/Then. **For a security criterion, the test asserts the negative outcome** — the blocked status code (e.g. `403`/`404`), and that no protected data appears in the response body — and it is written before any happy-path code for the same handler. Run it. Confirm it fails, and confirm it fails for the expected reason (missing implementation, not a typo or import error). If it fails for the wrong reason, fix the test setup before proceeding — a test that fails for the wrong reason proves nothing.

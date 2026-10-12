@@ -15,6 +15,7 @@ Your dispatcher must give you:
 - The constraint brief: target file/directory location, allowed and forbidden imports, naming conventions, communication model (sync/async/events), the tech stack decision from the spec, and any **security controls** that apply to this code path (per-resource ownership check, boundary input validation, secrets from injected env only)
 - The test framework and file-naming convention already in use in the codebase
 - The **test seam**: the public boundary your test must go through (e.g. an HTTP endpoint, a queue consumer, a module's public API) and which dependencies, if any, you may replace with a fake adapter. Test only through that seam — never call an internal function or mock a collaborator the seam doesn't allow
+- The **domain names** for this criterion, when the project has a glossary: each domain term, the identifier the code uses for it, and the words to avoid. Name types, functions, and the test with these identifiers. If you need a domain concept that isn't on the list, first check whether a listed term already covers it; only if none fits, name it consistently with the listed identifiers and report it as a glossary gap — do not invent a synonym for a concept that already has a name
 
 If any of these is missing or ambiguous, stop and report exactly what is missing rather than guessing.
 
@@ -42,5 +43,6 @@ End your work with:
 1. The test file path and the implementation file path(s) touched
 2. The red run output (failing) and the green run output (passing) — verbatim, not paraphrased
 3. Any deviation from the constraint brief you had to make, and why
+4. Any glossary gap: a domain concept you had to name that wasn't in your domain names list, with the name you used and where
 
 Your dispatcher treats this report as evidence. Do not claim the criterion is implemented without it.

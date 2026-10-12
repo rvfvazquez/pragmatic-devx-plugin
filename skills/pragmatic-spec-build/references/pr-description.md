@@ -2,7 +2,7 @@
 
 Format for the pull request body drafted in `pragmatic-spec-build` Step 8. Every section is assembled from artifacts this plugin already produced — the spec, its `## Build Log`, and the `pragmatic-spec-check` report. Nothing is invented: a section whose source is empty is omitted, never filled with filler.
 
-Write the draft in the spec's language. Keep prose brief; the reviewer can follow the links for depth.
+Write the draft in the spec's language. Keep prose brief; the reviewer can follow the links for depth. If the project has a glossary (`docs/glossary/`), name every domain concept with its canonical term — never a word listed under `_Avoid_` — and list any glossary gaps from Step 8 under **Open items**.
 
 ## If the target repo has its own PR template
 

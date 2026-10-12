@@ -136,6 +136,8 @@ Read each matching rule file and extract:
 - Component boundary rules
 - **Security Baseline constraints** — from `00-project-constitution.md` if present (authentication provider, authorization model, "verify ownership before returning a user-owned resource", "no secret in source", "no PII in logs"). These bind every code path in this build.
 
+If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns, or the arch spec read in Step 2). Its terms feed constraint brief item 9.
+
 Merge these with the arch spec rules gathered in Step 2. If a rule file contradicts an arch spec, flag the conflict explicitly and ask the user to resolve it before proceeding.
 
 ---
@@ -153,6 +155,7 @@ The brief must answer:
 6. **What are the acceptance criteria, in order?** — implementation priority; which of them are security criteria
 7. **What security controls must every code path honor?** — from the spec section 8 Security item and the constitution Security Baseline: the authentication check, the per-resource authorization/ownership check and where it runs, input validation at the boundary, secrets from injected env only, no protected data category in logs
 8. **Where do tests observe behavior?** — the **Test seam** row of spec section 5: the public boundary every acceptance-criterion test goes through, and which dependencies (if any) are replaced by a fake adapter. Every other dependency runs for real in the test. If the row is missing (a spec written before the template had it), derive the seam from where the existing tests in this codebase already hit and state it as an assumption in the Step 6 confirmation — do not let each task choose its own
+9. **What are the domain names?** — from the glossary read in Step 3: each domain term this feature touches, with the identifier the code uses for it (the term's `_In code_`, or the term itself when there is none), and the words listed under `_Avoid_`. Types, functions, test names, and events for a domain concept use these identifiers. When the build needs a domain concept the glossary doesn't define, treat it as a signal before naming it: first check whether an existing term already covers it (most of the time it does, and inventing a name is the mistake); only if none fits, name it in line with the existing identifiers and record it as a **glossary gap** for the Step 8 summary — never add it to the glossary from here. If no glossary exists, this item is empty and naming follows items 3 and the codebase
 
 If any of these questions cannot be answered from spec + arch + rules, use `AskUserQuestion` to ask — but only for genuinely missing information, not for decisions already captured.
 
@@ -211,7 +214,7 @@ Translate each type definition and interface from the spec into the project's ac
 - Function signatures with parameter and return types as specified
 - Leave function bodies empty or with a single `TODO: implement` comment
 
-Follow naming conventions from the constraint brief exactly.
+Follow naming conventions from the constraint brief exactly, including the domain names from item 9 — a type for a glossary term uses that term's code identifier, never a word listed under its `_Avoid_`.
 
 #### 7c/7d — Test and implement the behavior
 
@@ -221,6 +224,7 @@ Follow naming conventions from the constraint brief exactly.
 - The constraint brief items relevant to this criterion: target file/directory, allowed and forbidden imports, naming conventions, communication model, the technology decisions from spec section 5, and the **security controls from brief item 7** that apply to this code path (ownership check, input validation, secret handling)
 - The test framework and file-naming convention detected from the codebase scan
 - The **test seam** from constraint brief item 8 — the boundary the test must go through and which dependencies it may replace with a fake adapter
+- The **domain names** from constraint brief item 9 that this criterion touches — term, code identifier, and avoided words
 
 The subagent writes a real (non-stub) failing test, runs it, confirms it fails for the right reason, implements the minimal code to pass, and reruns to confirm green. Its report includes the file paths touched and verbatim red/green run output — treat that output as the evidence the criterion is implemented. Do not mark the task complete without it.
 
@@ -257,9 +261,9 @@ If a behavior requires an integration with an external dependency listed in spec
 
 The implementer's report is a claim, not a verdict — nothing about a task being green proves the code matches the criterion and the constraint brief. Before 7f, have the task reviewed by something that did not write it.
 
-**If the `Agent` tool is available:** dispatch the `task-reviewer` agent for this task. Pass it, self-contained (it has no access to this conversation): the acceptance criterion's full Given/When/Then text and index, whether it is a security criterion, the constraint brief items relevant to this task (including the security controls from item 7 and the test seam from item 8), the files this task touched and how to see their diff, and the implementer's report — labeled as claims to verify. It reads the diff, re-runs the test itself, and returns `APPROVED` or `CHANGES_REQUIRED` with findings classified Critical/Important/Minor and load-bearing/non-load-bearing, each with a `file:line`.
+**If the `Agent` tool is available:** dispatch the `task-reviewer` agent for this task. Pass it, self-contained (it has no access to this conversation): the acceptance criterion's full Given/When/Then text and index, whether it is a security criterion, the constraint brief items relevant to this task (including the security controls from item 7, the test seam from item 8, and the domain names from item 9), the files this task touched and how to see their diff, and the implementer's report — labeled as claims to verify. It reads the diff, re-runs the test itself, and returns `APPROVED` or `CHANGES_REQUIRED` with findings classified Critical/Important/Minor and load-bearing/non-load-bearing, each with a `file:line`.
 
-**Otherwise** (no subagent dispatch, or Interleaved was not chosen): do the review yourself as a checklist against the actual diff, not your memory of writing it — for each part of the Given/When/Then, name the line of code and the assertion that covers it; check nothing outside this task's scope was touched; check the brief's forbidden imports, naming, and security controls on this path; check the test goes through the brief's test seam and replaces only the dependencies the seam allows; check the test would fail if the implementation were removed. This is a weaker check than an independent reviewer, since the same context wrote the code — say so in the Build Log row's note if any item could not be confirmed.
+**Otherwise** (no subagent dispatch, or Interleaved was not chosen): do the review yourself as a checklist against the actual diff, not your memory of writing it — for each part of the Given/When/Then, name the line of code and the assertion that covers it; check nothing outside this task's scope was touched; check the brief's forbidden imports, naming, and security controls on this path; check the test goes through the brief's test seam and replaces only the dependencies the seam allows; check types, functions, and test names for domain concepts use item 9's identifiers; check the test would fail if the implementation were removed. This is a weaker check than an independent reviewer, since the same context wrote the code — say so in the Build Log row's note if any item could not be confirmed.
 
 **On `APPROVED`:** go to 7f.
 
@@ -305,8 +309,9 @@ After all tasks are marked complete:
 2. State which acceptance criteria are implemented (by index: AC-1, AC-2, ...)
 3. List any constraint deviations encountered and how they were resolved
 4. List any open items that require human follow-up (unresolved architecture conflicts, missing external dependencies, gaps not covered by the spec, and every row in the Build Log's `### Parked Findings`)
-5. Point to the spec's `## Build Log` as the persisted record of this build — every row should now be `done`, each with its own commit; `TodoWrite` itself is cleared when the session ends.
-6. **Draft the pull request description** — only once `pragmatic-spec-check` has returned PASS (the HARD-GATE above), since the draft cites its result. Assemble it from the spec, the Build Log, and the spec-check report following `references/pr-description.md`: problem, what changes, acceptance criteria with their covering tests, evidence, decisions worth knowing, security, open items, and merge risk (one-way/two-way door and blast radius). If the target repo has its own PR template, fill that instead. Present the draft in chat, ready to paste; write it to a file only if the user asks. Do not open, push, or create the pull request — that stays with the user. If spec-check has not passed yet, skip this item and say the draft comes after PASS.
+5. List every **glossary gap** recorded under constraint brief item 9 (from your own work and from implementer reports): the concept, the name used in code, and where. These are candidate terms — the user adds them through `pragmatic-spec-update`, which updates the glossary; this skill never edits it
+6. Point to the spec's `## Build Log` as the persisted record of this build — every row should now be `done`, each with its own commit; `TodoWrite` itself is cleared when the session ends.
+7. **Draft the pull request description** — only once `pragmatic-spec-check` has returned PASS (the HARD-GATE above), since the draft cites its result. Assemble it from the spec, the Build Log, and the spec-check report following `references/pr-description.md`: problem, what changes, acceptance criteria with their covering tests, evidence, decisions worth knowing, security, open items, and merge risk (one-way/two-way door and blast radius). If the target repo has its own PR template, fill that instead. Present the draft in chat, ready to paste; write it to a file only if the user asks. Do not open, push, or create the pull request — that stays with the user. If spec-check has not passed yet, skip this item and say the draft comes after PASS.
 
 Close with an explicit next step:
 

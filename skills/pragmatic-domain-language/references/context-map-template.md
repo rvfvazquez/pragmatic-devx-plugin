@@ -9,11 +9,13 @@ Location: `docs/glossary/context-map.md` — the single entry point to the proje
 ```markdown
 # Context Map
 
+**Last synced:** `<commit sha>` (<date>)
+
 ## Contexts
 
-| Context | Glossary | Arch spec | Purpose | Owns |
-|---|---|---|---|---|
-| <Name> | [<slug>](./<slug>.md) | [<name>.arch](../arch/<name>.arch.md) or — | <one line> | <terms whose source of truth is this context> |
+| Context | Glossary | Arch spec | Purpose | Owns | Code |
+|---|---|---|---|---|---|
+| <Name> | [<slug>](./<slug>.md) | [<name>.arch](../arch/<name>.arch.md) or — | <one line> | <terms whose source of truth is this context> | <paths, comma-separated> or — |
 
 ## Relationships
 
@@ -36,6 +38,8 @@ The same concept under different names, each correct in its own context:
 
 - **One row per context file.** Every `docs/glossary/*.md` other than this map appears in Contexts, and every row's Glossary link resolves to an existing file.
 - **Arch spec column:** link the `module`-scope arch spec for that context when one exists; `—` otherwise. A context without an arch spec is normal early on.
+- **Code column (optional):** the directories, relative to the repository root and comma-separated, where this context's code lives (`src/payments`, `internal/ordering`). It scopes `pragmatic-domain-language`'s sync and `glossary-drift.sh`; a context with `—` is skipped by both. Fill it when known, never guess it.
+- **Last synced (optional):** the commit the glossary was last reconciled with the code, written by the sync flow — never by hand and never by a skill that only reads the map. A map without it means "never synced"; the sync then scans the whole Code paths instead of the changes since that commit.
 - **Owns:** the terms this context is the source of truth for. Other contexts reference them by identifier only. Must not contradict a cross-module rule in the constitution.
 - **Mechanism** must agree with the Communication Style (section 6.3) of the arch specs involved, when they exist.
 - **Single-context project:** one row in Contexts; omit Relationships and Translations entirely rather than leaving them empty.
@@ -46,13 +50,15 @@ The same concept under different names, each correct in its own context:
 ```markdown
 # Context Map
 
+**Last synced:** `9c3d2e1` (2026-10-12)
+
 ## Contexts
 
-| Context | Glossary | Arch spec | Purpose | Owns |
-|---|---|---|---|---|
-| Ordering | [ordering](./ordering.md) | [ordering.arch](../arch/ordering.arch.md) | Receives and tracks orders | Order, Order Item |
-| Billing | [billing](./billing.md) | [billing.arch](../arch/billing.arch.md) | Issues invoices and processes payments | Invoice, Payment |
-| Fulfillment | [fulfillment](./fulfillment.md) | — | Picking and shipping | Shipment |
+| Context | Glossary | Arch spec | Purpose | Owns | Code |
+|---|---|---|---|---|---|
+| Ordering | [ordering](./ordering.md) | [ordering.arch](../arch/ordering.arch.md) | Receives and tracks orders | Order, Order Item | src/ordering |
+| Billing | [billing](./billing.md) | [billing.arch](../arch/billing.arch.md) | Issues invoices and processes payments | Invoice, Payment | src/billing |
+| Fulfillment | [fulfillment](./fulfillment.md) | — | Picking and shipping | Shipment | — |
 
 ## Relationships
 

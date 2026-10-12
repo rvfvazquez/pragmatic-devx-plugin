@@ -32,6 +32,18 @@ name a build chose for a type was nobody's decision.
   Invoice") run a confirm-then-write flow. It never rewrites specs: it lists
   the specs and arch specs still using an old name and the update skill each
   one needs.
+- **Sync from Code** (`sync`, or "sync the glossary with the code"):
+  reconciles an existing glossary with the code. The context map gains an
+  optional `Code` column (paths per context) and a `Last synced` commit
+  marker. `scripts/glossary-drift.sh` — read-only, grep-based, usable alone in
+  CI — reports `_In code_` identifiers that no longer exist and avoided words
+  used as identifiers; the flow adds new-term candidates from the files
+  changed since the marker (a scan pass moved here from `reverse-engineer`,
+  now §6 Scan Code), groups everything for confirmation, and accepts both
+  directions per item (the code is right → the glossary changes; the
+  glossary is right → a pending rename is recorded). It never edits code or
+  specs. Ownership and relationships are not checked yet. The script matches
+  text, so a comment can hide a stale name or raise a false avoided word.
 
 #### Where the glossary is used
 
@@ -95,9 +107,14 @@ None of this has the incident-based evidence CLAUDE.md's "Skill Changes
 Require Evidence" section normally requires — it is proposed from the
 comparative review above, not from a reported failed session. Proceeding
 without that evidence was at the repo owner's direction, same category as
-v0.11.0–v0.14.0. Verified with `tests/skill-triggering/run-all.sh`: 16 of 16
-skill prompts trigger their skill (a prompt for `pragmatic-domain-language`
-was added), and the SessionStart hook was run against four fixture projects.
+v0.11.0–v0.14.0. Verified with `tests/skill-triggering/run-all.sh`: every
+skill prompt triggers its skill (prompts for `pragmatic-domain-language` were
+added, including one for the sync; `run-all.sh` now accepts several prompts
+per skill, named `<skill>.<variant>.txt`), the SessionStart hook was run
+against four fixture projects, and `glossary-drift.sh` against a fixture repo
+(stale and avoided identifiers, a term's own identifier winning over an
+avoided word, camelCase components, missing path / glossary file / map, no
+`git`, a bad `Last synced` commit).
 Not verified: skills loading `pragmatic-domain-language` mid-step in a live
 session — the trigger tests only confirm each skill fires on its own prompt.
 

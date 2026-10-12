@@ -32,7 +32,7 @@ Claude Code plugin focused on Developer Experience — structured specs, archite
 | [`pragmatic-spec-build`](#pragmatic-spec-build) | Implement an approved spec, guided by arch rules and constitution |
 | [`pragmatic-spec-check`](#pragmatic-spec-check) | Verify the implementation matches the spec's acceptance criteria |
 | [`pragmatic-reverse-engineer`](#pragmatic-reverse-engineer) | Generate a spec/arch spec from existing undocumented code |
-| [`pragmatic-domain-language`](#pragmatic-domain-language) | Change the glossary or context map directly; shared domain-language procedures for the other skills |
+| [`pragmatic-domain-language`](#pragmatic-domain-language) | Change or sync the glossary and context map; shared domain-language procedures for the other skills |
 
 ## Installation
 
@@ -612,12 +612,19 @@ Owns the project's domain language in `docs/glossary/`: `context-map.md` (contex
 - "Add a term to the glossary"
 - "Record that Billing owns Invoice"
 - "Update the context map"
+- "Sync the glossary with the code" (or `sync`, `sync payments`)
 
 **Example:**
 
 > You: "We call it Account in the glossary but the business says Customer — and 'account' also means the login. Fix that."
 
 Claude locates the context, proposes splitting the word into **Customer** (who buys) and **User** (who logs in) with a boundary case for each, lists the specs and arch specs that still say "Account", and — once you confirm — renames the term (moving "account" under Avoid), adds User, and records the resolved ambiguity. It never rewrites the specs themselves: each one is listed with the update skill it needs.
+
+**Syncing with the code.** `sync` reconciles the glossary with what the code now says. It runs `scripts/glossary-drift.sh` (read-only, `grep`-based, usable on its own in CI or a pre-commit hook) to find `_In code_` identifiers that no longer exist and avoided words used as identifiers, scans only the files changed since the map's `Last synced` commit for new candidate terms, and groups what it found for you to confirm. Each item goes either way — the code is right and the glossary changes, or the glossary is right and a rename is recorded as pending — and nothing is written, and no code is touched, before you confirm. It does not check ownership or relationships yet.
+
+> You: "sync the glossary with the code"
+>
+> Claude reports, per group: *gone* (`Charge` no longer exists; `PaymentCharge` looks like its rename — update `_In code_`?), *avoided word in code* (`Customer`, 9 uses in `src/payments/service.go` — record a pending rename?), and *new* (`Settlement` — drafted with a definition and a boundary case). After you answer, it writes the accepted changes and moves `Last synced` to the current commit.
 
 ---
 
@@ -736,6 +743,8 @@ pragmatic-devx-plugin/
 │   │   ├── references/
 │   │   │   ├── glossary-template.md     # docs/glossary/<context>.md format
 │   │   │   └── context-map-template.md  # docs/glossary/context-map.md format
+│   │   ├── scripts/
+│   │   │   └── glossary-drift.sh        # read-only drift report (STALE / AVOIDED)
 │   │   └── examples/                    # context map + one glossary per context
 │   ├── pragmatic-reverse-engineer/
 │   │   ├── SKILL.md
@@ -763,10 +772,12 @@ pragmatic-devx-plugin/
 │   ├── bump-version.sh            # Updates version in all 5 manifests atomically
 │   └── sync-agents.sh             # Syncs CLAUDE.md → AGENTS.md
 ├── tests/
+│   ├── glossary-drift/
+│   │   └── run.sh                 # Fixture-repo test for glossary-drift.sh
 │   └── skill-triggering/
 │       ├── run-test.sh            # Single-skill trigger test
 │       ├── run-all.sh             # Runs all prompts, reports PASS/FAIL
-│       └── prompts/               # Natural-language trigger prompts (one per user-facing skill)
+│       └── prompts/               # Natural-language trigger prompts (<skill>.txt, optionally <skill>.<variant>.txt)
 ├── package.json                   # Pi/Antigravity manifest (pi.extensions + pi.skills)
 ├── AGENTS.md                      # Mirror of CLAUDE.md for Codex/OpenAI agents
 ├── CLAUDE.md                      # AI agent contributor guidelines

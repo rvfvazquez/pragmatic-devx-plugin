@@ -145,7 +145,7 @@ Before creating or updating any spec or arch spec, check whether `docs/constitut
 | "reverse engineer a spec from this code" / "generate a spec from existing code" / "document what this legacy code does" | `pragmatic-reverse-engineer` |
 | "this is too big for one spec, break it down" / "plan this initiative" | `pragmatic-initiative-create` |
 | "deliver this initiative" / "build out all the features in X" | `pragmatic-initiative-deliver` |
-| "rename a term in the glossary" / "add a term" / "update the context map" / "who owns X" | `pragmatic-domain-language` |
+| "rename a term in the glossary" / "add a term" / "update the context map" / "who owns X" / "sync the glossary with the code" | `pragmatic-domain-language` |
 
 ## Skill Invocation Rule
 

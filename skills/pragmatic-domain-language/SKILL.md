@@ -1,6 +1,6 @@
 ---
 name: pragmatic-domain-language
-description: This skill should be used when the user asks to "add a term to the glossary", "rename a domain term", "redefine what X means", "update the glossary", "update the context map", "add a bounded context", "record who owns X", or wants to change the project's domain language in docs/glossary/ directly, outside of writing a spec. Also loaded by the other pragmatic skills for the shared glossary and context-map procedures they apply.
+description: This skill should be used when the user asks to "add a term to the glossary", "rename a domain term", "redefine what X means", "update the glossary", "update the context map", "add a bounded context", "record who owns X", or wants to change the project's domain language in docs/glossary/ directly, outside of writing a spec. Also use it to "sync the glossary with the code", "the code drifted from the glossary", "check the glossary against the code", or "update the glossary from the code". Also loaded by the other pragmatic skills for the shared glossary and context-map procedures they apply.
 ---
 
 # pragmatic-domain-language
@@ -15,11 +15,13 @@ Use these as calibration targets for format and level of detail. They describe o
 - **`examples/example-glossary-ordering.md`** — terms that border another context's vocabulary, and resolved ambiguities
 - **`examples/example-glossary-payments.md`**, **`example-glossary-notifications.md`**, **`example-glossary-identity.md`** — a context with an avoided word common in prose, one that keeps a provider's word out of the domain language, and a deliberately small context
 
-## Two Ways This Skill Is Used
+## Three Ways This Skill Is Used
 
 **Loaded by another pragmatic skill.** The calling skill names a section below (e.g. "apply §2 Interview Checks"). Apply **only that section**, within the caller's own step, then continue with the caller's next step. Do not run the Direct Edit flow, do not ask the questions in it, and do not end the caller's skill. The caller's own gates (recaps, STOPs, confirmations) still govern when anything is written.
 
-**Invoked directly** — the user wants to change the domain language itself, outside of writing or updating a spec: add, rename, or redefine a term, add a context, record ownership, add a relationship or translation. Run the **Direct Edit** flow at the end of this file.
+**Invoked directly to change the language** — the user wants to change the domain language itself, outside of writing or updating a spec: add, rename, or redefine a term, add a context, record ownership, add a relationship or translation. Run the **Direct Edit** flow at the end of this file.
+
+**Invoked directly to sync with the code** — the invocation carries the argument `sync` (optionally followed by a context name, e.g. `sync payments`), or the user asks to reconcile or check the glossary against the code. Run the **Sync from Code** flow at the end of this file. When the request could be either, ask which with `AskUserQuestion`, ➡️ Sync when it mentions the code, Direct Edit otherwise.
 
 ## Files
 
@@ -29,14 +31,16 @@ docs/glossary/
 └── <context-slug>.md     ← one per bounded context
 ```
 
-Formats and content rules: `references/glossary-template.md` (a context's terms) and `references/context-map-template.md` (contexts, Owns, Relationships, Translations).
+Formats and content rules: `references/glossary-template.md` (a context's terms) and `references/context-map-template.md` (contexts, Owns, Code paths, Relationships, Translations, and the `Last synced` marker).
+
+`scripts/glossary-drift.sh` is a read-only drift report (needs bash, grep, awk, sed; git optional): `bash scripts/glossary-drift.sh [--root DIR] [--context NAME]`. It checks, per context with a Code column, that every `_In code_` identifier still exists in the code (STALE) and that no `_Avoid_` word is used as an identifier (AVOIDED). Exit 0 means no findings, 1 findings, 2 no map. It is the first step of Sync from Code and is safe to run in CI or a pre-commit hook on its own.
 
 ---
 
 ## §1 Locate the Context
 
 1. If `docs/glossary/context-map.md` does not exist, there is no glossary yet — say so and continue; §2 treats every central concept as new.
-2. Read the map. Identify the context the work belongs to by the map's **Purpose** and **Owns** columns, or by the linked arch spec. Work spanning several contexts (a `system`-scope arch spec, an initiative) identifies each one.
+2. Read the map. Identify the context the work belongs to by the map's **Purpose** and **Owns** columns, by the linked arch spec, or — when the work is about specific files — by the **Code** paths that contain them. Work spanning several contexts (a `system`-scope arch spec, an initiative) identifies each one.
 3. Read the glossary file of each identified context in full.
 4. **Ambiguous context** — if two or more contexts plausibly fit, ask the user which one via `AskUserQuestion`, recommending (`➡️`) the context whose Owns covers the central concept. Never pick silently.
 
@@ -92,7 +96,7 @@ Report **WARN at most, never FAIL** — a young glossary produces false positive
 Base checks — every validator:
 1. **No avoided terms** — no word listed under a term's `_Avoid_` is used in the document to mean that term. A word used for an unrelated concept is not a finding.
 2. **Domain terms defined** — the domain concepts the document relies on (a spec's goals and criteria; an arch spec's components, events, flows) are defined in the context's glossary.
-3. **Context map consistent** — every `docs/glossary/*.md` other than the map is listed in its Contexts table; every Glossary and Arch spec link resolves; no term is defined in two context files without a Translations row.
+3. **Context map consistent** — every `docs/glossary/*.md` other than the map is listed in its Contexts table; every Glossary and Arch spec link resolves; no term is defined in two context files without a Translations row; every path in a Code column exists.
 4. **Glossary hygiene** — in the context files the document touches, each entry follows `references/glossary-template.md`. WARN for: a definition longer than two sentences or describing behavior instead of what the concept is; implementation detail (table or column names, endpoints, field lists, types); a general programming concept (timeout, retry, DTO, cache); a missing definition; two terms sharing an `_In code_` identifier; a word under one term's `_Avoid_` that is another term's canonical name. A word under `_Avoid_` that matches the same term's own `_In code_` is not a finding (see §5).
 
 Architecture checks — arch spec validators add:
@@ -111,6 +115,20 @@ For anything that writes or checks code, tests, or text about it:
 - **A concept missing from the glossary is a signal.** First check whether an existing term already covers it; most of the time one does, and inventing a name is the mistake. Only if none fits, name it consistently with the existing identifiers and record it as a **glossary gap** — never add it to the glossary from a build or a check.
 - Conformance checks scan only their own scope. A different name or an avoided word in an interface or a test name is a warning; a concept the code doesn't represent at all is not a naming finding.
 
+## §6 Scan Code
+
+Used by Sync from Code and by `pragmatic-reverse-engineer`'s Domain Vocabulary pass. It proposes terms; it never writes the glossary and never renames code.
+
+1. **Collect candidate concepts** from what the code names: domain types and entities, table and collection names, enum values that name states, route nouns, event and message names. A candidate is a domain concept when it is persisted, crosses a boundary (an endpoint, an event), names a state, or is a type other types are built around. Ignore general programming constructs: handlers, DTOs, configs, clients, utilities, mocks, and test helpers.
+2. **Group synonyms** — the same concept under several names across the code (`Account`, `Customer`, `Client` all pointing at the same table) is one candidate with several names. Pick the **dominant** one (most uses) as the proposed `_In code_`, and list the others with their use counts as **rename candidates**. Propose the canonical term separately — it may be a business word none of the identifiers uses; the caller asks.
+3. **Compare with the glossary** (locate the context per §1, judge names per §5):
+   - the code uses the term's `_In code_` identifier → **CONFIRMED**
+   - the code names a defined concept differently, or uses a word under its `_Avoid_` → **DIVERGENCE** (cite file:line, the code name, the glossary identifier)
+   - a concept the glossary doesn't define → **NEW**, with an **INFERRED** one-sentence definition drawn from how the code uses it
+4. **Contexts** (architecture targets only) — propose which context each component belongs to (or a new context, named after the module) and what it appears to own: the concepts it persists.
+
+Done when every candidate is CONFIRMED, DIVERGENCE, or NEW, or was filtered out as non-domain.
+
 ---
 
 ## Direct Edit
@@ -123,3 +141,21 @@ Run this only when the user invoked this skill to change the domain language its
 4. **Confirm** — present the drafts and every map row that changes, plus the documents in `docs/specs/` and `docs/arch/` that use an affected name. **STOP until the user confirms.**
 5. **Write** — apply §3.
 6. **Summarize** — the files changed, the terms and rows added or changed, and every spec or arch spec that still uses an old name, with the update skill each one needs. A glossary change does not rewrite the documents that use it.
+
+---
+
+## Sync from Code
+
+Run this only when the user invoked this skill to reconcile the glossary with the code. It never edits code, specs, or arch specs, and it never writes without confirmation. The code can tell you **facts** — an identifier is gone, a type appeared, a word you avoid is in use — not the business word or the definition, which stay the user's decisions.
+
+1. **Locate** — apply §1 to every context in the map, or only the one named. For a context whose Code column is empty or `—`, ask once through `AskUserQuestion` for its paths, ➡️ the directories whose names match the context name or its Owns terms (list the project's directories to find them), or skip that context. Answers are written to the Code column in step 5.
+2. **Detect** — run `scripts/glossary-drift.sh --root . [--context <name>]` from the project root when `bash` is available. Otherwise do the same search yourself with Grep: every `_In code_` identifier no longer in the Code paths (STALE), and every `_Avoid_` word used as an identifier (AVOIDED), skipping a term's own `_In code_` identifier (§5). The match is textual — a comment can hide a STALE or raise an AVOIDED — so treat each finding as a question.
+   Then read `Last synced` in the map. If it names a commit that exists in this repository, run §6 only on files changed since it (`git diff --name-only <sha>..HEAD -- <paths>`) and, for each STALE identifier, look for its successor (`git log -S'<old>' --oneline -- <paths>`, and renames in that diff). If the marker is missing or unknown, run §6 on the whole Code paths and say so.
+3. **Classify** the results into groups, skipping empty ones:
+   - **Gone** (STALE) — propose per item: renamed (the new `_In code_`), moved to another context (move the entry), or removed from the code (keep the term and ask whether to retire it; nothing is deleted without the user).
+   - **Avoided word in code** (AVOIDED) — default: a **pending rename**, code untouched. Alternative when the code name is used consistently: change the term's `_In code_` to it (§6 dominant identifier).
+   - **New** (§6 NEW) — draft each as in §2: canonical term, one-sentence definition, `_Avoid_`, `_In code_`, and a boundary scenario.
+   - **Not checked in this version:** Owns and Relationships. Say so in the report — do not guess them from the code.
+4. **Confirm** — one `AskUserQuestion` round per group, items numbered, each with a recommended answer (`➡️`). List the specs and arch specs that use any affected name. Every item accepts both directions: *the code is right* → the glossary changes; *the glossary is right* → record a pending rename and leave the glossary alone. **STOP until the user confirms.** If nothing drifted, say so and ask only whether to move the `Last synced` marker.
+5. **Write** — apply §3 for each accepted glossary change. Write the Code column paths from step 1. Set `**Last synced:** \`<HEAD short sha>\` (<today>)` under the map's title (add the line if absent) — also when nothing drifted, and only after confirmation. The marker limits the next scan of *new* code; pending renames and avoided words are found again every run, because the script checks them on the whole Code paths.
+6. **Summarize** — files changed; items by outcome (updated, pending rename, ignored); every pending rename with its file:line and use count; the specs and arch specs still using an old name, each with the update skill it needs (§3); and what was not checked.

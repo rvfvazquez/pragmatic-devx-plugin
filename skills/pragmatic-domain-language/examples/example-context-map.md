@@ -6,7 +6,7 @@
 > authentication specs. Each context below has its own example glossary file in this
 > folder (`example-glossary-<context>.md`) — in a real project they live next to the
 > map as `docs/glossary/<context>.md`.
-> **Showcases:** the **Owns** column as the source of truth for each concept, an event
+> **Showcases:** the **Code** column and `Last synced` marker that scope the sync flow and `scripts/glossary-drift.sh`, the **Owns** column as the source of truth for each concept, an event
 > relationship defined by a system-scope arch spec, a shared-types relationship, a
 > synchronous call, and translations — including a word (*Customer*) that means a
 > different thing in two contexts and in an external system.
@@ -15,14 +15,16 @@
 
 # Context Map
 
+**Last synced:** `9c3d2e1` (2026-10-12)
+
 ## Contexts
 
-| Context | Glossary | Arch spec | Purpose | Owns |
-|---|---|---|---|---|
-| Ordering | [ordering](./ordering.md) | — | Receives customer orders and tracks them to delivery | Order, Order Item, Order Status, Cancellation, Customer, Operator |
-| Payments | [payments](./payments.md) | [payments.arch](../arch/payments.arch.md) | Charges and refunds money for orders | Transaction, Charge, Refund, Payer |
-| Notifications | [notifications](./notifications.md) | — | Tells recipients about events they care about | Notification, Recipient, Channel, Opt-out |
-| Identity | [identity](./identity.md) | — | Authenticates users and issues access tokens | User, Access Token |
+| Context | Glossary | Arch spec | Purpose | Owns | Code |
+|---|---|---|---|---|---|
+| Ordering | [ordering](./ordering.md) | — | Receives customer orders and tracks them to delivery | Order, Order Item, Order Status, Cancellation, Customer, Operator | src/ordering |
+| Payments | [payments](./payments.md) | [payments.arch](../arch/payments.arch.md) | Charges and refunds money for orders | Transaction, Charge, Refund, Payer | src/payments |
+| Notifications | [notifications](./notifications.md) | — | Tells recipients about events they care about | Notification, Recipient, Channel, Opt-out | src/notifications |
+| Identity | [identity](./identity.md) | — | Authenticates users and issues access tokens | User, Access Token | src/auth |
 
 ## Relationships
 

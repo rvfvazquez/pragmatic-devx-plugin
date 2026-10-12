@@ -23,8 +23,8 @@ name a build chose for a type was nobody's decision.
   the skill's `references/`; a complete worked example (map plus four
   glossaries) is in its `examples/`.
 - **One owner for the procedures.** §1 Locate the Context, §2 Interview
-  Checks, §3 Write the Glossary, §4 Validation Checks, §5 Names in Code.
-  Thirteen skills keep their own step and completion criterion inline and
+  Checks, §3 Write the Glossary, §4 Validation Checks, §5 Names in Code,
+  §6 Scan Code. Thirteen skills keep their own step and completion criterion inline and
   call the Skill tool for the section they need, so a rule changes in one
   place. The skill is model-invoked on purpose: `disable-model-invocation`
   would make it unreachable from other skills.
@@ -116,12 +116,17 @@ v0.11.0–v0.14.0. Verified with `tests/skill-triggering/run-all.sh`: every
 skill prompt triggers its skill (prompts for `pragmatic-domain-language` were
 added, including one for the sync; `run-all.sh` now accepts several prompts
 per skill, named `<skill>.<variant>.txt`), the SessionStart hook was run
-against four fixture projects, and `glossary-drift.sh` against a fixture repo
-(stale and avoided identifiers, a term's own identifier winning over an
-avoided word, camelCase components, missing path / glossary file / map, no
-`git`, an unknown or empty `Synced` commit).
-Not verified: skills loading `pragmatic-domain-language` mid-step in a live
-session — the trigger tests only confirm each skill fires on its own prompt.
+against four fixture projects, and `glossary-drift.sh` by
+`tests/glossary-drift/run.sh` (23 assertions on a throwaway git repo: stale
+and avoided identifiers, a term's own identifier winning over an avoided
+word, camelCase components, missing path / glossary file / map, per-context
+sync ages, an unknown or empty `Synced` commit). That test caught a real bug
+in the script's field parsing before it shipped.
+
+Not verified: skills loading `pragmatic-domain-language` mid-step, or running
+the sync, in a live session — the trigger tests only confirm each skill fires
+on its own prompt, and the script test does not cover the flow around the
+script (including how it reads and writes `Synced`).
 
 ## v0.14.0 (2026-10-04)
 

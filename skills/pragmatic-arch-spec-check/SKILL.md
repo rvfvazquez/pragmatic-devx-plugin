@@ -97,6 +97,8 @@ For each spec in scope:
    - **NFRs with structural implications** — e.g., "no direct DB access outside the repository layer"
    - **Trust boundaries** — from section 4.3, if it lists any: each boundary (from → to), what crosses it, and the control that must be applied on crossing; the declared attack surface; the section 9 **Security** row. If section 4.3 states a single trust domain, record that and skip check H.
 
+   - **Domain language** — if `docs/glossary/context-map.md` exists: the glossary of every context this spec covers (each term's code identifier and `_Avoid_` words), the map's **Owns** column for those contexts, and the map's **Relationships** rows between them. If no glossary exists, record that and skip check I.
+
 3. Build a rule list before scanning the codebase. Each rule should be traceable to a specific section of the spec.
 
 ### Step 3 — Scan the Codebase
@@ -148,6 +150,16 @@ Use Glob and Grep to gather evidence from the codebase within the defined scope.
 - Are there network entry points in the code (routes, listeners, webhook handlers, message consumers exposed to external input) that do not appear in the section 4.3 attack surface?
 
 State plainly that this check is static only: it confirms a control is *present* on the path, not that the control is *correct* at runtime.
+
+#### I. Domain Language Conformance
+
+**Skip this section entirely if the project has no `docs/glossary/`.** Otherwise, for the domain language extracted in Step 2:
+
+- **Names** — do modules, components, exported types, and events named after a glossary concept use that term's code identifier? A different name, or a word listed under the term's `_Avoid_`, is a PARTIAL warning: cite file:line, the name found, and the identifier expected.
+- **Ownership** — does any module outside the owning context define its own persisted model or store for a concept the map says another context **Owns** (e.g. a `customers` table in Billing when Ordering owns Customer)? Referencing the owned concept by identifier is fine; a second source of truth is a PARTIAL warning, or NON-CONFORMANT when it also breaks a Cross-Module Rule in the constitution.
+- **Relationships** — where two contexts in scope interact in code, does the mechanism match the map's Relationships row (event vs direct call vs shared types)? A direct import or call between contexts the map connects only by events is a PARTIAL warning; an interaction between two contexts with no Relationships row at all is an INFO observation.
+
+Naming findings are never NON-CONFORMANT on their own — a misnamed type is drift, not a broken boundary.
 
 ### Step 4 — Generate Conformance Report
 

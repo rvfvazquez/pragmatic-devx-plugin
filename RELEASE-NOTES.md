@@ -42,8 +42,11 @@ name a build chose for a type was nobody's decision.
   changed since the marker (a scan pass moved here from `reverse-engineer`,
   now §6 Scan Code), groups everything for confirmation, and accepts both
   directions per item (the code is right → the glossary changes; the
-  glossary is right → a pending rename is recorded). It never edits code or
-  specs. Ownership and relationships are not checked yet. The script matches
+  glossary is right → a pending rename is recorded). Without `--context` it
+  covers every context in the map (asking once for the paths of those with no
+  `Code` value); the single `Last synced` marker moves only after a run that
+  covered every context with Code paths, so a `--context` run cannot hide the
+  other contexts' changes from the next one. It never edits code or specs. Ownership and relationships are not checked yet. The script matches
   text, so a comment can hide a stale name or raise a false avoided word.
 
 #### Where the glossary is used

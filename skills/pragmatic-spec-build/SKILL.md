@@ -306,6 +306,7 @@ After all tasks are marked complete:
 3. List any constraint deviations encountered and how they were resolved
 4. List any open items that require human follow-up (unresolved architecture conflicts, missing external dependencies, gaps not covered by the spec, and every row in the Build Log's `### Parked Findings`)
 5. Point to the spec's `## Build Log` as the persisted record of this build — every row should now be `done`, each with its own commit; `TodoWrite` itself is cleared when the session ends.
+6. **Draft the pull request description** — only once `pragmatic-spec-check` has returned PASS (the HARD-GATE above), since the draft cites its result. Assemble it from the spec, the Build Log, and the spec-check report following `references/pr-description.md`: problem, what changes, acceptance criteria with their covering tests, evidence, decisions worth knowing, security, open items, and merge risk (one-way/two-way door and blast radius). If the target repo has its own PR template, fill that instead. Present the draft in chat, ready to paste; write it to a file only if the user asks. Do not open, push, or create the pull request — that stays with the user. If spec-check has not passed yet, skip this item and say the draft comes after PASS.
 
 Close with an explicit next step:
 

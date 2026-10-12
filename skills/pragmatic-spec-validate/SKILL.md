@@ -79,7 +79,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 | Security criteria testable | N/A if section 8's Security item has no applicable entries (all `N/A — <reason>`) |
 | Single feature focus | N/A if the spec explicitly documents a bounded context that intentionally includes multiple related subsystems |
 | Invariants verified | N/A if section 6.2 states `None — <reason>`, or the spec introduces or changes no data model |
-| Domain Language checks (all three) | N/A if `docs/glossary/` does not exist — the project has no glossary yet |
+| Domain Language checks (all four) | N/A if `docs/glossary/` does not exist — the project has no glossary yet |
 
 #### Completeness
 - **Title & Status** — Has a clear title and a defined status (Draft/Review/Approved)
@@ -124,6 +124,7 @@ These checks report **WARN at most, never FAIL** — a young glossary produces f
 - **No avoided terms** — no word listed under a term's `_Avoid_` is used in the spec to mean that term. WARN, naming each occurrence's section and the canonical term to use instead. A word that appears under `_Avoid_` but is clearly used for an unrelated concept is not a finding. *(may be N/A — see table above)*
 - **Domain terms defined** — the domain concepts the spec's goals and acceptance criteria rely on are defined in the context's glossary. WARN, listing each undefined term. General programming vocabulary (timeout, cache, retry) is never a finding. *(may be N/A — see table above)*
 - **Context map consistent** — every `docs/glossary/*.md` other than the map is listed in its Contexts table, every Glossary and Arch spec link in the map resolves to an existing file, and no term is defined in two context files without a row in the map's Translations section. WARN for each mismatch. *(may be N/A — see table above)*
+- **Glossary hygiene** — the glossary files read in Step 1 follow the content rules in `pragmatic-spec-create`'s `references/glossary-template.md`. WARN for each entry that: has a definition longer than two sentences or describing behavior instead of what the concept is; contains implementation detail (table or column names, endpoints, field lists, types); defines a general programming concept rather than a domain one (timeout, retry, DTO, cache); has no definition. Also WARN when two terms in one context share the same `_In code_` identifier, or a word under one term's `_Avoid_` is the canonical name of another term in the same context. Check only the context files this document touches, not the whole folder. *(may be N/A — see table above)*
 
 #### Scope
 - **Single feature focus** — Section 7 (acceptance criteria) describes one cohesive feature. WARN if criteria span multiple independent user workflows with no shared data model or flow — such a spec is better split into separate documents. *(may be N/A — see table above)*

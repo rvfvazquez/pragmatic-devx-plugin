@@ -76,6 +76,7 @@ Before the discovery interview, read:
 - `.claude/rules/` — extract rules already in force
 - `CLAUDE.md` at project root — understand any existing project-level instructions
 - `docs/specs/` — scan a sample to infer the project domain and tech stack
+- `docs/glossary/context-map.md`, if it exists — its contexts and **Owns** column already state which module is the source of truth for which concept; Area 4 answers must agree with it
 
 From this scan, build a preliminary picture of what the project already is. Bring decisions already documented into the discovery interview as defaults — do not ask the user to re-decide what is already evident. Only ask about what is genuinely unknown or not documented anywhere.
 
@@ -192,10 +193,15 @@ If no contradiction is found, skip straight to the recap below.
 
 > ⚠️ Possible contradiction: [Decision A, Area X] says "...", but [Decision B, Area Y] says "...". These look inconsistent because [reason]. Which should hold — or is there context I'm missing?
 
+**Seed the domain language (only when `docs/glossary/` does not exist yet).** If the Area 1 answers name the product's central concepts (who the customers are, what they buy or manage) or an Area 4 answer declares a module the single source of truth for a concept, offer once — via `AskUserQuestion`, ➡️ Yes — to start the glossary with them: the first context named after the product (per `pragmatic-spec-create`'s `references/context-map-template.md`), a drafted one-sentence definition per central concept, and each Area 4 ownership rule as that context's **Owns** entry. Keep it to the handful of concepts every feature will use; the rest arrive with the specs. If the user declines, skip it — feature specs will create the glossary when they need it.
+
+If a glossary already exists, add one more contradiction shape to the check above: an Area 4 ownership rule that disagrees with the context map's **Owns** column (the rule names AuthModule the source of identity, but the map says the Accounts context owns User).
+
 Once no contradictions remain, present the full recap and require explicit confirmation:
 
 > Here's the complete picture before I write the constitution:
 > **Area 1 (Project Identity):** ... **Area 2 (Global Tech Stack):** ... **Area 3 (Security Baseline):** ... **Area 4 (Cross-Module Rules):** ... **Area 5 (AI Behavior Guardrails):** ...
+> **Domain Language:** [seed terms and first context, if accepted — or "not seeded"]
 > Confirm this is complete, or tell me what's missing or wrong.
 
 **STOP. Do not proceed to Step 3 until the user explicitly confirms.**
@@ -292,6 +298,10 @@ Render these sections into the canonical rules file and every cross-tool destina
 
 ---
 
+### Step 4.5 — Seed the Glossary (if accepted)
+
+If the seed was accepted in Step 2.6, create `docs/glossary/context-map.md` and `docs/glossary/<context-slug>.md` together, following `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`. The map gets one row: the product context, its Purpose from Area 1, and its Owns from the Area 4 ownership rules.
+
 ### Step 5 — Output Summary
 
 After writing both files:
@@ -299,6 +309,7 @@ After writing both files:
 1. State every file path created or updated — `docs/constitution.md`, `.claude/rules/00-project-constitution.md`, and every cross-tool destination actually written (`AGENTS.md`, `.cursor/rules/project-constitution.mdc`, `.windsurf/rules/project-constitution.md`, `.github/copilot-instructions.md`, and `GEMINI.md` if it exists)
 2. List each rule extracted into `.claude/rules/00-project-constitution.md` by category
 3. List any areas explicitly marked as "none defined yet" — and what would typically trigger filling them
+4. If the glossary was seeded, list its path and the terms it starts with
 4. State:
 
 > **These rules are now active.** Claude Code loads `.claude/rules/00-project-constitution.md` automatically at the start of every session. All future `pragmatic-spec-create`, `pragmatic-arch-spec-create`, and `pragmatic-spec-build` runs will use these as context.
@@ -317,6 +328,8 @@ AGENTS.md                                         ← Codex CLI, Antigravity, an
 .windsurf/rules/project-constitution.md           ← Windsurf
 .github/copilot-instructions.md                   ← GitHub Copilot
 GEMINI.md                                         ← Gemini CLI / Antigravity, only if the file already exists
+docs/glossary/context-map.md                      ← only if the glossary seed was accepted
+docs/glossary/<context-slug>.md                   ← only if the glossary seed was accepted
 ```
 
 ## Constraint Priority

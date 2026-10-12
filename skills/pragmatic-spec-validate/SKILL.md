@@ -78,6 +78,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 | Security considerations addressed | N/A only if ALL hold: no network surface, no persistence of user or third-party data, no external input. Must be asserted explicitly in the report, not assumed. |
 | Security criteria testable | N/A if section 8's Security item has no applicable entries (all `N/A — <reason>`) |
 | Single feature focus | N/A if the spec explicitly documents a bounded context that intentionally includes multiple related subsystems |
+| Invariants verified | N/A if section 6.2 states `None — <reason>`, or the spec introduces or changes no data model |
 | Domain Language checks (all three) | N/A if `docs/glossary/` does not exist — the project has no glossary yet |
 
 #### Completeness
@@ -100,6 +101,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 - **Security criteria testable** — If section 7 contains security criteria, each names an actor, an action, and an observable result (an HTTP status code, the absence of protected data in the response). FAIL if a security criterion is vague ("must be secure", "unauthorized access is blocked" with no status). *(N/A if section 8's Security item has no applicable entries)*
 - **Interface matches design** — If APIs/interfaces are defined, they align with the described behavior *(may be N/A — see table above)*
 - **No contradictions** — Goals do not contradict the proposed solution or acceptance criteria
+- **Invariants verified** — Section 6.2 has an Invariants table, and each invariant names a section 7 criterion that exists and asserts that rule. WARN if the table is missing while section 6.2 introduces or changes data, or if an invariant has no verifying criterion (or names one that asserts something else). *(may be N/A — see table above)*
 
 #### Technology Decisions
 - **Technology Decisions section present** — Spec contains an explicit Technology Decisions table or equivalent section

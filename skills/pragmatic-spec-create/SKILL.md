@@ -187,7 +187,7 @@ Before writing, search for:
 - Related files or modules that reveal existing patterns and **technology already in use**
 - Prior specs in `docs/specs/` that may overlap
 - Type definitions, interfaces, or configuration files that reveal tech stack choices
-- `docs/glossary/context-map.md`, if it exists — identify which context this feature belongs to (by its Purpose and Owns columns, or a linked arch spec) and read that context's `docs/glossary/<context-slug>.md` in full
+- `docs/glossary/context-map.md`, if it exists — identify which context this feature belongs to (by its Purpose and Owns columns, or a linked arch spec) and read that context's `docs/glossary/<context-slug>.md` in full. If two or more contexts plausibly fit, ask the user which one (via `AskUserQuestion`, recommending the context whose Owns column covers the feature's central concept) — don't pick silently; a feature that genuinely spans two contexts is a signal for the Step 2.5 scope test.
 
 Note any technology already committed to in the codebase — these don't need to be asked again.
 
@@ -200,7 +200,13 @@ Check the words used so far — the user's description and the Step 2 answers �
 - **Contradiction with code** — the user describes a concept differently from how the code models it (e.g. partial cancellation, when the code only cancels whole orders). Surface it; don't pick a side.
 - **New term** — a domain concept the glossary doesn't define yet.
 
+**Whether or not a glossary exists**, also flag:
+- **Overloaded word** — a word the user has used for more than one thing in this conversation ("account" for the person who buys and for the login). Propose splitting it into distinct terms and ask which meaning each use had; never fold two concepts into one term.
+- **Vague word** — a word too fuzzy to define in one sentence ("item", "record", "entry", "data"). Propose a precise canonical term.
+
 **If no glossary exists**, every domain concept central to this feature is a new term.
+
+**Test each new or disputed term with a boundary scenario.** Alongside the drafted definition, give one concrete case that sits on the edge of it and say which side your draft puts it on — "cancelling 1 of 3 items in an Order: is that a **Cancellation**? My draft says no — Cancellation ends the whole Order." Pick the case most likely to be decided differently by two people reading the definition. Show it in the Step 4.6 recap next to the term; if the user moves the case to the other side, the definition changes, not the scenario.
 
 Resolve conflicts and code contradictions through `AskUserQuestion`, each with a recommended answer (`➡️`) taken from the glossary first, then the code's naming. For new terms, draft the entry yourself (canonical term, one-sentence definition, `_Avoid_` synonyms heard in the conversation, `_In code_` identifier if the code already names it) — don't ask a question per term; the drafts are confirmed in the Step 4.6 recap. **In Lean mode**, still ask about conflicts and contradictions — a misnamed concept in a spec is not a small change — but limit new terms to the ones the acceptance criteria will use.
 
@@ -320,7 +326,7 @@ Once no contradictions remain (or none were found), present the full recap and r
 > **Constraints:** [one-line summary]
 > **Security & Abuse:** [who must not do this; the abuse case; data sensitivity — or "not applicable because ..."]
 > **Technology Decisions:** [one-line summary per area from Step 4]
-> **Domain Language:** [context name; each new or changed term with its one-line definition and _Avoid_ list — or "no new domain terms"]
+> **Domain Language:** [context name; each new or changed term with its one-line definition, _Avoid_ list, and boundary case — or "no new domain terms"]
 >
 > Confirm this is complete, or tell me what's missing or wrong.
 
@@ -348,6 +354,8 @@ Fill every section with concrete content:
 
 **Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then the system SHALL [observable result]`. The **SHALL** in the Then clause is required (EARS notation) — it states the behavior as a mandatory system obligation, not a soft expectation ("should"/"will"). Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
 
+**Section 6.2 — Invariants:** list the rules about this feature's data that must hold after every operation, whichever path changed it — the ones a later change is most likely to break without noticing (a total never negative, a status never going backwards, a record always existing for an event). Name them with glossary terms. Each one names the section 7 criterion that verifies it; if none does, add the criterion rather than leaving the invariant unverified. Write `None — <reason>` only when the feature introduces or changes no data rule.
+
 **Section 8 — Security item:** Fill every sub-item (untrusted input, authentication, authorization, sensitive data, abuse case) with concrete handling or `N/A — <reason>`. Never leave it as a bare "security considerations" line. For any feature exposing an endpoint or handler, touching user data or PII, or processing external input, at least one sub-item must be non-`N/A`. Populate it from, in order: (1) the constitution's Security Baseline if one was loaded — state the inherited decision, e.g. "Authentication: platform OIDC (from constitution)"; (2) the Step 2 Security & Abuse answers — the "worst thing a malicious authenticated user could try" becomes the *Abuse case*; (3) the feature's own design.
 
 **Code blocks in sections 6.1 and 6.2:** The template uses Go as placeholder syntax. Always adapt code blocks to the project's actual programming language — inferred from Step 3 codebase scan or from the technology stack discussed in Step 4. For example: use TypeScript interfaces for a Node.js project, Python dataclasses or Protocol classes for a Python project, Java interfaces for a JVM project.
@@ -373,6 +381,7 @@ After writing the file in Step 5, read it back with fresh eyes before summarizin
 3. **TODO / Open Questions placement** — every `[TODO: decide — <options>]` lists real options, not a bare TODO; nothing in section 9 is precise enough that it should have been an inline TODO instead (per `references/template.md`'s own rule for that section).
 4. **Diagram correctness** — if a Mermaid diagram was added, its type matches the "When to add diagrams" table above and the syntax is valid.
 5. **Domain language** — every domain term the spec uses is defined in the context's glossary, and no word listed under `_Avoid_` appears in the spec.
+6. **Invariants verified** — every row in section 6.2's Invariants names a section 7 criterion that exists and actually asserts that rule.
 
 Fix anything found directly in the file. No need to re-run this check after fixing — fix and move on.
 

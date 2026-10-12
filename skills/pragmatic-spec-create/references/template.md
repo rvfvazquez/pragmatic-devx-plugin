@@ -74,6 +74,17 @@ type EntityName struct {
 }
 ```
 
+#### Invariants
+
+Rules about this data that must hold after **every** operation, whichever path made the change — not the behavior of one flow (that belongs in 6.3). Name concepts with their glossary terms.
+
+| # | Invariant | Verified by |
+|---|-----------|-------------|
+| INV-1 | e.g. An Order's total is never negative | AC-3 |
+
+> Every invariant names the acceptance criterion (section 7, numbered in order) whose test verifies it. An invariant no criterion verifies is a gap — add a criterion.
+> Write `None — <reason>` when the feature introduces or changes no data rule.
+
 ### 6.3 Behavior & Logic
 
 Step-by-step description of how the solution works.

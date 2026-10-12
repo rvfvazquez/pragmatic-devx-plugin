@@ -81,6 +81,13 @@ type OrderNotification struct {
 }
 ```
 
+#### Invariants
+
+| # | Invariant | Verified by |
+|---|-----------|-------------|
+| INV-1 | No email is ever sent to an address that has opted out | AC-5 |
+| INV-2 | Every send attempt has exactly one `order_notifications` record, whatever its outcome | AC-6, AC-7 |
+
 ### 6.3 Behavior & Logic
 
 ```mermaid

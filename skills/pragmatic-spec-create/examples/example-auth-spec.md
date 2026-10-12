@@ -99,6 +99,13 @@ type User struct {
 }
 ```
 
+#### Invariants
+
+| # | Invariant | Verified by |
+|---|-----------|-------------|
+| INV-1 | An issued token is never accepted more than 24 hours after it was issued | AC-4, AC-6 |
+| INV-2 | A login response is identical for a wrong password and an unknown email | AC-2, AC-3 |
+
 ### 6.3 Behavior & Logic
 
 **Flow 1: Login**

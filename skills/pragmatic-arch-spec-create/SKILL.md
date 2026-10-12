@@ -111,6 +111,12 @@ Templates and rules for the glossary files are in `pragmatic-spec-create`'s `ref
 - **`integration`** — the external system almost always names things differently. Draft a Translations row for each external concept that maps to one of ours (e.g. the provider's "Charge" is our **Payment**), so the adapter's vocabulary is explicit.
 - **`layer`** — read the glossary for naming only; a horizontal layer rarely introduces domain terms.
 
+**Ambiguous context:** if this scope could belong to two or more existing contexts, ask which one (via `AskUserQuestion`, recommending the context whose Owns covers the scope's central concept) — don't pick silently.
+
+**Overloaded and vague words**, whether or not a glossary exists: a word the user has used for more than one thing, or one too fuzzy to define in one sentence, gets split or sharpened into canonical terms — never fold two concepts into one.
+
+**Boundary scenarios:** next to each new or disputed term's drafted definition, give one concrete edge case and say which side the draft puts it on ("a refund issued after shipping: is it owned by Ordering or Billing? My draft says Billing"). Show it in the Step 1.7 recap; if the user moves the case, the definition or the Owns column changes.
+
 In every scope, flag immediately — through `AskUserQuestion`, with a recommended answer (`➡️`) from the glossary first, then the code's naming — any word the user uses that is listed under a term's `_Avoid_`, any defined term used with a different meaning, and any concept the code models differently from how the user describes it. Draft new terms and map rows yourself rather than asking one question per item; they are confirmed in the Step 1.7 recap. Use the confirmed canonical terms in the Step 1.5 questions and throughout the document.
 
 A context's **Owns** column must not contradict a Cross-Module Rule in the constitution (e.g. the constitution names AuthModule as the single source of identity, but this context claims to own users) — flag it the same way as any constitution conflict.

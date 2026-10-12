@@ -99,6 +99,7 @@ Read the entire spec document. Extract and record:
 - **Feature name and slug** — used to locate related arch docs and implementation paths
 - **Technology decisions** (section 5) — the definitive tech stack for this feature; do not re-ask or override
 - **Interfaces, types, and endpoint definitions** (sections 6.1 and 6.2) — the contracts to implement
+- **Invariants** (section 6.2) — each invariant and the criterion that verifies it. The invariant is part of that criterion's task: its test must assert the rule holds, not only the criterion's happy path
 - **Behavior and logic** (section 6.3) — including any Mermaid diagrams; these define the execution model
 - **Acceptance criteria** (section 7) — each criterion is a discrete implementation task and its own test case. Tag which criteria are **security criteria** (negative assertions — non-owner blocked, unauthorized role blocked, malformed input rejected); these are implemented test-first with the negative assertion, never as an afterthought.
 - **Security item** (section 8) — each non-`N/A` entry (authentication, authorization, untrusted-input validation, sensitive-data handling, abuse-case mitigation) is a **build constraint that every relevant code path must satisfy**, not just documentation. An ownership check the Security item requires is mandatory even if no acceptance criterion names it.
@@ -136,7 +137,7 @@ Read each matching rule file and extract:
 - Component boundary rules
 - **Security Baseline constraints** — from `00-project-constitution.md` if present (authentication provider, authorization model, "verify ownership before returning a user-owned resource", "no secret in source", "no PII in logs"). These bind every code path in this build.
 
-If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns, or the arch spec read in Step 2). Its terms feed constraint brief item 9.
+If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns, or the arch spec read in Step 2). If two or more contexts plausibly fit, ask the user which one before building — names chosen from the wrong context are expensive to undo. Its terms feed constraint brief item 9.
 
 Merge these with the arch spec rules gathered in Step 2. If a rule file contradicts an arch spec, flag the conflict explicitly and ask the user to resolve it before proceeding.
 
@@ -225,6 +226,7 @@ Follow naming conventions from the constraint brief exactly, including the domai
 - The test framework and file-naming convention detected from the codebase scan
 - The **test seam** from constraint brief item 8 — the boundary the test must go through and which dependencies it may replace with a fake adapter
 - The **domain names** from constraint brief item 9 that this criterion touches — term, code identifier, and avoided words
+- Any **invariant** from spec section 6.2 that names this criterion as its verifier — the test must assert the invariant holds
 
 The subagent writes a real (non-stub) failing test, runs it, confirms it fails for the right reason, implements the minimal code to pass, and reruns to confirm green. Its report includes the file paths touched and verbatim red/green run output — treat that output as the evidence the criterion is implemented. Do not mark the task complete without it.
 

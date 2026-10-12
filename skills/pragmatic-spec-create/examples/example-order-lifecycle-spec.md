@@ -84,6 +84,14 @@ type OrderStatusHistory struct {
 }
 ```
 
+#### Invariants
+
+| # | Invariant | Verified by |
+|---|-----------|-------------|
+| INV-1 | An order's status changes only through `OrderStateMachine.Transition` | AC-3 |
+| INV-2 | Every status change has exactly one `order_status_history` record | AC-2 |
+| INV-3 | A delivered order never returns to an earlier status | AC-5 |
+
 ### 6.3 Behavior & Logic
 
 ```mermaid

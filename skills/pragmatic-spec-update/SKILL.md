@@ -61,7 +61,7 @@ Find the spec file from the user's context. Common locations:
 
 Read the full file and understand its current content and structure.
 
-If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns or a linked arch spec).
+If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns or a linked arch spec). If two or more contexts plausibly fit, ask the user which one — don't pick silently.
 
 ### Step 2 — Understand the Change
 
@@ -69,6 +69,7 @@ Analyze what needs to change:
 - If a description is provided, identify the relevant sections
 - If no description is given, scan for `[TODO: ...]` placeholders
 - Map which sections are directly affected and which may be indirectly impacted (a change to the data model may also affect the API and acceptance criteria)
+- **Invariants cascade:** if the change touches the data model or a rule about it, section 6.2's Invariants table is in scope — add, change, or retire invariants, and keep each one pointing at a section 7 criterion that verifies it.
 - **Domain language cascade:** if the change introduces a new domain concept, renames or redefines an existing one, or the request uses a word listed under a term's `_Avoid_`, then the context's glossary is in scope too. A request coming from a `pragmatic-spec-validate` Domain Language WARN is this case by definition: replace each avoided term in the spec, and add each undefined term to the glossary.
 - **Security cascade:** if the change adds or modifies an endpoint or handler, an authentication or authorization check, or the data the feature touches (new PII, new user-owned resource), then section 8's Security item — and, when any sub-item becomes applicable, the section 7 security acceptance criterion — are in scope even if the user did not name them.
 
@@ -121,7 +122,11 @@ Before I apply any changes, let me confirm my understanding of this update:
   company that places Orders and lists "account" under Avoid — here "account" means Customer?
   ➡️ Customer — matches the glossary; I'll replace "account" in sections X and Y
 - [New or redefined terms, drafted:] **<Term>** — <one-line definition>; Avoid: <synonyms>
+  Boundary case: <a concrete edge case> — the draft puts it <inside/outside> the term
   ➡️ Add as drafted
+- [Overloaded or vague words in the request:] "<word>" is used here for both <A> and <B> —
+  split into **<Term A>** and **<Term B>**?
+  ➡️ Split as proposed
 
 [Include the following block only if the spec has open [TODO: decide — ...] items OR if the
  requested change introduces new technology decisions. Omit for purely textual updates.]
@@ -222,6 +227,7 @@ After applying changes, verify:
 - All `[TODO: ...]` items that were addressed are now resolved
 - No section is left inconsistent with the changes applied
 - Acceptance criteria still reflect the updated solution
+- Every invariant in section 6.2 still names an existing criterion that verifies it (criterion numbers shift when criteria are added or removed)
 - Version and status fields are updated
 - If the glossary changed: no word listed under `_Avoid_` remains in this spec, and every domain term it uses is defined
 

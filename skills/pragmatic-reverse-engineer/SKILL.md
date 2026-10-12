@@ -72,7 +72,8 @@ isn't a safe guess.
    Branch — Component & Dependency Discovery") to find components,
    dependency directions, and the 1–3 most significant data flows. Also run
    the "Both Branches — Security Observations" pass and record any
-   SECURITY-GAP findings.
+   SECURITY-GAP findings, and the "Both Branches — Domain Vocabulary" pass
+   for the context, ownership, and terms this architecture implies.
 3. **Reconstruct ADRs.** For each technology/pattern found, record the
    choice as CONFIRMED and the rationale as INFERRED (unless a
    comment/commit/doc states it — then cite the source).
@@ -94,7 +95,8 @@ isn't a safe guess.
    tech stack (CONFIRMED), acceptance criteria drafted from tests where
    they exist (tagged CONFIRMED-BY-TEST or INFERRED-NO-TEST). Also run the
    "Both Branches — Security Observations" pass and record any SECURITY-GAP
-   findings for the handoff.
+   findings for the handoff, and the "Both Branches — Domain Vocabulary"
+   pass for the terms this feature uses.
 3. **Hand off** to `pragmatic-spec-create`, once per target — see
    "Sequential Delegation" below before processing more than one.
 
@@ -193,6 +195,8 @@ After the session report is written:
    per-target counts).
 4. List any candidates that were found but not selected, so the user knows
    what's still undocumented.
+5. List the domain vocabulary outcome: terms added to the glossary by the
+   downstream skills, and every DIVERGENCE left as a code rename to do.
 
 ---
 

@@ -45,6 +45,7 @@ When an order status changes, the order service publishes an event to an SQS que
 | Templates | SendGrid Dynamic Templates | Go html/template, hardcoded | Editable without deploy; supported by current SendGrid contract |
 | Notification history | PostgreSQL — `order_notifications` table | No persistence, separate table | DB already in use; history required for audit and data retention |
 | Opt-out | SendGrid native unsubscribe link | User profile setting | Simpler solution; satisfies legal requirement without new UI |
+| Test seam | Notification consumer's message handler, fed an order event directly; SendGrid replaced by a fake adapter, PostgreSQL real | Through a real SQS queue; `NotificationService` with mocked repository | SendGrid is the only dependency we can't run locally; the handler is where every criterion's behavior is observable |
 
 ## 6. Detailed Design
 

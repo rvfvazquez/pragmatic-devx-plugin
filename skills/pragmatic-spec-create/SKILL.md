@@ -247,6 +247,8 @@ Before I write the spec, I need to clarify a few technology decisions:
 **Testing Strategy**
 - What test levels are expected for this feature? Options: unit only, unit + integration, unit + integration + e2e, contract tests, no automated tests
   ➡️ Unit + integration — matches the project's existing test pyramid (found in Step 3)
+- Where should tests observe this feature's behavior (the test seam)? Options: the outermost public boundary (HTTP endpoint, queue consumer, module's public API), the service layer, each internal class
+  ➡️ The highest public boundary the acceptance criteria are written against, with only out-of-process dependencies we don't run locally replaced by a fake adapter — e.g. "HTTP — POST /orders/:id/cancel; payment gateway via fake adapter", matching where existing tests in Step 3 already hit. One seam is the target; name a second only for dense internal logic that the outer seam can't exercise precisely
 - Infer the testing framework from the codebase (Step 3) before asking — only ask if not evident
 - Are there coverage gates or quality requirements? (e.g., all acceptance criteria must have a corresponding integration test)
   ➡️ State the repo's existing convention if one was found in Step 3, otherwise recommend "all acceptance criteria have a corresponding integration test"
@@ -312,7 +314,8 @@ If the directory `docs/specs/` does not exist, create it before writing the file
 Create the file at `docs/specs/<feature-slug>.md` using the full template in `references/template.md`.
 
 Fill every section with concrete content:
-- Capture all technology decisions made in Step 4 in section **5. Technology Decisions**
+- Capture all technology decisions made in Step 4 in section **5. Technology Decisions**, including the **Test seam** row
+- If the feature has no testable behavior of its own (pure documentation or configuration), set the Test seam row to `N/A — <reason>` rather than inventing one
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
 - Section 9 (Open Questions) holds concerns you can't yet phrase precisely enough for `[TODO: decide — <options>]` — don't force premature options onto something still vague

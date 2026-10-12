@@ -34,7 +34,7 @@ The implementer's report says the criterion is implemented and its test went red
 
 **Security controls** — if the brief names an ownership/authorization check, boundary input validation, or secrets-from-env rule for this path, confirm the code applies it. For a security criterion, confirm the test asserts the *negative* outcome (blocked status, no protected data in the body), not the happy path.
 
-**Test quality** — the test exercises real behavior (not a placeholder assertion, not a mock of the thing under test) and would fail if the implementation were removed.
+**Test quality** — the test exercises real behavior (not a placeholder assertion, not a mock of the thing under test) and would fail if the implementation were removed. If the brief names a test seam, the test goes through that boundary and replaces only the dependencies the seam allows; a test that reaches past it into internals is an **Important** finding.
 
 ## Severity
 

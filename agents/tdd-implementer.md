@@ -14,6 +14,7 @@ Your dispatcher must give you:
 - Whether this is a **security criterion** — a negative assertion (a non-owner or unauthorized caller is blocked, malformed input is rejected)
 - The constraint brief: target file/directory location, allowed and forbidden imports, naming conventions, communication model (sync/async/events), the tech stack decision from the spec, and any **security controls** that apply to this code path (per-resource ownership check, boundary input validation, secrets from injected env only)
 - The test framework and file-naming convention already in use in the codebase
+- The **test seam**: the public boundary your test must go through (e.g. an HTTP endpoint, a queue consumer, a module's public API) and which dependencies, if any, you may replace with a fake adapter. Test only through that seam — never call an internal function or mock a collaborator the seam doesn't allow
 
 If any of these is missing or ambiguous, stop and report exactly what is missing rather than guessing.
 

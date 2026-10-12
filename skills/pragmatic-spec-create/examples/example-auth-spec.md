@@ -44,6 +44,7 @@ Introduce a `POST /auth/login` endpoint that accepts credentials, validates them
 | Data store | PostgreSQL (existing `users` table) | Separate auth DB | Already in use; avoids new infrastructure |
 | Password hashing | bcrypt (cost factor 12) | argon2, scrypt | Already used in user registration flow |
 | Infrastructure | Existing ECS Fargate service | Lambda | No cold-start sensitivity; already deployed |
+| Test seam | HTTP — `POST /auth/login` and a protected route behind the middleware, via `httptest` against a test PostgreSQL | `AuthService` directly; unit per function with a mocked repository | Acceptance criteria are written as HTTP status codes; testing at the endpoint covers handler, middleware and service together and survives refactors |
 
 ## 6. Detailed Design
 

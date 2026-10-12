@@ -152,6 +152,7 @@ The brief must answer:
 5. **What external dependencies must be wired?** — from spec section 8
 6. **What are the acceptance criteria, in order?** — implementation priority; which of them are security criteria
 7. **What security controls must every code path honor?** — from the spec section 8 Security item and the constitution Security Baseline: the authentication check, the per-resource authorization/ownership check and where it runs, input validation at the boundary, secrets from injected env only, no protected data category in logs
+8. **Where do tests observe behavior?** — the **Test seam** row of spec section 5: the public boundary every acceptance-criterion test goes through, and which dependencies (if any) are replaced by a fake adapter. Every other dependency runs for real in the test. If the row is missing (a spec written before the template had it), derive the seam from where the existing tests in this codebase already hit and state it as an assumption in the Step 6 confirmation — do not let each task choose its own
 
 If any of these questions cannot be answered from spec + arch + rules, use `AskUserQuestion` to ask — but only for genuinely missing information, not for decisions already captured.
 
@@ -219,6 +220,7 @@ Follow naming conventions from the constraint brief exactly.
 - Whether this is a **security criterion** (a negative assertion) — if so, the red test must assert the negative outcome (the blocked status code, no protected data in the response body), not the happy path
 - The constraint brief items relevant to this criterion: target file/directory, allowed and forbidden imports, naming conventions, communication model, the technology decisions from spec section 5, and the **security controls from brief item 7** that apply to this code path (ownership check, input validation, secret handling)
 - The test framework and file-naming convention detected from the codebase scan
+- The **test seam** from constraint brief item 8 — the boundary the test must go through and which dependencies it may replace with a fake adapter
 
 The subagent writes a real (non-stub) failing test, runs it, confirms it fails for the right reason, implements the minimal code to pass, and reruns to confirm green. Its report includes the file paths touched and verbatim red/green run output — treat that output as the evidence the criterion is implemented. Do not mark the task complete without it.
 
@@ -228,6 +230,7 @@ The subagent writes a real (non-stub) failing test, runs it, confirms it fails f
 
 For each acceptance criterion in Given/When/Then format, generate a test function stub using:
 - The project's existing test framework and file naming conventions (detected from codebase scan)
+- The test seam from constraint brief item 8 — the stub calls through that boundary, not an internal function
 - A descriptive test name derived from the criterion (e.g., `test_ShouldReturnUnauthorized_WhenTokenIsExpired`)
 - The full criterion text as structured comments inside the stub:
 
@@ -254,9 +257,9 @@ If a behavior requires an integration with an external dependency listed in spec
 
 The implementer's report is a claim, not a verdict — nothing about a task being green proves the code matches the criterion and the constraint brief. Before 7f, have the task reviewed by something that did not write it.
 
-**If the `Agent` tool is available:** dispatch the `task-reviewer` agent for this task. Pass it, self-contained (it has no access to this conversation): the acceptance criterion's full Given/When/Then text and index, whether it is a security criterion, the constraint brief items relevant to this task (including the security controls from item 7), the files this task touched and how to see their diff, and the implementer's report — labeled as claims to verify. It reads the diff, re-runs the test itself, and returns `APPROVED` or `CHANGES_REQUIRED` with findings classified Critical/Important/Minor and load-bearing/non-load-bearing, each with a `file:line`.
+**If the `Agent` tool is available:** dispatch the `task-reviewer` agent for this task. Pass it, self-contained (it has no access to this conversation): the acceptance criterion's full Given/When/Then text and index, whether it is a security criterion, the constraint brief items relevant to this task (including the security controls from item 7 and the test seam from item 8), the files this task touched and how to see their diff, and the implementer's report — labeled as claims to verify. It reads the diff, re-runs the test itself, and returns `APPROVED` or `CHANGES_REQUIRED` with findings classified Critical/Important/Minor and load-bearing/non-load-bearing, each with a `file:line`.
 
-**Otherwise** (no subagent dispatch, or Interleaved was not chosen): do the review yourself as a checklist against the actual diff, not your memory of writing it — for each part of the Given/When/Then, name the line of code and the assertion that covers it; check nothing outside this task's scope was touched; check the brief's forbidden imports, naming, and security controls on this path; check the test would fail if the implementation were removed. This is a weaker check than an independent reviewer, since the same context wrote the code — say so in the Build Log row's note if any item could not be confirmed.
+**Otherwise** (no subagent dispatch, or Interleaved was not chosen): do the review yourself as a checklist against the actual diff, not your memory of writing it — for each part of the Given/When/Then, name the line of code and the assertion that covers it; check nothing outside this task's scope was touched; check the brief's forbidden imports, naming, and security controls on this path; check the test goes through the brief's test seam and replaces only the dependencies the seam allows; check the test would fail if the implementation were removed. This is a weaker check than an independent reviewer, since the same context wrote the code — say so in the Build Log row's note if any item could not be confirmed.
 
 **On `APPROVED`:** go to 7f.
 

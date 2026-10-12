@@ -54,6 +54,8 @@ Record the chosen language and use it for **all report content** — section hea
 
 Find the architecture spec file. Common locations: `docs/arch/`, or any `.arch.md` file matching the provided path. Read the full document before running any checks.
 
+If `docs/glossary/context-map.md` exists, read it and the glossary file of every context this arch spec touches (for a `module` scope, the context whose row links this arch spec). If the constitution exists, read its Cross-Module Rules too. These feed the Domain Language checks in Step 2.
+
 ### Step 1.5 — Pre-scan: Detect Open TODO Items
 
 **This is a mandatory step before running any checks.**
@@ -116,6 +118,15 @@ Evaluate each criterion below. Report **PASS**, **WARN**, or **FAIL** with a sho
 - **Dependency rules are explicit** — Forbidden and allowed dependencies are named, not implied
 - **Naming conventions are precise** — Naming patterns (e.g., `*Service`, `*Repository`) are specific enough to be matched against actual file names
 
+#### F. Domain Language
+These checks report **WARN at most, never FAIL** — a young glossary produces false positives, and a wording finding should not block an arch spec. Quote the glossary or map entry in each note. If `docs/glossary/` does not exist, skip this category and add one INFO suggestion that the project has no glossary yet.
+- **No avoided terms** — no component, event, flow, or prose in the arch spec uses a word listed under a term's `_Avoid_` to mean that term. Name each occurrence's section and the canonical term.
+- **Domain terms defined** — the domain concepts the arch spec's components, events, and flows are named after are defined in the context's glossary. General technical vocabulary (gateway, cache, queue) is never a finding.
+- **Context registered** — for a `module` scope: the context map has a row for this module, and its Arch spec link points at this file.
+- **Ownership consistent** — the map's Owns for this context agrees with the component boundaries (4.2), and doesn't contradict a Cross-Module Rule in the constitution (e.g. the constitution names another module the single source of identity).
+- **Communication matches the map** — wherever section 6.3 or section 7 describes two contexts communicating, the map's Relationships row for that pair records the same mechanism (event vs sync call vs shared types). A pair that communicates with no Relationships row is a finding too.
+- **Context map consistent** — every `docs/glossary/*.md` other than the map is listed in its Contexts table, every Glossary and Arch spec link resolves, and no term is defined in two context files without a row in Translations.
+
 ### Step 3 — Generate Validation Report
 
 Produce the report in this format:
@@ -158,7 +169,8 @@ Optional improvements.
 
 ### Output Rules
 
-- Print the full report; do **not** modify the spec file
+- Print the full report; do **not** modify the spec file or any glossary file
+- **If a Domain Language WARN is present:** recommend `pragmatic-arch-spec-update`, which updates the arch spec, the glossary, and the context map together; list each undefined term and each map mismatch so the update has them
 - Group findings: FAIL → WARN → INFO → PASS
 - **Every FAIL must include a "How to resolve" block** with two options: fix the spec to satisfy the criterion, or reconsider the criterion if a deliberate decision makes it inapplicable
 - For each WARN, provide a concrete, actionable suggestion

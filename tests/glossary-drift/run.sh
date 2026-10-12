@@ -35,16 +35,14 @@ echo "// touch" >> src/payments/service.go && git add -A && git commit -qm secon
 cat > docs/glossary/context-map.md <<MAP
 # Context Map
 
-**Last synced:** \`$SHA\` (2026-10-01)
-
 ## Contexts
 
-| Context | Glossary | Arch spec | Purpose | Owns | Code |
-|---|---|---|---|---|---|
-| Ordering | [ordering](./ordering.md) | — | Orders | Order | src/ordering |
-| Payments | [payments](./payments.md) | [payments.arch](../arch/payments.arch.md) | Money | Transaction | \`src/payments\`, src/missing |
-| Notifications | [notifications](./notifications.md) | — | Tell people | Notification | — |
-| Identity | [identity](./identity.md) | — | Sign in | User | src/notifications |
+| Context | Glossary | Arch spec | Purpose | Owns | Code | Synced |
+|---|---|---|---|---|---|---|
+| Ordering | [ordering](./ordering.md) | — | Orders | Order | src/ordering | \`$SHA\` |
+| Payments | [payments](./payments.md) | [payments.arch](../arch/payments.arch.md) | Money | Transaction | \`src/payments\`, src/missing | \`$SHA\` |
+| Notifications | [notifications](./notifications.md) | — | Tell people | Notification | — | — |
+| Identity | [identity](./identity.md) | — | Sign in | User | src/notifications | — |
 
 ## Relationships
 
@@ -71,7 +69,9 @@ hasnt "a term's own identifier is not avoided"   'AVOIDED +Customer'
 has   "missing code path"                        'NOPATH +src/missing'
 has   "context without a Code value is skipped"  'Notifications +\(no Code column value'
 has   "stale in a context with a real path"      'STALE +User +`User` not found'
-has   "last synced age"                          'last synced [0-9a-f]+ · 1 commit touches these paths since'
+has   "per-context sync age (Payments: 1 commit)"  'synced [0-9a-f]+ · 1 commit touches these paths since'
+has   "per-context sync age (Ordering: 0 commits)"  'synced [0-9a-f]+ · 0 commits touch these paths since'
+has   "a context with an empty Synced cell"       'never synced'
 
 echo "== --context filter"
 OUT="$(bash "$SCRIPT" --context payments 2>&1)"
@@ -83,17 +83,14 @@ printf '\n**Payer legacy**\nSame idea, legacy identifier.\n_Avoid_: customer\n_I
 OUT="$(bash "$SCRIPT" --context payments 2>&1)"
 hasnt "customer no longer reported once another term's _In code_ is Customer"  'AVOIDED +Payer +"customer"'
 
-echo "== missing glossary file, bad and absent marker"
+echo "== missing glossary file, unknown synced commit"
 mv docs/glossary/identity.md "$T/identity.bak"
 OUT="$(bash "$SCRIPT" --context identity 2>&1)"
 has   "missing glossary file"                    'MISSING +glossary file \./identity\.md'
 mv "$T/identity.bak" docs/glossary/identity.md
-sed -i 's/`[0-9a-f]\{7,\}` (2026-10-01)/`deadbee`/' docs/glossary/context-map.md
+sed -i 's#| src/notifications | — |#| src/notifications | `deadbee` |#' docs/glossary/context-map.md
 OUT="$(bash "$SCRIPT" --context identity 2>&1)"
-has   "unknown commit in the marker"             'last synced deadbee \(not found in this repository\)'
-sed -i '/Last synced/d' docs/glossary/context-map.md
-OUT="$(bash "$SCRIPT" --context identity 2>&1)"
-has   "no marker"                                'no Last synced marker'
+has   "unknown commit in the Synced cell"        'synced deadbee \(not found in this repository\)'
 
 echo "== clean context exits 0"
 printf 'package x\ntype Order struct{}\ntype OrderItem struct{}\ntype Customer struct{}\n' > src/ordering/order.go

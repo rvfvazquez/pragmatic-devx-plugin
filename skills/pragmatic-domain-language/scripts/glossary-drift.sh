@@ -12,10 +12,12 @@
 #            (a term's own `_In code_` identifier is never reported)
 #   MISSING  a glossary file the map links to does not exist
 #   NOPATH   a Code path does not exist
+# Under each context it also prints when it was last synced (the map's `Synced`
+# column), as information — never as a finding.
 #
 # It never writes anything. Exit: 0 no findings · 1 findings · 2 usage error
 # or no context map. Needs bash, grep, awk and sed; git is optional (used only
-# for the `Last synced` age). Matching is a text heuristic, not a parser: it
+# for each context's `Synced` age: how many commits touched its paths since). Matching is a text heuristic, not a parser: it
 # sees what grep sees: comments and strings count as matches (an old name left in a
 # comment hides a STALE; an avoided word in a comment is reported), and dynamically
 # built or non-Latin identifiers are missed. Treat findings as questions, not verdicts.
@@ -44,7 +46,7 @@ EXCLUDES=(--exclude-dir=.git --exclude-dir=node_modules --exclude-dir=vendor
 
 # Fields are separated by \037 (unit separator), not tab: bash `read` collapses runs of
 # whitespace IFS characters, which would silently shift empty fields.
-# Context map rows -> "name<US>glossary-link<US>code-paths". A row counts when one of
+# Context map rows -> "name<US>glossary-link<US>code-paths<US>synced". A row counts when one of
 # its cells links to a glossary file; the first such cell is the Glossary column.
 parse_map() {
   awk -F'|' '
@@ -56,6 +58,7 @@ parse_map() {
         for (i = 2; i < NF; i++) {
           h = tolower(trim($i))
           if (h == "code" || h ~ /^c.digo$/) codecol = i
+          if (h == "synced") syncedcol = i
         }
         next
       }
@@ -65,7 +68,8 @@ parse_map() {
       }
       if (link == "" || link ~ /(^|\/)arch\//) next
       code = (codecol ? trim($codecol) : "")
-      print trim($2) "\037" link "\037" code
+      synced = (syncedcol ? trim($syncedcol) : "")
+      print trim($2) "\037" link "\037" code "\037" synced
     }' "$MAP"
 }
 
@@ -104,9 +108,21 @@ avoid_pattern() {
 }
 
 FINDINGS=0
-ALLPATHS=()
 
-while IFS=$'\037' read -r cname glink codecell; do
+# "synced <sha> · N commits touch these paths since" for one context.
+sync_line() { # sha paths...
+  local sha="$1" n; shift
+  if [ -z "$sha" ]; then printf '  never synced\n'; return; fi
+  if command -v git >/dev/null 2>&1 && git rev-parse --verify -q "$sha^{commit}" >/dev/null 2>&1; then
+    n="$(git rev-list --count "$sha..HEAD" -- "$@" 2>/dev/null)"
+    if [ "$n" = 1 ]; then printf '  synced %s · 1 commit touches these paths since\n' "$sha"
+    else printf '  synced %s · %s commits touch these paths since\n' "$sha" "$n"; fi
+  else
+    printf '  synced %s (not found in this repository)\n' "$sha"
+  fi
+}
+
+while IFS=$'\037' read -r cname glink codecell syncedcell; do
   [ -z "$cname" ] && continue
   if [ -n "$ONLY" ] && [ "$(printf '%s' "$cname" | tr 'A-Z' 'a-z')" != "$(printf '%s' "$ONLY" | tr 'A-Z' 'a-z')" ]; then continue; fi
 
@@ -124,10 +140,11 @@ while IFS=$'\037' read -r cname glink codecell; do
     continue
   fi
   printf '%s  (%s)\n' "$cname" "$(IFS=,; echo "${paths[*]}")"
+  sync_line "$(printf '%s' "$syncedcell" | grep -oE '[0-9a-fA-F]{7,40}' | head -1)" "${paths[@]}"
 
   existing=()
   for p in "${paths[@]}"; do
-    if [ -e "$p" ]; then existing+=("$p"); ALLPATHS+=("$p")
+    if [ -e "$p" ]; then existing+=("$p")
     else printf '  NOPATH   %s does not exist\n' "$p"; FINDINGS=$((FINDINGS + 1)); fi
   done
   [ ${#existing[@]} -eq 0 ] && continue
@@ -174,21 +191,5 @@ while IFS=$'\037' read -r cname glink codecell; do
   FINDINGS=$((FINDINGS + ctx_findings))
 done < <(parse_map)
 
-# Age of the last sync, from "Last synced: <sha>" in the map header.
-SYNC="$(sed -n 's/.*[Ll]ast synced:[^0-9a-fA-F]*\([0-9a-fA-F]\{7,40\}\).*/\1/p' "$MAP" | head -1)"
-if [ -z "$SYNC" ]; then
-  age="no Last synced marker"
-elif command -v git >/dev/null 2>&1 && git rev-parse --verify -q "$SYNC^{commit}" >/dev/null 2>&1; then
-  if [ ${#ALLPATHS[@]} -gt 0 ]; then
-    n="$(git rev-list --count "$SYNC..HEAD" -- "${ALLPATHS[@]}" 2>/dev/null)"
-    if [ "$n" = 1 ]; then age="last synced $SYNC · 1 commit touches these paths since"
-    else age="last synced $SYNC · $n commits touch these paths since"; fi
-  else
-    age="last synced $SYNC"
-  fi
-else
-  age="last synced $SYNC (not found in this repository)"
-fi
-
-printf '%s finding%s · %s\n' "$FINDINGS" "$([ "$FINDINGS" = 1 ] || echo s)" "$age"
+printf '%s finding%s\n' "$FINDINGS" "$([ "$FINDINGS" = 1 ] || echo s)"
 [ "$FINDINGS" -eq 0 ] && exit 0 || exit 1

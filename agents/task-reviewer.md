@@ -36,7 +36,7 @@ The implementer's report says the criterion is implemented and its test went red
 
 **Test quality** — the test exercises real behavior (not a placeholder assertion, not a mock of the thing under test) and would fail if the implementation were removed. If the brief names a test seam, the test goes through that boundary and replaces only the dependencies the seam allows; a test that reaches past it into internals is an **Important** finding.
 
-**Domain names** — if the brief lists domain names, a type, function, event, or test name for one of those concepts uses its listed identifier. A different name for a listed concept, or a word from its avoided list, is an **Important** finding when it is part of an interface other code calls or a test name, and **Minor** when it is local to a function body. A concept the implementer named that isn't listed at all is not a finding by itself — confirm the implementer reported it as a glossary gap.
+**Domain names** — if the brief lists domain names, a type, function, event, or test name for one of those concepts uses its listed identifier. A different name for a listed concept, or a word from its avoided list (the term's own code identifier is never a finding, even when it contains a word listed under `_Avoid_`), is an **Important** finding when it is part of an interface other code calls or a test name, and **Minor** when it is local to a function body. A concept the implementer named that isn't listed at all is not a finding by itself — confirm the implementer reported it as a glossary gap.
 
 ## Severity
 

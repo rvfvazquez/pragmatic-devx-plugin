@@ -50,6 +50,12 @@ Apply to the words used so far — the user's description and answers — counti
 
 **Resolve** avoided words, different meanings, overloaded words, and code contradictions through `AskUserQuestion`, each with a recommended answer (`➡️`) taken from the glossary first, then the code's naming.
 
+**Terms handed in from code.** When the input contains a `DOMAIN TERMS` block (the handoff brief of `pragmatic-reverse-engineer`), it is the starting set of drafts — don't re-derive them:
+- **CONFIRMED** — stated, not asked.
+- **NEW** — already a draft; add its boundary scenario and carry it to the recap. Every NEW term goes to the recap, whatever interview depth the caller runs: these were found in the code, not invented.
+- **Several code names for one concept** — the canonical term is a decision (the business word may differ from every identifier); recommend (`➡️`) the name the user's domain uses. The `_In code_` defaults to the **dominant identifier in the code**, so the glossary describes the code that exists. The other identifiers go under `_Avoid_` only as words; actually renaming them in code is a separate decision — record each as a **pending rename** for the caller's summary, never as a silent change.
+- **DIVERGENCE** — resolve through `AskUserQuestion`: change the glossary's `_In code_` to match the code (➡️ when the code name is used consistently), or keep the glossary and record a pending rename in the code.
+
 **Draft new terms yourself** — don't ask one question per term. A draft has: canonical term, one-sentence definition of what it *is*, `_Avoid_` synonyms heard so far, `_In code_` if the code already names it, and the context it belongs to.
 
 **Boundary scenario** — next to each new or disputed term, give one concrete edge case and say which side the draft puts it on ("cancelling 1 of 3 items in an Order: is that a **Cancellation**? The draft says no — Cancellation ends the whole Order"). Pick the case two readers would most likely decide differently. If the user moves the case, the definition changes, not the scenario.
@@ -79,7 +85,7 @@ Base checks — every validator:
 1. **No avoided terms** — no word listed under a term's `_Avoid_` is used in the document to mean that term. A word used for an unrelated concept is not a finding.
 2. **Domain terms defined** — the domain concepts the document relies on (a spec's goals and criteria; an arch spec's components, events, flows) are defined in the context's glossary.
 3. **Context map consistent** — every `docs/glossary/*.md` other than the map is listed in its Contexts table; every Glossary and Arch spec link resolves; no term is defined in two context files without a Translations row.
-4. **Glossary hygiene** — in the context files the document touches, each entry follows `references/glossary-template.md`. WARN for: a definition longer than two sentences or describing behavior instead of what the concept is; implementation detail (table or column names, endpoints, field lists, types); a general programming concept (timeout, retry, DTO, cache); a missing definition; two terms sharing an `_In code_` identifier; a word under one term's `_Avoid_` that is another term's canonical name.
+4. **Glossary hygiene** — in the context files the document touches, each entry follows `references/glossary-template.md`. WARN for: a definition longer than two sentences or describing behavior instead of what the concept is; implementation detail (table or column names, endpoints, field lists, types); a general programming concept (timeout, retry, DTO, cache); a missing definition; two terms sharing an `_In code_` identifier; a word under one term's `_Avoid_` that is another term's canonical name. A word under `_Avoid_` that matches the same term's own `_In code_` is not a finding (see §5).
 
 Architecture checks — arch spec validators add:
 5. **Context registered** — for a `module` scope, the map has a row for this module whose Arch spec link points at this file.
@@ -93,6 +99,7 @@ The fix for any of these is the matching update skill, which applies §3: `pragm
 For anything that writes or checks code, tests, or text about it:
 
 - A type, function, event, test, or endpoint for a glossary concept uses the term's code identifier — `_In code_`, or the term itself when there is none — never a word under its `_Avoid_`.
+- **`_In code_` wins over `_Avoid_`.** When a term's `_In code_` is `Account` while "account" is listed under `_Avoid_` (the business says Customer, the code says Account), using `Account` in code is correct — `_Avoid_` governs prose and new names, not the identifier the glossary itself records.
 - **A concept missing from the glossary is a signal.** First check whether an existing term already covers it; most of the time one does, and inventing a name is the mistake. Only if none fits, name it consistently with the existing identifiers and record it as a **glossary gap** — never add it to the glossary from a build or a check.
 - Conformance checks scan only their own scope. A different name or an avoided word in an interface or a test name is a warning; a concept the code doesn't represent at all is not a naming finding.
 

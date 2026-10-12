@@ -135,7 +135,7 @@ category.
 Run this pass on every target, after the branch's own scan. It proposes terms; it never writes the glossary — the downstream create skill confirms and writes them (its Step 3.5 / Step 1.4).
 
 1. **Collect candidate concepts** from what the code names: domain types and entities, table and collection names, enum values that name states, route nouns, event and message names. Ignore general programming constructs (handlers, DTOs, configs, clients, utilities).
-2. **Group synonyms** — the same concept under several names across the code (`Account`, `Customer`, `Client` all pointing at the same table) is one candidate with several names; pick the dominant one as the proposed identifier and list the rest as proposed `_Avoid_`.
+2. **Group synonyms** — the same concept under several names across the code (`Account`, `Customer`, `Client` all pointing at the same table) is one candidate with several names; pick the **dominant** one (most uses) as the proposed `_In code_`, and list the others with their use counts as **rename candidates**. Propose the canonical term separately — it may be a business word none of the identifiers uses; the downstream skill asks.
 3. **Compare with the glossary**, if `docs/glossary/context-map.md` exists — locate the context per §1 of `pragmatic-domain-language`, and judge names per its §5:
    - the code uses the term's `_In code_` identifier → **CONFIRMED** term
    - the code names a defined concept differently, or uses a word under its `_Avoid_` → **DIVERGENCE** (cite file:line, the code name, the glossary identifier)
@@ -164,7 +164,7 @@ SECURITY-GAP — confirm whether each is intentional:
 
 DOMAIN TERMS — proposed for the glossary:
 - CONFIRMED: <Term> (code: `<Identifier>`)
-- NEW: <Term> — <INFERRED definition>; code: `<Identifier>`; also seen as: <other names → proposed _Avoid_>
+- NEW: <Term> — <INFERRED definition>; code: `<DominantIdentifier>` (N uses); also in code: `<Other>` (N uses) → rename candidate
 - DIVERGENCE: <Term> is `<GlossaryIdentifier>` in the glossary but `<CodeName>` at <file:line>
 - (or: "no domain concepts found in the scanned scope")
 ```

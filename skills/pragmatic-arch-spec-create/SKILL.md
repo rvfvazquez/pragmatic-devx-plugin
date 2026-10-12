@@ -104,7 +104,7 @@ Before writing, scan the codebase for:
 
 ### Step 1.4 — Domain Language and Context
 
-Apply **§2 Interview Checks** of `pragmatic-domain-language` to the user's input. On top of the terms it drafts, what this step settles depends on the scope:
+Apply **§2 Interview Checks** of `pragmatic-domain-language` to the user's input — including the `DOMAIN TERMS` block when this arch spec comes from `pragmatic-reverse-engineer`, whose proposed contexts and ownership seed the map rows below. On top of the terms it drafts, what this step settles depends on the scope:
 
 - **`module`** — a module-scope arch spec documents one bounded context. Find its row in the context map (by name, Purpose, or Owns). If there is none, this arch spec introduces a new context: draft its row — name (same as this arch spec), one-line Purpose, the terms it Owns — and its glossary file with the module's central domain terms.
 - **`system`** — the arch spec spans several contexts. Draft any context-map Relationships rows (From → To, mechanism, what crosses) the system design implies and the map doesn't have yet.

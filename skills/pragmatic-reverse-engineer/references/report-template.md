@@ -83,3 +83,31 @@ Never include a secret value here — file and line only.
 
 *(If the scan found nothing: "No security gaps observed in the scanned
 scope.")*
+
+## 8. Domain Vocabulary
+
+What the Domain Vocabulary pass (see `references/discovery-heuristics.md`)
+found, and what the downstream skills wrote to `docs/glossary/`.
+
+**Glossary changes**
+
+| Context | Term | `_In code_` | Origin | File |
+|---------|------|-------------|--------|------|
+| ... | ... | `...` | CONFIRMED / NEW (confirmed) / NEW (corrected) | `docs/glossary/<context>.md` |
+
+**New contexts and ownership** *(architecture targets only — omit
+otherwise)*
+
+| Context | Owns | Arch spec |
+|---------|------|-----------|
+| ... | ... | `docs/arch/<name>.arch.md` |
+
+**Pending renames and divergences** — code names left as they are, with
+the user's decision for each:
+
+| Location | Code name | Glossary term | Decision |
+|----------|-----------|---------------|----------|
+| `file:line` (N uses) | `Client` | Customer (`_In code_: Account`) | rename later / keep — glossary updated / keep for now |
+
+*(If nothing was found: "No domain concepts found in the scanned scope." If
+every name matched: "No divergences — the glossary matches the code.")*

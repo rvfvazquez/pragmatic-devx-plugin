@@ -115,7 +115,8 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 
 > This dimension checks that the code names each glossary concept the spec uses with the
 > identifier the glossary records (`_In code_`, or the term itself), and never with a word
-> listed under the term's `_Avoid_`. Only the implementation scope is scanned.
+> listed under the term's `_Avoid_` — unless that identifier is the term's own `_In code_`.
+> Only the implementation scope is scanned.
 >
 > Mark dimension as N/A when the project has no `docs/glossary/`.
 > Rows are PASS or WARN only — a naming divergence never makes the report FAIL.

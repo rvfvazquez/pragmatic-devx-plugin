@@ -174,7 +174,9 @@ After the downstream skill finishes writing the document for one target:
 
 2. **Record the target's results** (target scanned, candidates not
    selected, confidence counts, any corrections the user made to an
-   INFERRED item) to be written into the session report once every target
+   INFERRED item, and the domain vocabulary outcome — glossary terms
+   written, new contexts, pending renames and divergences with their
+   decisions) to be written into the session report once every target
    in the session is done.
 
 Once every target from Step 2 has been through Steps 3–4, write the session
@@ -196,7 +198,8 @@ After the session report is written:
 4. List any candidates that were found but not selected, so the user knows
    what's still undocumented.
 5. List the domain vocabulary outcome: terms added to the glossary by the
-   downstream skills, and every DIVERGENCE left as a code rename to do.
+   downstream skills, and every pending rename or divergence left in the
+   code (detailed in the report's Domain Vocabulary section).
 
 ---
 

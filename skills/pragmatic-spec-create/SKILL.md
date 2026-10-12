@@ -193,9 +193,9 @@ Note any technology already committed to in the codebase — these don't need to
 
 ### Step 3.5 — Domain Language
 
-Apply **§2 Interview Checks** of `pragmatic-domain-language` to the user's description and the Step 2 answers. The drafts it produces are confirmed in the Step 4.6 recap, each shown with its boundary scenario.
+Apply **§2 Interview Checks** of `pragmatic-domain-language` to the user's description and the Step 2 answers — and, when this spec comes from `pragmatic-reverse-engineer`, to the `DOMAIN TERMS` block of its handoff brief, which §2 treats as the starting drafts. The drafts it produces are confirmed in the Step 4.6 recap, each shown with its boundary scenario.
 
-**In Lean mode**, still resolve avoided words, overloaded words, and code contradictions — a misnamed concept in a spec is not a small change — but draft only the new terms the acceptance criteria will use.
+**In Lean mode**, still resolve avoided words, overloaded words, and code contradictions — a misnamed concept in a spec is not a small change — but draft only the new terms the acceptance criteria will use — except terms from a `DOMAIN TERMS` block, which all go to the recap.
 
 Skip this step only when the feature introduces no domain concept at all (pure infrastructure or tooling), and say so in the recap.
 

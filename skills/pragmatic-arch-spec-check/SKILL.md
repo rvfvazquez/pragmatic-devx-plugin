@@ -155,7 +155,7 @@ State plainly that this check is static only: it confirms a control is *present*
 
 **Skip this section entirely if the project has no `docs/glossary/`.** Otherwise, for the domain language extracted in Step 2:
 
-- **Names** — do modules, components, exported types, and events named after a glossary concept use that term's code identifier? A different name, or a word listed under the term's `_Avoid_`, is a PARTIAL warning: cite file:line, the name found, and the identifier expected.
+- **Names** — do modules, components, exported types, and events named after a glossary concept use that term's code identifier? A different name, or a word listed under the term's `_Avoid_` (the term's own code identifier is never a finding, even when it contains a word listed under `_Avoid_`), is a PARTIAL warning: cite file:line, the name found, and the identifier expected.
 - **Ownership** — does any module outside the owning context define its own persisted model or store for a concept the map says another context **Owns** (e.g. a `customers` table in Billing when Ordering owns Customer)? Referencing the owned concept by identifier is fine; a second source of truth is a PARTIAL warning, or NON-CONFORMANT when it also breaks a Cross-Module Rule in the constitution.
 - **Relationships** — where two contexts in scope interact in code, does the mechanism match the map's Relationships row (event vs direct call vs shared types)? A direct import or call between contexts the map connects only by events is a PARTIAL warning; an interaction between two contexts with no Relationships row at all is an INFO observation.
 

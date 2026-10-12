@@ -79,7 +79,14 @@ Each row is a point where control or data passes from a less trusted zone into a
 
 ## 5. Key Design Decisions
 
-Document significant architectural decisions using ADR format:
+Document significant architectural decisions using ADR format.
+
+> **Record a decision here only when all three hold:**
+> 1. **Hard to reverse** — changing your mind later has a meaningful cost
+> 2. **Surprising without context** — a future reader would wonder why it was done this way
+> 3. **A real trade-off** — there were genuine alternatives and one was picked for specific reasons
+>
+> A decision that fails any of the three is stated plainly in the section it governs (6.1–6.4, 8, or 9), with no ADR. Typical ADRs: architectural shape, integration patterns between contexts, technology choices with lock-in, ownership and scope boundaries, deliberate deviations from the obvious path, constraints not visible in the code, and rejected alternatives whose rejection is not obvious.
 
 ### Decision 1: [Short title]
 

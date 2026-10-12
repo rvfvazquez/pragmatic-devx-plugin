@@ -45,6 +45,8 @@ Record the chosen language and use it for **all report content** — section hea
 
 Find the spec file. Common locations: `docs/specs/`, `specs/`, or the path provided. Read the full document before running any checks.
 
+For the Domain Language checks in Step 2, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** — without asking: if several contexts plausibly apply, read each.
+
 ### Step 1.5 — Pre-scan: Detect Open TODO Items
 
 **This is a mandatory step before running any checks.**
@@ -76,6 +78,8 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 | Security considerations addressed | N/A only if ALL hold: no network surface, no persistence of user or third-party data, no external input. Must be asserted explicitly in the report, not assumed. |
 | Security criteria testable | N/A if section 8's Security item has no applicable entries (all `N/A — <reason>`) |
 | Single feature focus | N/A if the spec explicitly documents a bounded context that intentionally includes multiple related subsystems |
+| Invariants verified | N/A if section 6.2 states `None — <reason>`, or the spec introduces or changes no data model |
+| Domain Language checks (all four) | N/A if `docs/glossary/` does not exist — the project has no glossary yet |
 
 #### Completeness
 - **Title & Status** — Has a clear title and a defined status (Draft/Review/Approved)
@@ -97,6 +101,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 - **Security criteria testable** — If section 7 contains security criteria, each names an actor, an action, and an observable result (an HTTP status code, the absence of protected data in the response). FAIL if a security criterion is vague ("must be secure", "unauthorized access is blocked" with no status). *(N/A if section 8's Security item has no applicable entries)*
 - **Interface matches design** — If APIs/interfaces are defined, they align with the described behavior *(may be N/A — see table above)*
 - **No contradictions** — Goals do not contradict the proposed solution or acceptance criteria
+- **Invariants verified** — Section 6.2 has an Invariants table, and each invariant names a section 7 criterion that exists and asserts that rule. WARN if the table is missing while section 6.2 introduces or changes data, or if an invariant has no verifying criterion (or names one that asserts something else). *(may be N/A — see table above)*
 
 #### Technology Decisions
 - **Technology Decisions section present** — Spec contains an explicit Technology Decisions table or equivalent section
@@ -113,6 +118,9 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
   - **WARN** if the Security item is present but the *Abuse case* sub-item is empty or unaddressed
   - **PASS** if every sub-item is addressed (handled or `N/A — <reason>`) and, where applicable, section 7 contains at least one testable security criterion
   *(may be N/A — see table above)*
+
+#### Domain Language
+Run the **base checks 1–4 of §4 Validation Checks** in `pragmatic-domain-language` against this spec, one report row each: **No avoided terms**, **Domain terms defined**, **Context map consistent**, **Glossary hygiene**. WARN at most, never FAIL; quote the glossary entry in each note. *(may be N/A — see table above)*
 
 #### Scope
 - **Single feature focus** — Section 7 (acceptance criteria) describes one cohesive feature. WARN if criteria span multiple independent user workflows with no shared data model or flow — such a spec is better split into separate documents. *(may be N/A — see table above)*
@@ -148,7 +156,8 @@ Produce the report in this format:
 
 ### Output Rules
 
-- Print the full report; do **not** modify the spec file
+- Print the full report; do **not** modify the spec file or any glossary file
+- **If a Domain Language WARN is present:** recommend `pragmatic-spec-update`, which replaces avoided terms in the spec and adds each undefined term to `docs/glossary/<context-slug>.md`; list the undefined terms so the update has them
 - List FAILs first with concrete suggestions for each
 - N/A checks are not counted in Passed/Warnings/Failed summary totals
 - Overall Status is FAIL if any check is FAIL; WARN if any check is WARN and none are FAIL; PASS if all checks are PASS or N/A

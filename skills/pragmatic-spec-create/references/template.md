@@ -39,6 +39,7 @@ Explicit record of technology choices made for this feature. Every row must have
 | Auth | e.g. JWT via existing middleware | OAuth, API key | Consistent with rest of API |
 | Async processing | e.g. None — synchronous | SQS, background job | Low volume, latency acceptable |
 | Infrastructure | e.g. ECS Fargate (existing cluster) | Lambda, EC2 | Follows service deployment standard |
+| Test seam | e.g. HTTP — POST /resource, external payment gateway via fake adapter | Service layer directly; unit per class with mocks | Highest public boundary maps 1:1 to acceptance criteria and survives refactors |
 
 > Use `[TODO: decide — options: A, B, C]` for any row where the decision is not yet made.
 
@@ -72,6 +73,17 @@ type EntityName struct {
     CreatedAt time.Time `json:"created_at"`
 }
 ```
+
+#### Invariants
+
+Rules about this data that must hold after **every** operation, whichever path made the change — not the behavior of one flow (that belongs in 6.3). Name concepts with their glossary terms.
+
+| # | Invariant | Verified by |
+|---|-----------|-------------|
+| INV-1 | e.g. An Order's total is never negative | AC-3 |
+
+> Every invariant names the acceptance criterion (section 7, numbered in order) whose test verifies it. An invariant no criterion verifies is a gap — add a criterion.
+> Write `None — <reason>` when the feature introduces or changes no data rule.
 
 ### 6.3 Behavior & Logic
 

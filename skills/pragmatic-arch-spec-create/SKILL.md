@@ -100,6 +100,20 @@ Before writing, scan the codebase for:
 - Existing code, README files, or prior specs that reveal current decisions and constraints
 - Related architecture specs in `docs/arch/`
 - The project constitution loaded in Pre-condition 0, if one exists — its Global Tech Stack, Security Baseline, and Cross-Module Rules constrain this arch spec and must not be re-litigated here
+- The domain language — call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** for every context this scope touches
+
+### Step 1.4 — Domain Language and Context
+
+Apply **§2 Interview Checks** of `pragmatic-domain-language` to the user's input — including the `DOMAIN TERMS` block when this arch spec comes from `pragmatic-reverse-engineer`, whose proposed contexts and ownership seed the map rows below. On top of the terms it drafts, what this step settles depends on the scope:
+
+- **`module`** — a module-scope arch spec documents one bounded context. Find its row in the context map (by name, Purpose, or Owns). If there is none, this arch spec introduces a new context: draft its row — name (same as this arch spec), one-line Purpose, the terms it Owns — and its glossary file with the module's central domain terms.
+- **`system`** — the arch spec spans several contexts. Draft any context-map Relationships rows (From → To, mechanism, what crosses) the system design implies and the map doesn't have yet.
+- **`integration`** — the external system almost always names things differently. Draft a Translations row for each external concept that maps to one of ours (e.g. the provider's "Charge" is our **Payment**), so the adapter's vocabulary is explicit.
+- **`layer`** — read the glossary for naming only; a horizontal layer rarely introduces domain terms.
+
+Draft the map rows above yourself, with a boundary scenario where the row is disputed ("a refund issued after shipping: owned by Ordering or Billing? The draft says Billing"). Terms and rows are confirmed in the Step 1.7 recap; if the user moves a boundary case, the definition or the Owns column changes. Use the confirmed canonical terms in the Step 1.5 questions and throughout the document.
+
+A context's **Owns** column must not contradict a Cross-Module Rule in the constitution (e.g. the constitution names AuthModule as the single source of identity, but this context claims to own users) — flag it the same way as any constitution conflict.
 
 ### Step 1.5 — Architecture Discovery Interview
 
@@ -195,7 +209,7 @@ Run this check once. A second round should not itself spawn a third round unless
 
 ### Step 1.7 — Final Consistency Check
 
-Before generating the document, assemble every decision confirmed across Steps 1.5 and 1.6 into one list, grouped by area. Scan pairwise for **contradiction** — not completeness (that is `pragmatic-arch-spec-validate`'s job) — only cases where one confirmed decision makes another incoherent or impossible.
+Before generating the document, assemble every decision confirmed across Steps 1.4, 1.5 and 1.6 into one list, grouped by area. Scan pairwise for **contradiction** — not completeness (that is `pragmatic-arch-spec-validate`'s job) — only cases where one confirmed decision makes another incoherent or impossible.
 
 Known contradiction shapes to check for:
 
@@ -206,6 +220,7 @@ Known contradiction shapes to check for:
 | Constraints (existing platform) | Technology-implying Quality Attributes | A stated platform constraint conflicts with what a chosen NFR target would require |
 | Security named as a top quality attribute | Trust boundaries (4.3) | Security is a driver but 4.3 is going to be marked "single trust domain" — one of the two is wrong |
 | Trust boundary identified (4.3) | Dependency Direction (6.2) / Component Boundaries (4.2) | A component on the trusted side is reachable directly from an untrusted entry point with no validation component between them |
+| Communication Style (6.3) | Context map Relationships | The arch spec has two contexts talking synchronously, but the map records an event between them (or the reverse) |
 
 If no contradiction is found, skip straight to the recap below.
 
@@ -217,6 +232,7 @@ Once no contradictions remain, present the full recap and require explicit confi
 
 > Here's the complete picture before I write the architecture spec:
 > **Purpose & Drivers:** ... **Quality Attributes:** ... **Constraints:** ... **Open Decisions:** ...
+> **Domain Language:** [context(s) touched; new or changed terms with one-line definitions; context-map rows to add — or "no glossary changes"]
 > Confirm this is complete, or tell me what's missing or wrong.
 
 **STOP. Do not proceed to Step 2 until the user explicitly confirms.**
@@ -225,7 +241,11 @@ Once no contradictions remain, present the full recap and require explicit confi
 
 Create the file at `docs/arch/<name>.arch.md` using the full template in `references/template.md`.
 
-Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision. Section 10 (Open Questions) holds concerns you can't yet phrase precisely enough for an inline `[TODO: ...]` — don't force premature options onto something still vague.
+Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision. Section 10 (Open Questions) holds concerns you can't yet phrase precisely enough for an inline `[TODO: ...]` — don't force premature options onto something still vague. Name components, events, and flows with the canonical terms from Step 1.4 — never a word listed under `_Avoid_`.
+
+**Section 5 — Key Design Decisions:** apply the three-part filter in `references/template.md` (hard to reverse, surprising without context, a real trade-off) to every decision confirmed in the interview. Only decisions passing all three become an ADR; the rest are stated plainly in the section they govern. If the user explicitly asks for a decision to be recorded as an ADR, record it — the filter decides the default, not the final word. Section 5 still needs at least one ADR; if nothing passes the filter, the most consequential decision is it.
+
+**Update the glossary** with what was confirmed in the Step 1.7 recap: apply **§3 Write the Glossary** of `pragmatic-domain-language`. For a `module` scope, the context is this arch spec's module and its map row's Arch spec column links `docs/arch/<name>.arch.md`; for `system` / `integration` scopes, the confirmed Relationships or Translations rows go into the map.
 
 #### Trust boundaries (section 4.3) — assess applicability first
 
@@ -263,6 +283,7 @@ After creating the file:
 2. Summarize the key architectural decisions documented
 3. List any `[TODO: ...]` items that remain open
 4. If section 10 has entries, list them separately from the `[TODO: ...]` items — they're concerns still being sharpened, not pending decisions
+5. List the glossary changes: files created, terms added or redefined, context-map rows added
 
 ---
 
@@ -275,6 +296,8 @@ After creating the file:
 
 ```
 docs/arch/<name>.arch.md
+docs/glossary/context-map.md        (created or updated when the domain language changed)
+docs/glossary/<context-slug>.md     (created or updated when the domain language changed)
 ```
 
 ## Additional Resources
@@ -289,3 +312,5 @@ Use these examples as calibration targets for output structure, ADR depth, compo
 
 - **`examples/example-payments-arch.md`** — Payments module with anti-corruption layer and transactional outbox. Showcases `graph TD` for component dependencies, `flowchart TD` for dependency direction, and `sequenceDiagram` for synchronous multi-step flows
 - **`examples/example-notification-service-arch.md`** — Event-driven notification service with multiple channels (email + push). Showcases consumer/dispatcher pattern, `sequenceDiagram` for async flows, and `flowchart LR` for opt-out/skip branching logic
+
+Both examples also calibrate two behaviors: the **three-part ADR filter** (each opens with a note naming the decision it deliberately keeps out of section 5, and where it went instead) and the **domain language** (the context each spec represents, its canonical terms, and — for the system-scope spec — the context-map relationships it defines). The matching glossary and context map are in `pragmatic-domain-language/examples/`.

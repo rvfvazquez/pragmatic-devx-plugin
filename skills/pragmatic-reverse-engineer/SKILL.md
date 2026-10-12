@@ -72,7 +72,8 @@ isn't a safe guess.
    Branch — Component & Dependency Discovery") to find components,
    dependency directions, and the 1–3 most significant data flows. Also run
    the "Both Branches — Security Observations" pass and record any
-   SECURITY-GAP findings.
+   SECURITY-GAP findings, and the "Both Branches — Domain Vocabulary" pass
+   for the context, ownership, and terms this architecture implies.
 3. **Reconstruct ADRs.** For each technology/pattern found, record the
    choice as CONFIRMED and the rationale as INFERRED (unless a
    comment/commit/doc states it — then cite the source).
@@ -94,7 +95,8 @@ isn't a safe guess.
    tech stack (CONFIRMED), acceptance criteria drafted from tests where
    they exist (tagged CONFIRMED-BY-TEST or INFERRED-NO-TEST). Also run the
    "Both Branches — Security Observations" pass and record any SECURITY-GAP
-   findings for the handoff.
+   findings for the handoff, and the "Both Branches — Domain Vocabulary"
+   pass for the terms this feature uses.
 3. **Hand off** to `pragmatic-spec-create`, once per target — see
    "Sequential Delegation" below before processing more than one.
 
@@ -172,7 +174,9 @@ After the downstream skill finishes writing the document for one target:
 
 2. **Record the target's results** (target scanned, candidates not
    selected, confidence counts, any corrections the user made to an
-   INFERRED item) to be written into the session report once every target
+   INFERRED item, and the domain vocabulary outcome — glossary terms
+   written, new contexts, pending renames and divergences with their
+   decisions) to be written into the session report once every target
    in the session is done.
 
 Once every target from Step 2 has been through Steps 3–4, write the session
@@ -193,6 +197,9 @@ After the session report is written:
    per-target counts).
 4. List any candidates that were found but not selected, so the user knows
    what's still undocumented.
+5. List the domain vocabulary outcome: terms added to the glossary by the
+   downstream skills, and every pending rename or divergence left in the
+   code (detailed in the report's Domain Vocabulary section).
 
 ---
 
@@ -223,6 +230,7 @@ docs/reverse-engineering/<session-slug>-<date>.report.md
 - **`references/report-template.md`** — session report template
 - **`examples/example-session-report.md`** — a complete session report for a
   repo-wide Feature pass, showing a produced document, a document skipped
-  by the existing-file guard, unselected candidates, and a corrected
-  INFERRED item. Use as a calibration target for output structure and level
-  of detail.
+  by the existing-file guard, unselected candidates, a corrected
+  INFERRED item, and the Domain Vocabulary section (glossary created, a
+  corrected term, and a pending rename). Use as a calibration target for
+  output structure and level of detail.

@@ -3,7 +3,8 @@
 # Usage: ./run-all.sh [max-turns]
 #
 # Each .txt file in prompts/ is treated as a test case.
-# The filename (without extension) is the expected skill name.
+# The filename up to the first dot is the expected skill name, so one skill can have
+# several prompts: pragmatic-domain-language.txt and pragmatic-domain-language.sync.txt.
 
 set -e
 
@@ -21,8 +22,9 @@ echo "Max turns:   $MAX_TURNS"
 echo ""
 
 for prompt_file in "$PROMPTS_DIR"/*.txt; do
-    skill_name=$(basename "$prompt_file" .txt)
-    echo "--- Testing: $skill_name"
+    prompt_base=$(basename "$prompt_file" .txt)
+    skill_name="${prompt_base%%.*}"
+    echo "--- Testing: $prompt_base"
 
     if bash "$SCRIPT_DIR/run-test.sh" "$skill_name" "$prompt_file" "$MAX_TURNS"; then
         PASS=$((PASS + 1))

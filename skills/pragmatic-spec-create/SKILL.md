@@ -187,8 +187,19 @@ Before writing, search for:
 - Related files or modules that reveal existing patterns and **technology already in use**
 - Prior specs in `docs/specs/` that may overlap
 - Type definitions, interfaces, or configuration files that reveal tech stack choices
+- The domain language — call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context**. A feature that genuinely spans two contexts is a signal for the Step 2.5 scope test.
 
 Note any technology already committed to in the codebase — these don't need to be asked again.
+
+### Step 3.5 — Domain Language
+
+Apply **§2 Interview Checks** of `pragmatic-domain-language` to the user's description and the Step 2 answers — and, when this spec comes from `pragmatic-reverse-engineer`, to the `DOMAIN TERMS` block of its handoff brief, which §2 treats as the starting drafts. The drafts it produces are confirmed in the Step 4.6 recap, each shown with its boundary scenario.
+
+**In Lean mode**, still resolve avoided words, overloaded words, and code contradictions — a misnamed concept in a spec is not a small change — but draft only the new terms the acceptance criteria will use — except terms from a `DOMAIN TERMS` block, which all go to the recap.
+
+Skip this step only when the feature introduces no domain concept at all (pure infrastructure or tooling), and say so in the recap.
+
+Done when §2's completion criterion holds and you are using the canonical terms in your own Step 4 questions.
 
 ### Step 4 — Technology Discovery Interview
 
@@ -247,6 +258,8 @@ Before I write the spec, I need to clarify a few technology decisions:
 **Testing Strategy**
 - What test levels are expected for this feature? Options: unit only, unit + integration, unit + integration + e2e, contract tests, no automated tests
   ➡️ Unit + integration — matches the project's existing test pyramid (found in Step 3)
+- Where should tests observe this feature's behavior (the test seam)? Options: the outermost public boundary (HTTP endpoint, queue consumer, module's public API), the service layer, each internal class
+  ➡️ The highest public boundary the acceptance criteria are written against, with only out-of-process dependencies we don't run locally replaced by a fake adapter — e.g. "HTTP — POST /orders/:id/cancel; payment gateway via fake adapter", matching where existing tests in Step 3 already hit. One seam is the target; name a second only for dense internal logic that the outer seam can't exercise precisely
 - Infer the testing framework from the codebase (Step 3) before asking — only ask if not evident
 - Are there coverage gates or quality requirements? (e.g., all acceptance criteria must have a corresponding integration test)
   ➡️ State the repo's existing convention if one was found in Step 3, otherwise recommend "all acceptance criteria have a corresponding integration test"
@@ -275,7 +288,7 @@ Run this check once. A second round should not itself spawn a third round unless
 
 ### Step 4.6 — Final Consistency Check
 
-Before generating the document, assemble every decision confirmed across Steps 2, 2.5, 4, and 4.5 into one list, grouped by area. Scan pairwise across areas for **contradiction** — not completeness (that is `pragmatic-spec-validate`'s job) — only cases where one confirmed decision makes another confirmed decision incoherent, redundant, or impossible.
+Before generating the document, assemble every decision confirmed across Steps 2, 2.5, 3.5, 4, and 4.5 into one list, grouped by area. Scan pairwise across areas for **contradiction** — not completeness (that is `pragmatic-spec-validate`'s job) — only cases where one confirmed decision makes another confirmed decision incoherent, redundant, or impossible.
 
 Known contradiction shapes to check for:
 
@@ -300,6 +313,7 @@ Once no contradictions remain (or none were found), present the full recap and r
 > **Constraints:** [one-line summary]
 > **Security & Abuse:** [who must not do this; the abuse case; data sensitivity — or "not applicable because ..."]
 > **Technology Decisions:** [one-line summary per area from Step 4]
+> **Domain Language:** [context name; each new or changed term with its one-line definition, _Avoid_ list, and boundary case — or "no new domain terms"]
 >
 > Confirm this is complete, or tell me what's missing or wrong.
 
@@ -312,12 +326,18 @@ If the directory `docs/specs/` does not exist, create it before writing the file
 Create the file at `docs/specs/<feature-slug>.md` using the full template in `references/template.md`.
 
 Fill every section with concrete content:
-- Capture all technology decisions made in Step 4 in section **5. Technology Decisions**
+- Capture all technology decisions made in Step 4 in section **5. Technology Decisions**, including the **Test seam** row
+- If the feature has no testable behavior of its own (pure documentation or configuration), set the Test seam row to `N/A — <reason>` rather than inventing one
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
 - Section 9 (Open Questions) holds concerns you can't yet phrase precisely enough for `[TODO: decide — <options>]` — don't force premature options onto something still vague
+- Use the canonical terms from Step 3.5 throughout the spec — never a word listed under `_Avoid_`
+
+**Update the glossary** with the terms confirmed in the Step 4.6 recap: apply **§3 Write the Glossary** of `pragmatic-domain-language`. A resolved conflict is recorded linking this spec.
 
 **Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then the system SHALL [observable result]`. The **SHALL** in the Then clause is required (EARS notation) — it states the behavior as a mandatory system obligation, not a soft expectation ("should"/"will"). Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
+
+**Section 6.2 — Invariants:** list the rules about this feature's data that must hold after every operation, whichever path changed it — the ones a later change is most likely to break without noticing (a total never negative, a status never going backwards, a record always existing for an event). Name them with glossary terms. Each one names the section 7 criterion that verifies it; if none does, add the criterion rather than leaving the invariant unverified. Write `None — <reason>` only when the feature introduces or changes no data rule.
 
 **Section 8 — Security item:** Fill every sub-item (untrusted input, authentication, authorization, sensitive data, abuse case) with concrete handling or `N/A — <reason>`. Never leave it as a bare "security considerations" line. For any feature exposing an endpoint or handler, touching user data or PII, or processing external input, at least one sub-item must be non-`N/A`. Populate it from, in order: (1) the constitution's Security Baseline if one was loaded — state the inherited decision, e.g. "Authentication: platform OIDC (from constitution)"; (2) the Step 2 Security & Abuse answers — the "worst thing a malicious authenticated user could try" becomes the *Abuse case*; (3) the feature's own design.
 
@@ -343,6 +363,8 @@ After writing the file in Step 5, read it back with fresh eyes before summarizin
 2. **Internal consistency** — does section 6 (Detailed Design) match section 5's technology decisions? Does section 7 (Acceptance Criteria) cover every Goal listed in section 3? Does section 8's Security item align with the Step 2 Security & Abuse answers?
 3. **TODO / Open Questions placement** — every `[TODO: decide — <options>]` lists real options, not a bare TODO; nothing in section 9 is precise enough that it should have been an inline TODO instead (per `references/template.md`'s own rule for that section).
 4. **Diagram correctness** — if a Mermaid diagram was added, its type matches the "When to add diagrams" table above and the syntax is valid.
+5. **Domain language** — every domain term the spec uses is defined in the context's glossary, and no word listed under `_Avoid_` appears in the spec.
+6. **Invariants verified** — every row in section 6.2's Invariants names a section 7 criterion that exists and actually asserts that rule.
 
 Fix anything found directly in the file. No need to re-run this check after fixing — fix and move on.
 
@@ -353,6 +375,7 @@ After the self-review:
 2. Summarize the key decisions captured, especially technology choices
 3. List any `[TODO: ...]` items that remain open, indicating who needs to decide
 4. If section 9 has entries, list them separately from the `[TODO: ...]` items — they're concerns still being sharpened, not pending decisions
+5. List the glossary changes: files created, terms added or redefined, ambiguities recorded
 
 ---
 
@@ -367,6 +390,8 @@ After the self-review:
 
 ```
 docs/specs/<feature-slug>.md
+docs/glossary/context-map.md        (created or updated when domain terms were confirmed)
+docs/glossary/<context-slug>.md     (created or updated when domain terms were confirmed)
 ```
 
 ## Additional Resources
@@ -374,6 +399,7 @@ docs/specs/<feature-slug>.md
 ### Reference Files
 
 - **`references/template.md`** — Full spec template with all sections and formatting guidance
+- **`pragmatic-domain-language`** — glossary and context-map procedures (§1–§3) and their templates
 
 ### Example Files
 
@@ -382,3 +408,5 @@ Use these examples as calibration targets for output structure, level of detail,
 - **`examples/example-auth-spec.md`** — JWT authentication feature. Showcases `sequenceDiagram` for multi-step request/response flows (login + middleware validation)
 - **`examples/example-order-notifications-spec.md`** — Async email notifications via SQS. Showcases `flowchart LR` for event-driven and asynchronous processing flows
 - **`examples/example-order-lifecycle-spec.md`** — Order status state machine. Showcases `stateDiagram-v2` for features with explicit state transitions and validity rules
+
+All three also show the **Test seam** row in section 5 and an **Invariants** table in section 6.2 whose rows each name a verifying criterion. The lifecycle and notifications examples end section 6.3 with a **Domain language** note — canonical terms and the boundary they settle (a Cancellation vs. a return; a Recipient vs. a Customer) — matching the example glossary in `pragmatic-domain-language/examples/`.

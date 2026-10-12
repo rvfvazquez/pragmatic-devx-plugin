@@ -62,6 +62,8 @@ Read `docs/constitution.md` in full. Note:
 
 Also read `.claude/rules/00-project-constitution.md` if it exists — it will need to be regenerated after the update.
 
+If `docs/glossary/context-map.md` exists, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply §1 — the map's **Owns** column must keep agreeing with the Cross-Module Rules.
+
 ---
 
 ### Step 2 — Understand the Change
@@ -74,6 +76,8 @@ Analyze what needs to change. Classify the update by area:
 | **Global Tech Stack** | Add permitted technology, remove forbidden one, update a stack decision and rationale |
 | **Security Baseline** | New or changed authentication or authorization model, secrets-management rule, data-classification category, security baseline reference (OWASP ASVS, etc.) |
 | **Cross-Module Rules** | New inter-module constraint, updated ownership boundary, deprecated rule |
+
+**Ownership cascade:** if the change adds, moves, or removes a "single source of truth" rule (a module owning identity, customers, payments…) and a context map exists, the map's **Owns** column is in scope: every context whose Owns now contradicts the rule, and the context the rule names as owner.
 | **AI Behavior Guardrails** | New action Claude must always ask before taking, removed guardrail, updated trigger condition |
 
 ---
@@ -149,6 +153,7 @@ Known contradiction shapes to check for:
 | New or corrected rule | Untouched section of the same or another area | The new rule contradicts or silently supersedes an existing rule that wasn't marked as deprecated |
 | New AI guardrail | Existing Global Tech Stack decision | The guardrail implies a technology choice the stack section doesn't list as permitted |
 | Deprecated rule | Other rules referencing it | Another active rule still depends on the rule being deprecated |
+| New or changed ownership rule | Context map **Owns** column | The rule names one module the source of truth for a concept, but the map records a different context as its owner, or two contexts as owners |
 | New/changed Security Baseline decision | Untouched Cross-Module Rules or Global Tech Stack | The security decision assumes an entry point, provider, or storage rule the other sections do not establish — e.g. "all auth via the gateway" while a Cross-Module Rule lets a module be called directly |
 
 If no contradiction is found, skip straight to the recap below.
@@ -159,7 +164,7 @@ If no contradiction is found, skip straight to the recap below.
 
 Once clear, present a short recap and require explicit confirmation before writing:
 
-> Here's what I'm about to change: [sections in scope, one line each]. Everything else in the constitution stays as-is. Confirm before I apply this?
+> Here's what I'm about to change: [sections in scope, one line each; context-map Owns rows to change, if the ownership cascade applied]. Everything else in the constitution stays as-is. Confirm before I apply this?
 
 **STOP. Do not proceed to Step 4 until the user explicitly confirms.**
 
@@ -182,7 +187,8 @@ When modifying `docs/constitution.md`:
 6. **Increment** the version (if the constitution has one):
    - Patch bump for wording corrections or minor clarifications
    - Minor bump for new rules, updated decisions, or deprecated constraints
-7. **Append** a changelog entry at the end of the file:
+7. **Update the context map** if the ownership cascade applied and the user confirmed it: move the concept in the **Owns** column to the context the rule names by applying **§3 Write the Glossary** of `pragmatic-domain-language`. Do **not** edit arch specs or feature specs — list every `docs/arch/` file for a context whose Owns changed, since its component boundaries likely need `pragmatic-arch-spec-update`
+8. **Append** a changelog entry at the end of the file:
 
 ```markdown
 | <date> | <summary of what changed> | <motivation — compliance, new decision, correction...> |
@@ -213,7 +219,8 @@ Re-render these sections into the canonical rules file and every cross-tool dest
 Report:
 1. Which sections were changed and what was added, corrected, or deprecated
 2. The updated `Last Updated` date and new version (if applicable)
-3. Confirmation that `.claude/rules/00-project-constitution.md` and every cross-tool destination (`AGENTS.md`, `.cursor/rules/project-constitution.mdc`, `.windsurf/rules/project-constitution.md`, `.github/copilot-instructions.md`, and `GEMINI.md` if present) were regenerated
+3. Context-map Owns rows changed, if any, and every arch spec that now needs `pragmatic-arch-spec-update` to match
+4. Confirmation that `.claude/rules/00-project-constitution.md` and every cross-tool destination (`AGENTS.md`, `.cursor/rules/project-constitution.mdc`, `.windsurf/rules/project-constitution.md`, `.github/copilot-instructions.md`, and `GEMINI.md` if present) were regenerated
 
 State:
 

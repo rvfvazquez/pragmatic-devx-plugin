@@ -26,6 +26,8 @@ Use when the user describes a problem too large for a single feature spec — mu
 
 Before anything else, check whether `docs/constitution.md` exists. If it does, load it in full — every feature this initiative eventually produces will inherit its tech stack and Security Baseline decisions. If it doesn't, follow the same disclosure `pragmatic-spec-create` Pre-condition 0 uses: offer to create one first, or continue with a note that global constraints won't be available yet.
 
+For the domain language, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** for every context the destination plausibly touches. The breakdown names features and concepts with these terms.
+
 ### Pre-condition 1 — Check for Existing Initiative
 
 Determine the `<initiative-slug>` from the user's message and check whether `docs/initiatives/<initiative-slug>.md` already exists.
@@ -45,6 +47,8 @@ Extract from the user's message: the problem or goal in their own words, why it 
 
 Use `AskUserQuestion` to confirm your understanding of the destination and surface any obvious hard constraint (deadline, must-integrate-with-X, explicitly out of scope). One round — not the full depth of `pragmatic-spec-create` Step 2.
 
+In the same round, run a light version of **§2 Interview Checks** on the destination: a word listed under a glossary term's `_Avoid_`, a word the user uses for more than one thing, or a destination that could belong to more than one existing context — each flagged with a recommended answer (`➡️`). Definitions and boundary scenarios are not drafted here; they belong to Step 4.5 and to each feature's spec.
+
 **STOP. Do not proceed to Step 3 until the destination is confirmed.**
 
 ### Step 3 — Domain Research and Architecture Scoping
@@ -59,6 +63,12 @@ If triggered, name which `docs/arch/<name>.arch.md` this initiative depends on (
 
 If no such signal applies, record `## Architecture` as "None needed — <one-line reason>".
 
+**Contexts.** Using the context map (if any) and the destination, list the contexts this initiative touches. Two signals add architecture work even when the scope test above did not trigger:
+- **A new context** — the destination introduces a domain the map doesn't have (e.g. Loyalty). Name it and add its `module`-scope arch spec (`docs/arch/<context>.arch.md`) to `## Architecture`.
+- **A new relationship** — the destination makes two contexts interact in a way the map's Relationships don't record. Name the relationship (from → to, likely mechanism) and add the arch spec that will define it — a `system`-scope arch spec, or an update to an existing one — to `## Architecture`.
+
+Record both in the initiative's `## Domain Language` section. Do not edit the context map here — the arch spec that defines the context or relationship writes it.
+
 **Facts vs. decisions (reactive fallback).** The proactive pass above won't catch everything — if a feature's cohesion in Step 4 turns on a fact the initial research didn't cover, dispatch `fact-finder` again for that specific gap before asking the user or guessing. Reserve `AskUserQuestion` for genuine decisions: choices with no single objectively correct answer, never for something `fact-finder` could have answered.
 
 ### Step 4 — Break Down Into Features
@@ -69,9 +79,22 @@ For each feature, capture:
 - A short name
 - A short description (2-4 sentences) — what it does and why it's needed; enough context that `pragmatic-spec-create` doesn't have to re-derive intent from scratch later, but still not a full spec
 - Its dependencies on other features in this same breakdown, if any
+- Its **context** — the one context the feature lives in. A feature that spans two contexts is split at the boundary when that leaves two independently shippable features; when it can't be split, keep it whole, assign it to the context that owns its central concept, and add a **Watch for** naming the relationship it relies on (e.g. "reads Points, owned by Loyalty, by identifier only — relies on Ordering → Loyalty `OrderDelivered` event")
 - Optionally, a **Watch for** note — anything already known at the breakdown level that this feature's own spec interview should take seriously (e.g. "touches PII, handle retention carefully" or "highest-risk feature in this set — consider Full interview mode even if others run Lean")
 
-**Order the table topologically** — a feature never appears above a feature it depends on. If a dependency cycle is detected, stop and ask the user to resolve it before proceeding; do not silently pick an order.
+Name features and write descriptions with the glossary's canonical terms.
+
+**Order the table topologically** — a feature never appears above a feature it depends on. Among features with no dependency between them, put the one that introduces a concept before the ones that consume it — the first spec to define a term is the one other features will read it from. If a dependency cycle is detected, stop and ask the user to resolve it before proceeding; do not silently pick an order.
+
+### Step 4.5 — Shared Vocabulary
+
+`pragmatic-initiative-deliver` creates each feature's spec in Lean mode, one at a time — and Lean mode does not ask about new terms beyond the acceptance criteria. Without a shared vocabulary set up front, two features of the same initiative coin different names for the same concept.
+
+From the breakdown, pick the domain concepts **used by more than one feature** — at most 8. Skip any already defined in the glossary. For each, draft a glossary entry as **§2** describes (canonical term, one-sentence definition, `_Avoid_`, `_In code_`, context) — boundary scenarios stay with each feature's spec. Present the drafts, together with each feature's context assignment, in one `AskUserQuestion` round, ➡️ "as drafted". Concepts used by a single feature are left to that feature's own spec.
+
+On confirmation, apply **§3 Write the Glossary** of `pragmatic-domain-language`: it creates `docs/glossary/`, the context map, and context files as needed. A **new context** from Step 3 gets its context-map row now (Arch spec column `—` until its arch spec exists) so its terms have a home. List the seeded terms in the initiative's `## Domain Language` section.
+
+If the user declines, skip the write and record "not seeded" — the specs will create terms as they go.
 
 ### Step 5 — Autonomy Setting
 
@@ -91,22 +114,25 @@ Record the result in the initiative's `## Notes` section as `autonomous executio
 
 ### Step 6 — Generate the Initiative Document
 
-Create `docs/initiatives/<initiative-slug>.md` using the template in `references/template.md`. Every feature row starts at `Spec: not created yet`, `Status: Not started`, `Build: Not started`. Below the table, write one subsection per feature with the description and any `Watch for` note captured in Step 4 — the table stays a scannable index; the subsections hold the context.
+Create `docs/initiatives/<initiative-slug>.md` using the template in `references/template.md`. Every feature row starts at `Spec: not created yet`, `Status: Not started`, `Build: Not started`, with its **Context** column from Step 4. Fill `## Domain Language` from Steps 3 and 4.5. Below the table, write one subsection per feature with the description and any `Watch for` note captured in Step 4 — the table stays a scannable index; the subsections hold the context.
 
 ### Step 7 — Output Summary
 
 After writing the file:
 1. State the file path created
 2. List the features in delivery order, with their dependencies
-3. State whether architecture work is needed first, and which arch spec
-4. State the autonomy setting recorded
-5. Tell the user the next step is `pragmatic-initiative-deliver` on this file
+3. State whether architecture work is needed first, and which arch spec(s)
+4. State the contexts touched, any new context or relationship, and the glossary terms seeded (with file paths)
+5. State the autonomy setting recorded
+6. Tell the user the next step is `pragmatic-initiative-deliver` on this file
 
 **Charting is one session's work.** This skill hands nothing off automatically — `pragmatic-initiative-deliver` only runs when the user explicitly invokes it afterward.
 
 ## Output Location
 
 `docs/initiatives/<initiative-slug>.md` — create the `docs/initiatives/` directory if it does not exist.
+
+`docs/glossary/context-map.md` and `docs/glossary/<context-slug>.md` — only when shared terms were seeded in Step 4.5.
 
 ## Additional Resources
 

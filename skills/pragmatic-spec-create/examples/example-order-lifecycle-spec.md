@@ -42,6 +42,7 @@ Implement an `OrderStateMachine` in the domain layer that encapsulates all valid
 | State machine implementation | Pure Go (transition map) | External library (looplab/fsm) | Simple logic; no external dependency; easier to test |
 | History persistence | `order_status_history` table in existing PostgreSQL | Events in SQS, no history | Synchronous audit trail; simplifies debugging and support |
 | Transition validation | Typed domain error (`ErrInvalidTransition`) | Panic, generic error | Allows explicit handling by the handler; no surprises in production |
+| Test seam | `OrderStateMachine` public interface, with history persisted to a test PostgreSQL | HTTP handlers of each caller; unit per transition rule | The state machine is the feature's public boundary and has no network surface; its callers own their own HTTP tests |
 
 ## 6. Detailed Design
 
@@ -83,6 +84,14 @@ type OrderStatusHistory struct {
 }
 ```
 
+#### Invariants
+
+| # | Invariant | Verified by |
+|---|-----------|-------------|
+| INV-1 | An order's status changes only through `OrderStateMachine.Transition` | AC-3 |
+| INV-2 | Every status change has exactly one `order_status_history` record | AC-2 |
+| INV-3 | A delivered order never returns to an earlier status | AC-5 |
+
 ### 6.3 Behavior & Logic
 
 ```mermaid
@@ -121,6 +130,8 @@ stateDiagram-v2
 | `delivered` | `refunded` | operator (approved return) |
 
 Any transition not listed above returns `ErrInvalidTransition`.
+
+**Domain language** (`docs/glossary/ordering.md`): `shipped → cancelled` is a **Cancellation** — the Order is ended before delivery, here because it was returned in transit. `delivered → refunded` is a return, **not** a Cancellation. The `refunded` status records that Payments completed a **Refund**; the Refund itself belongs to Payments, and this spec only reacts to its callback.
 
 ## 7. Acceptance Criteria
 

@@ -34,7 +34,9 @@ The implementer's report says the criterion is implemented and its test went red
 
 **Security controls** — if the brief names an ownership/authorization check, boundary input validation, or secrets-from-env rule for this path, confirm the code applies it. For a security criterion, confirm the test asserts the *negative* outcome (blocked status, no protected data in the body), not the happy path.
 
-**Test quality** — the test exercises real behavior (not a placeholder assertion, not a mock of the thing under test) and would fail if the implementation were removed.
+**Test quality** — the test exercises real behavior (not a placeholder assertion, not a mock of the thing under test) and would fail if the implementation were removed. If the brief names a test seam, the test goes through that boundary and replaces only the dependencies the seam allows; a test that reaches past it into internals is an **Important** finding.
+
+**Domain names** — if the brief lists domain names, a type, function, event, or test name for one of those concepts uses its listed identifier. A different name for a listed concept, or a word from its avoided list (the term's own code identifier is never a finding, even when it contains a word listed under `_Avoid_`), is an **Important** finding when it is part of an interface other code calls or a test name, and **Minor** when it is local to a function body. A concept the implementer named that isn't listed at all is not a finding by itself — confirm the implementer reported it as a glossary gap.
 
 ## Severity
 

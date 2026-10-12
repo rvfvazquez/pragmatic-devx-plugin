@@ -59,6 +59,8 @@ Read the full document and understand:
 - Component boundaries and dependency rules
 - Any `[TODO: ...]` items already present
 
+For the domain language, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** — every context this arch spec touches; for a `module` scope, the context whose row links this arch spec.
+
 ### Step 2 — Understand the Change
 
 Analyze what needs to change:
@@ -69,6 +71,15 @@ Analyze what needs to change:
 - Is this capturing an **intentional deviation** identified by `pragmatic-arch-spec-check`?
 
 Map which sections are directly affected and which may be indirectly impacted — a change to a component boundary may also affect dependency direction rules, data flow descriptions, and NFRs.
+
+**Domain language cascade:** the glossary and context map are in scope when the change:
+- introduces, renames, or redefines a domain concept (a component, event, or flow named after one), or the request uses a word listed under a term's `_Avoid_`
+- changes what a context **Owns** (an entity moves to another module, a module becomes the source of truth for something)
+- changes how two contexts communicate — the context map's Relationships mechanism must keep agreeing with section 6.3
+- for an `integration` scope, changes the external system's vocabulary — the map's Translations rows
+- renames, splits, or merges the module a `module`-scope arch spec documents — the context's map row and glossary file follow
+
+A request coming from a `pragmatic-arch-spec-validate` Domain Language WARN is this case by definition.
 
 **Security cascade:** if the change adds an inbound entry point, moves or removes an authorization check, changes an external integration, or changes where a classified data category is stored, then section 4.3 (Trust Boundaries & Attack Surface) and the section 9 Security row are in scope even if the user did not name them — and the ADR's Consequences should name the STRIDE category it opens or closes.
 
@@ -107,6 +118,10 @@ Are there sections that should also be updated as a consequence?
 - If the Step 2 security cascade applies: does section 4.3 need a new boundary row or an
   updated attack surface, and does the section 9 Security row still hold?
   ➡️ Yes if the change adds an inbound entry point or moves an authorization check
+- If the Step 2 domain language cascade applies: which terms, Owns entries, Relationships, or
+  Translations change? Apply §2 Interview Checks of `pragmatic-domain-language`: draft each one with
+  its boundary scenario, and flag every conflict with the glossary, quoting the entry.
+  ➡️ The draft as written — matches the glossary where one exists
 
 **Motivation**
 - What triggered this change? (new decision, intentional deviation found in code, correction, requirement change)
@@ -130,6 +145,8 @@ Do **not** proceed to Step 2.6 until:
 ### Step 2.6 — Capture ADR Details for New Decisions
 
 **Apply this step when the update includes a new or updated ADR.**
+
+First check the new decision against the three-part filter in `pragmatic-arch-spec-create`'s `references/template.md` section 5: hard to reverse, surprising without context, and a real trade-off. If it fails any of the three, propose stating it plainly in the section it governs instead of as an ADR, and skip the questions below for it. Record it as an ADR anyway if the user asks to.
 
 Use `AskUserQuestion` to ensure the ADR is fully documented. **Every question here must carry a recommended answer (`➡️`)**, derived in this priority order: (1) constraints or quality attributes already recorded elsewhere in this spec, (2) patterns evident in the codebase, (3) a pragmatic default stated as such.
 
@@ -186,6 +203,8 @@ Known contradiction shapes to check for:
 | New component boundary | Existing component diagram (4.1) not marked in scope | A component referenced elsewhere in the spec now has an inconsistent responsibility |
 | New NFR target | Existing constraint elsewhere in the spec | The new target conflicts with a constraint the update didn't touch |
 | New inbound entry point | Section 4.3 attack surface (unchanged) | The change adds a route or listener but section 4.3 still lists the old attack surface, or the section 9 Security row assumes it |
+| Redefined or renamed term, changed Owns | Untouched sections, the constitution's Cross-Module Rules | Untouched sections still use the old name or meaning, or the new Owns contradicts a constitution rule (e.g. two modules now claim to be the source of truth for identity) |
+| Changed communication between contexts | Context map Relationships | Section 6.3 now says events but the map still records a sync call between the same contexts (or the reverse) |
 
 If no contradiction is found, skip straight to the recap below.
 
@@ -195,7 +214,7 @@ If no contradiction is found, skip straight to the recap below.
 
 Once clear, present a short recap and require explicit confirmation before writing:
 
-> Here's what I'm about to change: [sections in scope, one line each]. Everything else in the spec stays as-is. Confirm before I apply this?
+> Here's what I'm about to change: [sections in scope, one line each; glossary terms and context-map rows added, changed, or renamed]. Everything else in the spec stays as-is. Confirm before I apply this?
 
 **STOP. Do not proceed to Step 3 until the user explicitly confirms.**
 
@@ -215,7 +234,8 @@ When modifying the arch spec:
    - Minor bump (`1.0.0` → `1.1.0`) for new ADRs, updated component boundaries, or new integrations
    - Major bump (`1.0.0` → `2.0.0`) for fundamental architecture changes (e.g., new dependency direction, major component restructuring)
 5. **Deprecate** superseded ADRs — mark them with `~~strikethrough~~` and add a note referencing the new decision. Never delete prior ADRs.
-6. **Append** a changelog entry at the end of the document:
+6. **Update the glossary and context map** if the domain language cascade applied: apply **§3 Write the Glossary** of `pragmatic-domain-language` — terms, Owns, Relationships, Translations, and a renamed module's context row and file. Then replace every use of an avoided or renamed term in this arch spec, including untouched sections — terminology is not "preserved content". §3's list of other documents still using an old name goes into Step 5
+7. **Append** a changelog entry at the end of the document:
 
 ```markdown
 ---
@@ -233,6 +253,7 @@ After applying changes, verify:
 - Component names used in dependency rules match the updated component boundaries table
 - Dependency direction rules are consistent with the updated component structure
 - No section is left contradicting the changes applied
+- If the glossary or map changed: no word listed under `_Avoid_` remains in this arch spec, and section 6.3 agrees with the map's Relationships
 
 ### Step 5 — Output Summary and Next Steps
 
@@ -240,6 +261,7 @@ Report:
 1. A concise summary of what was changed
 2. Any remaining `[TODO: ...]` items still present in the document
 3. Sections that may need human review due to the changes
+4. Glossary and context-map changes, and every other spec or arch spec that still uses an old term — those need their own `pragmatic-spec-update` / `pragmatic-arch-spec-update`
 
 > **Arch spec updated** — `docs/arch/<name>.arch.md`.
 >

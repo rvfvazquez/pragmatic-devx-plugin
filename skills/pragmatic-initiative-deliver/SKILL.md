@@ -27,20 +27,20 @@ Read `docs/initiatives/<slug>.md` in full. If it doesn't exist, stop and point t
 
 ### Step 1 — Architecture First, If Named
 
-If `## Architecture` names an arch spec that doesn't exist yet, dispatch `pragmatic-arch-spec-create` for it before touching any feature. Call `pragmatic-initiative-status` on it afterward; do not proceed to Step 2 until it reports `Ready: yes`.
+For each arch spec `## Architecture` names that doesn't exist yet, dispatch `pragmatic-arch-spec-create` for it before touching any feature — for a new context listed under `## Domain Language`, as a `module`-scope arch spec for that context; for a new relationship, with that relationship as part of its input, so the context map records it. Call `pragmatic-initiative-status` on each afterward; do not proceed to Step 2 until every one reports `Ready: yes`.
 
 ### Step 2 — Walk the Feature Table, in Order
 
 For each feature row not yet `Build: Checked`, in table order (already topologically sorted by `pragmatic-initiative-create` — never reorder it here):
 
-1. **No spec yet** (`Spec: not created yet`) — dispatch `pragmatic-spec-create` **in Lean mode**, using the initiative's `## Destination` plus this feature's own subsection (description and any `Watch for` note) as the input — pass the `Watch for` note through explicitly so the spec's interview doesn't have to rediscover it. Update the row's `Spec` column to the created path and its `Status` column to the created spec's own `Status` field.
+1. **No spec yet** (`Spec: not created yet`) — dispatch `pragmatic-spec-create` **in Lean mode**, using the initiative's `## Destination` plus this feature's own subsection (description and any `Watch for` note) as the input — pass the `Watch for` note through explicitly so the spec's interview doesn't have to rediscover it. Also pass the feature's **Context** column, so the spec reads that context's glossary — including the terms seeded by `pragmatic-initiative-create` and those added by earlier features' specs — instead of asking which context applies. Update the row's `Spec` column to the created path and its `Status` column to the created spec's own `Status` field.
 2. **Spec exists, not yet validated this pass** — dispatch `pragmatic-spec-validate`. If it returns FAIL, dispatch `pragmatic-spec-update` addressing the specific findings, then re-validate once. Do not proceed to build on a FAIL, and do not loop validate/update more than once per feature without surfacing it as a blocker (Step 3).
 3. **Check readiness** — call `pragmatic-initiative-status` on this feature's spec path.
 4. **Decide whether to build**, using the `autonomous execution` setting noted in the Pre-condition:
    - `autonomous execution: yes` — proceed to build once `pragmatic-initiative-status` reports `Ready: yes` (Status is `Review` or `Approved`, zero open TODOs). Do not wait for a human to flip `Status` to `Approved`.
    - `autonomous execution: no` — stop here for this feature, report that its spec is ready, and wait for explicit human approval before dispatching `pragmatic-spec-build`.
 5. **Build** — dispatch `pragmatic-spec-build`, then `pragmatic-spec-check`. Update the row's `Build` column (`In progress` → `Done` → `Checked`, matching `pragmatic-spec-check`'s Overall Status of PASS).
-6. **Update the initiative document** after every sub-step above — it is the running log of this delivery, not a summary written once at the end. Table columns record the *what* (current Status/Build state); when a feature reaches `Build: Checked`, also append one line to `## Decisions So Far` recording the *why* — e.g. "Feature X: validated PASS on first pass, built and checked" or "Feature X: validate FAIL (open TODO in section 8), one `pragmatic-spec-update` pass, then checked." Only append on a feature's terminal outcome for this run (`Checked`, or the blocker reported in Step 3) — not on every sub-step transition, or the section turns into noise.
+6. **Update the initiative document** after every sub-step above — it is the running log of this delivery, not a summary written once at the end. Table columns record the *what* (current Status/Build state); when a feature reaches `Build: Checked`, also append one line to `## Decisions So Far` recording the *why* — e.g. "Feature X: validated PASS on first pass, built and checked" or "Feature X: validate FAIL (open TODO in section 8), one `pragmatic-spec-update` pass, then checked." If the feature's spec added or redefined glossary terms, name them in that same line — later features will read them. Only append on a feature's terminal outcome for this run (`Checked`, or the blocker reported in Step 3) — not on every sub-step transition, or the section turns into noise.
 
 ### Step 3 — Handle Real Blockers
 

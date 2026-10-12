@@ -54,6 +54,32 @@
 | Document | Inferred | Corrected to |
 |----------|----------|----------------|
 | Payments spec | Retry logic exists to handle provider timeouts | Retry logic exists to handle provider *rate limiting* specifically (429 responses only — confirmed by the caller reading the `Retry-After` header) |
+| Payments spec (glossary: Payer) | Payer is the Customer who placed the Order | Payer is whoever's payment method is charged; it can differ from the Customer (e.g. a company card paying for an employee's Order) |
+
+## 7. Security Observations
+
+No security gaps observed in the scanned scope.
+
+## 8. Domain Vocabulary
+
+**Glossary changes**
+
+No glossary existed, so `pragmatic-spec-create` created `docs/glossary/context-map.md` and `docs/glossary/payments.md` together when the user confirmed the recap.
+
+| Context | Term | `_In code_` | Origin | File |
+|---------|------|-------------|--------|------|
+| Payments | Transaction | `Transaction` | NEW (confirmed) | `docs/glossary/payments.md` |
+| Payments | Charge | `Charge` | NEW (confirmed) | `docs/glossary/payments.md` |
+| Payments | Refund | `Refund` | NEW (confirmed) | `docs/glossary/payments.md` |
+| Payments | Payer | `Customer` | NEW (corrected) | `docs/glossary/payments.md` |
+
+**Pending renames and divergences**
+
+The code calls the paying party `Customer` (9 uses) and, in one adapter, `Payer` (3 uses). The user chose **Payer** as the term — `Customer` already belongs to Ordering, and the two can differ — but the glossary records the dominant identifier, `Customer`, so it describes the code as it is today. `_In code_` wins over `_Avoid_`, so using `Customer` in this module is not flagged by the conformance checks meanwhile.
+
+| Location | Code name | Glossary term | Decision |
+|----------|-----------|---------------|----------|
+| `src/payments/service.go:57` (9 uses) | `Customer` | Payer (`_In code_`: `Customer`) | rename later — `src/payments/gateway.go` already uses `Payer` (3 uses); update `_In code_` to `Payer` when the rename lands |
 
 ---
 
@@ -62,6 +88,7 @@
 > **Reverse engineering complete.**
 >
 > - `docs/specs/payments.md` — produced, Provenance appended (11 confirmed, 3 inferred-confirmed, 1 still open)
+> - Domain language: created `docs/glossary/context-map.md` and `docs/glossary/payments.md` (4 terms). One pending rename: `Customer` → `Payer` in `src/payments/service.go` (9 uses) — left as is for now.
 > - Notifications — not produced this session; `docs/specs/notifications-draft.md` already exists and covers part of this scope. Run `pragmatic-spec-update` on that file instead, or re-run this skill once the overlap is resolved.
 >
 > Also found but not selected: **Rate limiting** and **Admin audit log** — both look like undocumented feature boundaries if you want to reverse-engineer them next.

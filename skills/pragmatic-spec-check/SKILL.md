@@ -68,9 +68,11 @@ Before scanning code, map everything that will be verified:
 - **Interfaces, structs, type definitions, endpoints** — from sections 6.1 and 6.2
 - **Security controls** — each non-`N/A` entry in the section 8 Security item (authentication, authorization, untrusted-input validation, sensitive-data handling). Skip any control already fully expressed by a section 7 criterion — it is covered under Dimension 1.
 - **Open TODOs** — all `[TODO: ...]` items from any section
+- **Domain names** — if `docs/glossary/context-map.md` exists, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`), apply **§1 Locate the Context** without asking, and take from this spec's context, per **§5 Names in Code**: each term the spec uses, with its code identifier (`_In code_`, or the term itself) and its `_Avoid_` words
 
 Mark Dimension 2 as `N/A` only if sections 6.1 and 6.2 are absent or contain no verifiable elements **and** the section 8 Security item has no applicable (non-`N/A`) entry.
 If no open `[TODO: ...]` items exist in the spec → mark Dimension 3 as `N/A`.
+If `docs/glossary/` does not exist → mark Dimension 4 as `N/A`.
 
 ### Step 3 — Scan Implementation
 
@@ -83,6 +85,8 @@ For each element extracted in Step 2:
 - **Security controls** → for each section 8 Security entry mapped in Step 2, search source for the control on the relevant path: an auth middleware or guard (authentication), an ownership or role comparison against the caller identity before the resource is returned (authorization), request validation or a schema check (untrusted input), redaction or an allow-list in logging and a secrets-manager / env read (sensitive data). PASS if the control is present on the path, WARN if partial or ambiguous, FAIL if absent. Report these under Dimension 2. **Never reproduce a secret value found during this scan — cite file and line only.**
 
 - **Open TODOs** → search source files and config files for evidence of resolution (a decision implemented, a comment resolving the question). PASS if clear evidence found, WARN if partial or ambiguous, FAIL if no evidence found.
+
+- **Domain names** → in the implementation scope only, find the types, exported functions, endpoints, events, and test names that represent each glossary concept the spec uses. PASS if they use the term's code identifier. WARN if a concept is represented under a different name, or an identifier uses a word listed under the term's `_Avoid_` (the term's own code identifier is never a finding, even when it contains a word listed under `_Avoid_`) (cite file:line, the name found, and the expected identifier). A concept the code has no representation of is not a Dimension 4 finding — Dimensions 1 and 2 already cover missing behavior and types. Dimension 4 is **WARN at most, never FAIL**. Tag each action `[code]` (rename in code) or `[pragmatic-spec-update]` (the glossary's identifier should change instead).
 
 > **Scope note:** Scanning is limited to current code files (source, test, config). Git commit history is not scanned — that is a future enhancement.
 
@@ -126,6 +130,14 @@ See `references/report-format.md` for the annotated format. The report structure
 
 > N/A when the spec has no open [TODO: ...] items.
 
+### Dimension 4 — Domain Names
+**Status:** PASS | WARN | N/A
+
+| Term | Status | Finding |
+|------|--------|---------|
+
+> N/A when the project has no `docs/glossary/`. WARN at most — never FAIL.
+
 ### Recommended Actions
 1. [FAIL][code] ...
 2. [FAIL][pragmatic-spec-update] ...
@@ -161,4 +173,4 @@ Overall Status:
 ## Additional Resources
 
 - **`references/report-format.md`** — Annotated report format with inline explanations of each field
-- **`examples/example-auth-check.md`** — Worked conformance check example against the JWT authentication spec
+- **`examples/example-auth-check.md`** — Worked conformance check example against the JWT authentication spec, including a Dimension 4 (Domain Names) PASS and WARN

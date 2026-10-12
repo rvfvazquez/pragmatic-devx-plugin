@@ -54,6 +54,8 @@ Record the chosen language and use it for **all report content** — section hea
 
 Find the architecture spec file. Common locations: `docs/arch/`, or any `.arch.md` file matching the provided path. Read the full document before running any checks.
 
+For the Domain Language checks in Step 2, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** for every context this arch spec touches, without asking. If the constitution exists, read its Cross-Module Rules too.
+
 ### Step 1.5 — Pre-scan: Detect Open TODO Items
 
 **This is a mandatory step before running any checks.**
@@ -116,6 +118,9 @@ Evaluate each criterion below. Report **PASS**, **WARN**, or **FAIL** with a sho
 - **Dependency rules are explicit** — Forbidden and allowed dependencies are named, not implied
 - **Naming conventions are precise** — Naming patterns (e.g., `*Service`, `*Repository`) are specific enough to be matched against actual file names
 
+#### F. Domain Language
+Run **all seven checks of §4 Validation Checks** in `pragmatic-domain-language` against this arch spec, one finding each: **No avoided terms**, **Domain terms defined**, **Context map consistent**, **Glossary hygiene**, **Context registered**, **Ownership consistent**, **Communication matches the map**. WARN at most, never FAIL; quote the glossary or map entry in each note. If `docs/glossary/` does not exist, skip this category and add one INFO suggestion that the project has no glossary yet.
+
 ### Step 3 — Generate Validation Report
 
 Produce the report in this format:
@@ -158,7 +163,8 @@ Optional improvements.
 
 ### Output Rules
 
-- Print the full report; do **not** modify the spec file
+- Print the full report; do **not** modify the spec file or any glossary file
+- **If a Domain Language WARN is present:** recommend `pragmatic-arch-spec-update`, which updates the arch spec, the glossary, and the context map together; list each undefined term and each map mismatch so the update has them
 - Group findings: FAIL → WARN → INFO → PASS
 - **Every FAIL must include a "How to resolve" block** with two options: fix the spec to satisfy the criterion, or reconsider the criterion if a deliberate decision makes it inapplicable
 - For each WARN, provide a concrete, actionable suggestion

@@ -111,6 +111,28 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 
 ---
 
+### Dimension 4 — Domain Names
+
+> This dimension checks that the code names each glossary concept the spec uses with the
+> identifier the glossary records (`_In code_`, or the term itself), and never with a word
+> listed under the term's `_Avoid_` — unless that identifier is the term's own `_In code_`.
+> Only the implementation scope is scanned.
+>
+> Mark dimension as N/A when the project has no `docs/glossary/`.
+> Rows are PASS or WARN only — a naming divergence never makes the report FAIL.
+
+**Status:** `PASS | WARN | N/A`
+
+| Term | Status | Finding |
+|------|--------|---------|
+| Customer | PASS | `customer.go:8` — `type Customer struct` matches `_In code_: Customer` |
+| Order Item | WARN | `order.go:31` — `type OrderLine struct`; glossary identifier is `OrderItem` ("line" is listed under Avoid) |
+
+> For WARN rows: cite file:line, the name found, and the identifier the glossary expects.
+> A concept with no representation in code is not a finding here — Dimensions 1 and 2 cover it.
+
+---
+
 ### Recommended Actions
 
 > List only when Overall Status is WARN or FAIL.

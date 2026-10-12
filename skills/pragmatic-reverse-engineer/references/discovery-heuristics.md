@@ -130,6 +130,12 @@ If the scan finds no such patterns, say so explicitly in the brief — "no
 security gaps observed in the scanned scope" — rather than omitting the
 category.
 
+## Both Branches — Domain Vocabulary
+
+Run this pass on every target, after the branch's own scan. It proposes terms; it never writes the glossary — the downstream create skill confirms and writes them (its Step 3.5 / Step 1.4).
+
+Apply **§6 Scan Code** of `pragmatic-domain-language` (call the Skill tool with `pragmatic-domain-language`; without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) to the target's paths. Its CONFIRMED / DIVERGENCE / NEW classification, dominant-identifier rule, and — for architecture targets — proposed contexts and ownership are what the `DOMAIN TERMS` block below carries. Its sibling flow, Sync from Code, uses the same pass to keep an existing glossary current; this pass is for the first time a project's code is read.
+
 ## Presenting the Brief During Handoff
 
 When invoking the downstream create skill, state findings in this shape so
@@ -149,6 +155,12 @@ INFERRED — please confirm or correct:
 SECURITY-GAP — confirm whether each is intentional:
 - <pattern> at <file:line> — <why it looks like a weakness>
 - (or: "no security gaps observed in the scanned scope")
+
+DOMAIN TERMS — proposed for the glossary:
+- CONFIRMED: <Term> (code: `<Identifier>`)
+- NEW: <Term> — <INFERRED definition>; code: `<DominantIdentifier>` (N uses); also in code: `<Other>` (N uses) → rename candidate
+- DIVERGENCE: <Term> is `<GlossaryIdentifier>` in the glossary but `<CodeName>` at <file:line>
+- (or: "no domain concepts found in the scanned scope")
 ```
 
 The downstream skill's own `AskUserQuestion` steps should only actually
@@ -156,4 +168,8 @@ prompt for the INFERRED items and any genuine gaps neither branch above
 could resolve — CONFIRMED items are stated, not asked. SECURITY-GAP items
 are always surfaced for confirmation: the user decides whether each is an
 intentional design choice (documented as such) or a defect (recorded as a
-`[TODO: ...]` in the spec's Security item, not fixed here).
+`[TODO: ...]` in the spec's Security item, not fixed here). DOMAIN TERMS feed
+the downstream skill's domain-language step: NEW terms are confirmed there
+like any drafted term, and each DIVERGENCE is resolved there — either the
+glossary's identifier changes, or the divergence is recorded for a code
+rename (never renamed here).

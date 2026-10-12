@@ -1,5 +1,128 @@
 # Pragmatic DevX — Release Notes
 
+## v0.15.0 (2026-10-12)
+
+### Domain Language Layer, Test Seam, Invariants, and a PR Draft from the Spec
+
+A comparative review of superpowers v7.0.0 and `mattpocock/skills` 1.3.1
+(`domain-modeling`, `codebase-design`, `tdd`, `to-spec`, `to-tickets`,
+`wayfinder`, `pr`) found that the plugin had a strong *structure* for
+documentation (constitution, arch spec, feature spec, initiative) but no
+*language*: nothing defined what "Order", "Customer" or "Cancellation" mean,
+which context owns a concept, or what the code should call it. Two specs
+could name the same concept differently and no gate would notice, and the
+name a build chose for a type was nobody's decision.
+
+#### New skill: `pragmatic-domain-language`
+
+- **`docs/glossary/`** is the home of the project's domain language:
+  `context-map.md` (always present — contexts, who **Owns** each concept,
+  Relationships, Translations including external systems) plus one
+  `<context>.md` per bounded context (term, definition, `_Avoid_` words,
+  `_In code_` identifier, resolved ambiguities). Formats and rules live in
+  the skill's `references/`; a complete worked example (map plus four
+  glossaries) is in its `examples/`.
+- **One owner for the procedures.** §1 Locate the Context, §2 Interview
+  Checks, §3 Write the Glossary, §4 Validation Checks, §5 Names in Code.
+  Thirteen skills keep their own step and completion criterion inline and
+  call the Skill tool for the section they need, so a rule changes in one
+  place. The skill is model-invoked on purpose: `disable-model-invocation`
+  would make it unreachable from other skills.
+- **Direct edits** ("rename Account to Customer", "record that Billing owns
+  Invoice") run a confirm-then-write flow. It never rewrites specs: it lists
+  the specs and arch specs still using an old name and the update skill each
+  one needs.
+- **Sync from Code** (`--sync [--context <name>]`, the bare word `sync`, or
+  "sync the glossary with the code"; the skill declares an `argument-hint`):
+  reconciles an existing glossary with the code. The context map gains two
+  optional columns: `Code` (paths per context) and `Synced` (the commit at
+  which that context was last reconciled — one per context, so syncing one
+  context never hides another's changes). `scripts/glossary-drift.sh` —
+  read-only, grep-based, usable alone in CI — reports `_In code_` identifiers
+  that no longer exist and avoided words used as identifiers, and prints each
+  context's sync age. The flow adds new-term candidates from the files changed
+  since each context's `Synced` commit (a scan pass moved here from
+  `reverse-engineer`, now §6 Scan Code), groups everything for confirmation,
+  and accepts both directions per item (the code is right → the glossary
+  changes; the glossary is right → a pending rename is recorded). Without
+  `--context` it covers every context in the map, asking once for the paths of
+  those with no `Code` value. It never edits code or specs. Ownership and
+  relationships are not checked yet. The script matches text, so a comment can
+  hide a stale name or raise a false avoided word.
+
+#### Where the glossary is used
+
+- **Interviews** (`spec-create` Step 3.5, `arch-spec-create` Step 1.4,
+  `spec-update`, `arch-spec-update`, `initiative-create`): avoided words,
+  overloaded and vague words, contradictions with the code, a boundary
+  scenario per new or disputed term, and an ambiguous context is asked, not
+  guessed. Terms are drafted, shown in the recap, and written only after
+  confirmation.
+- **Validation** (`spec-validate`, `arch-spec-validate`): WARN-only Domain
+  Language checks — avoided terms, undefined terms, context-map consistency,
+  glossary hygiene; for arch specs also context registered, ownership vs the
+  constitution, and communication vs the map's Relationships.
+- **Conformance** (`spec-check` Dimension 4, `arch-spec-check` check I): types
+  and events use the glossary identifier; a second source of truth for an
+  owned concept; a mechanism that disagrees with the map. WARN at most, and a
+  term's own `_In code_` is never a finding even if it contains an avoided
+  word.
+- **Build** (`spec-build` constraint brief item 9, `tdd-implementer`,
+  `task-reviewer`, the PR draft): domain names flow into code and tests. A
+  concept the glossary lacks is checked against existing terms first and, if
+  truly new, reported as a **glossary gap** in the Step 8 summary — the build
+  never edits the glossary.
+- **Other entry points:** `pragmatic-reverse-engineer` proposes terms from
+  code (CONFIRMED / NEW / DIVERGENCE), defaults `_In code_` to the dominant
+  identifier and records a pending rename instead of changing code, and its
+  report gains a Domain Vocabulary section. `initiative-create` assigns each
+  feature one context, names new contexts and relationships, and seeds up to
+  eight terms shared by several features (new Step 4.5) so Lean-mode specs do
+  not coin competing names; `initiative-deliver` passes the context along.
+  `pragmatic-project-constitution` offers to seed the glossary and checks
+  ownership rules against the map; `-update` gains an ownership cascade. The
+  SessionStart hook lists the glossary contexts.
+
+#### Spec lifecycle changes
+
+- **Test seam.** A `Test seam` row in spec section 5 records the boundary
+  tests observe and which dependencies a fake may replace. It becomes
+  constraint brief item 8 in `spec-build` and is passed to `tdd-implementer`;
+  `task-reviewer` flags tests that reach past it. Source: `tdd` / `to-spec`.
+- **Invariants.** Spec section 6.2 gains an Invariants table; each row names
+  the acceptance criterion that verifies it. `spec-validate` warns on an
+  unverified invariant and `spec-update` keeps the references in step.
+- **Three-part ADR filter.** An arch spec records a decision as an ADR only
+  when it is hard to reverse, surprising without context, and a real
+  trade-off; anything else is stated in the section it governs. The user can
+  still force an ADR.
+- **PR description draft.** After `spec-check` passes, `spec-build` Step 8
+  assembles a pull request body from the spec, the Build Log and the check
+  report (format and example in `references/pr-description.md`), following
+  the target repo's PR template when one exists. It never opens the PR.
+
+#### Not changed, found on the way
+
+`pragmatic-initiative-status` is `disable-model-invocation: true` while
+`pragmatic-initiative-deliver` invokes it — the same reachability problem
+described above. Left as is here; it deserves its own change with a
+reproduction.
+
+None of this has the incident-based evidence CLAUDE.md's "Skill Changes
+Require Evidence" section normally requires — it is proposed from the
+comparative review above, not from a reported failed session. Proceeding
+without that evidence was at the repo owner's direction, same category as
+v0.11.0–v0.14.0. Verified with `tests/skill-triggering/run-all.sh`: every
+skill prompt triggers its skill (prompts for `pragmatic-domain-language` were
+added, including one for the sync; `run-all.sh` now accepts several prompts
+per skill, named `<skill>.<variant>.txt`), the SessionStart hook was run
+against four fixture projects, and `glossary-drift.sh` against a fixture repo
+(stale and avoided identifiers, a term's own identifier winning over an
+avoided word, camelCase components, missing path / glossary file / map, no
+`git`, an unknown or empty `Synced` commit).
+Not verified: skills loading `pragmatic-domain-language` mid-step in a live
+session — the trigger tests only confirm each skill fires on its own prompt.
+
 ## v0.14.0 (2026-10-04)
 
 ### Independent Per-Task Review, Escalation Ladder, and Parallel Waves in spec-build

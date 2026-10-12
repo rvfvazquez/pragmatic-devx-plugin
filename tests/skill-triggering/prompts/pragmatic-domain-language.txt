@@ -1,0 +1,1 @@
+In our glossary we call it "Account", but the business always says "Customer" — and "account" also gets used for the login. Can you rename Account to Customer in docs/glossary and split out the login meaning as its own term?

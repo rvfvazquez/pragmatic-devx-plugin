@@ -45,6 +45,7 @@ When an order status changes, the order service publishes an event to an SQS que
 | Templates | SendGrid Dynamic Templates | Go html/template, hardcoded | Editable without deploy; supported by current SendGrid contract |
 | Notification history | PostgreSQL — `order_notifications` table | No persistence, separate table | DB already in use; history required for audit and data retention |
 | Opt-out | SendGrid native unsubscribe link | User profile setting | Simpler solution; satisfies legal requirement without new UI |
+| Test seam | Notification consumer's message handler, fed an order event directly; SendGrid replaced by a fake adapter, PostgreSQL real | Through a real SQS queue; `NotificationService` with mocked repository | SendGrid is the only dependency we can't run locally; the handler is where every criterion's behavior is observable |
 
 ## 6. Detailed Design
 
@@ -80,6 +81,13 @@ type OrderNotification struct {
 }
 ```
 
+#### Invariants
+
+| # | Invariant | Verified by |
+|---|-----------|-------------|
+| INV-1 | No email is ever sent to an address that has opted out | AC-5 |
+| INV-2 | Every send attempt has exactly one `order_notifications` record, whatever its outcome | AC-6, AC-7 |
+
 ### 6.3 Behavior & Logic
 
 ```mermaid
@@ -97,11 +105,13 @@ flowchart LR
 **Consumer steps:**
 1. Receive SQS message with `OrderStatusChangedEvent`
 2. Check if `new_status` is `shipped` or `delivered` — if not, skip (record `skipped`) and ack message
-3. Fetch customer email and name via `customer_id` from the user service
+3. Look up the Recipient's email and name by `customer_id` (the Identity user service — a Customer and a User share the same id)
 4. Select the Dynamic Template ID corresponding to the status
 5. Trigger send via SendGrid with order data
 6. Persist result to `order_notifications` (sent/failed)
 7. Ack the SQS message regardless of send result — delivery failures do not trigger reprocessing
+
+**Domain language** (`docs/glossary/notifications.md`): the person notified is the **Recipient** — for order events, the Order's Customer. Each attempt is a **Notification** with an outcome of sent, skipped, or failed. An **Opt-out** is the Recipient's choice per Channel; SendGrid's name for it is *unsubscribe*, which stays in the provider integration and out of the domain language.
 
 ## 7. Acceptance Criteria
 

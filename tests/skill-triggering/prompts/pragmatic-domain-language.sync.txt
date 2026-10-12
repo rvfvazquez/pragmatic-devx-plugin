@@ -1,0 +1,1 @@
+We renamed a bunch of things in src/payments over the last few sprints and I think the glossary no longer matches the code. Can you sync the glossary with the code and tell me what drifted?

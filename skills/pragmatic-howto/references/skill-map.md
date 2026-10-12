@@ -280,6 +280,24 @@ Default scope when not specified: `module`.
 
 ---
 
+## Domain Language
+
+### pragmatic-domain-language
+
+**Purpose:** Keep the project's domain language — `docs/glossary/context-map.md` and one `docs/glossary/<context>.md` per context — and be the single source of the procedures every other skill applies to it.
+
+**Output:** `docs/glossary/context-map.md` and `docs/glossary/<context-slug>.md` only. Never edits a spec or arch spec — it lists the ones still using an old name, with the update skill each needs.
+
+**Behavior:**
+- **Direct use:** add, rename, or redefine a term; add a context; change Owns, Relationships, or Translations — with a boundary scenario per term and explicit confirmation before writing.
+- **Loaded by other skills:** they apply one named section — §1 Locate the Context, §2 Interview Checks, §3 Write the Glossary, §4 Validation Checks (WARN at most), §5 Names in Code — and continue with their own steps and gates.
+- **Sync from Code** (`--sync`, optionally `--context <name>`; the bare word `sync` and plain-language requests also work): reconciles the glossary with the code. Runs `scripts/glossary-drift.sh` (read-only; STALE `_In code_` identifiers and AVOIDED words used as identifiers), scans only files changed since each context's own `Synced` commit for new terms, groups the findings, and writes only what you confirm — either direction per item (update the glossary, or record a pending rename). Never edits code or specs. Ownership and relationships are not checked yet.
+- Model-invoked (no `disable-model-invocation`), so other skills can load it through the Skill tool.
+
+**Templates:** `references/glossary-template.md`, `references/context-map-template.md` (the map has optional `Code` and per-context `Synced` columns used by the sync).
+
+---
+
 ## Reverse Engineering
 
 ### pragmatic-reverse-engineer

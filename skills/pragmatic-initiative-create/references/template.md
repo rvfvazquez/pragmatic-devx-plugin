@@ -14,16 +14,23 @@ autonomous execution: yes | no
 
 ## Architecture
 
-<Which `docs/arch/<name>.arch.md` this initiative depends on (existing or new), or "None needed — <one-line reason>">
+<Each `docs/arch/<name>.arch.md` this initiative depends on (existing or new) — including the arch spec for any new context or relationship listed under Domain Language — or "None needed — <one-line reason>">
+
+## Domain Language
+
+**Contexts touched:** <context names from docs/glossary/context-map.md, or "no glossary yet">
+**New contexts:** <name — needs docs/arch/<name>.arch.md (listed under Architecture)> | none
+**New relationships:** <From → To — mechanism — what crosses> | none
+**Shared terms seeded:** <Term, Term → docs/glossary/<context>.md> | not seeded — <reason>
 
 ## Features
 
 Ordered by dependency — a feature never appears above one it depends on.
 
-| # | Feature | Depends on | Spec | Status | Build |
-|---|---|---|---|---|---|
-| 1 | <name> | — | not created yet | Not started | Not started |
-| 2 | <name> | #1 | not created yet | Not started | Not started |
+| # | Feature | Context | Depends on | Spec | Status | Build |
+|---|---|---|---|---|---|---|
+| 1 | <name> | <context> | — | not created yet | Not started | Not started |
+| 2 | <name> | <context> | #1 | not created yet | Not started | Not started |
 
 The table is an index. Detail for each feature lives below, one subsection per row.
 

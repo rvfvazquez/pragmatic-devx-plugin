@@ -39,6 +39,7 @@ Explicit record of technology choices made for this feature. Every row must have
 | Auth | e.g. JWT via existing middleware | OAuth, API key | Consistent with rest of API |
 | Async processing | e.g. None — synchronous | SQS, background job | Low volume, latency acceptable |
 | Infrastructure | e.g. ECS Fargate (existing cluster) | Lambda, EC2 | Follows service deployment standard |
+| Test seam | e.g. HTTP — POST /resource, external payment gateway via fake adapter | Service layer directly; unit per class with mocks | Highest public boundary maps 1:1 to acceptance criteria and survives refactors |
 
 > Use `[TODO: decide — options: A, B, C]` for any row where the decision is not yet made.
 

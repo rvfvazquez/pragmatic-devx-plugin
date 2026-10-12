@@ -100,6 +100,20 @@ Before writing, scan the codebase for:
 - Existing code, README files, or prior specs that reveal current decisions and constraints
 - Related architecture specs in `docs/arch/`
 - The project constitution loaded in Pre-condition 0, if one exists — its Global Tech Stack, Security Baseline, and Cross-Module Rules constrain this arch spec and must not be re-litigated here
+- `docs/glossary/context-map.md`, if it exists, and the glossary file of every context this scope touches — the domain language and context relationships this arch spec must stay consistent with
+
+### Step 1.4 — Domain Language and Context
+
+Templates and rules for the glossary files are in `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`. What this step settles depends on the scope:
+
+- **`module`** — a module-scope arch spec documents one bounded context. Find its row in the context map (by name, Purpose, or Owns). If there is none, this arch spec introduces a new context: draft its row — name (same as this arch spec), one-line Purpose, the terms it Owns — and its glossary file with the module's central domain terms.
+- **`system`** — the arch spec spans several contexts. Draft any context-map Relationships rows (From → To, mechanism, what crosses) the system design implies and the map doesn't have yet.
+- **`integration`** — the external system almost always names things differently. Draft a Translations row for each external concept that maps to one of ours (e.g. the provider's "Charge" is our **Payment**), so the adapter's vocabulary is explicit.
+- **`layer`** — read the glossary for naming only; a horizontal layer rarely introduces domain terms.
+
+In every scope, flag immediately — through `AskUserQuestion`, with a recommended answer (`➡️`) from the glossary first, then the code's naming — any word the user uses that is listed under a term's `_Avoid_`, any defined term used with a different meaning, and any concept the code models differently from how the user describes it. Draft new terms and map rows yourself rather than asking one question per item; they are confirmed in the Step 1.7 recap. Use the confirmed canonical terms in the Step 1.5 questions and throughout the document.
+
+A context's **Owns** column must not contradict a Cross-Module Rule in the constitution (e.g. the constitution names AuthModule as the single source of identity, but this context claims to own users) — flag it the same way as any constitution conflict.
 
 ### Step 1.5 — Architecture Discovery Interview
 
@@ -195,7 +209,7 @@ Run this check once. A second round should not itself spawn a third round unless
 
 ### Step 1.7 — Final Consistency Check
 
-Before generating the document, assemble every decision confirmed across Steps 1.5 and 1.6 into one list, grouped by area. Scan pairwise for **contradiction** — not completeness (that is `pragmatic-arch-spec-validate`'s job) — only cases where one confirmed decision makes another incoherent or impossible.
+Before generating the document, assemble every decision confirmed across Steps 1.4, 1.5 and 1.6 into one list, grouped by area. Scan pairwise for **contradiction** — not completeness (that is `pragmatic-arch-spec-validate`'s job) — only cases where one confirmed decision makes another incoherent or impossible.
 
 Known contradiction shapes to check for:
 
@@ -206,6 +220,7 @@ Known contradiction shapes to check for:
 | Constraints (existing platform) | Technology-implying Quality Attributes | A stated platform constraint conflicts with what a chosen NFR target would require |
 | Security named as a top quality attribute | Trust boundaries (4.3) | Security is a driver but 4.3 is going to be marked "single trust domain" — one of the two is wrong |
 | Trust boundary identified (4.3) | Dependency Direction (6.2) / Component Boundaries (4.2) | A component on the trusted side is reachable directly from an untrusted entry point with no validation component between them |
+| Communication Style (6.3) | Context map Relationships | The arch spec has two contexts talking synchronously, but the map records an event between them (or the reverse) |
 
 If no contradiction is found, skip straight to the recap below.
 
@@ -217,6 +232,7 @@ Once no contradictions remain, present the full recap and require explicit confi
 
 > Here's the complete picture before I write the architecture spec:
 > **Purpose & Drivers:** ... **Quality Attributes:** ... **Constraints:** ... **Open Decisions:** ...
+> **Domain Language:** [context(s) touched; new or changed terms with one-line definitions; context-map rows to add — or "no glossary changes"]
 > Confirm this is complete, or tell me what's missing or wrong.
 
 **STOP. Do not proceed to Step 2 until the user explicitly confirms.**
@@ -225,7 +241,13 @@ Once no contradictions remain, present the full recap and require explicit confi
 
 Create the file at `docs/arch/<name>.arch.md` using the full template in `references/template.md`.
 
-Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision. Section 10 (Open Questions) holds concerns you can't yet phrase precisely enough for an inline `[TODO: ...]` — don't force premature options onto something still vague.
+Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision. Section 10 (Open Questions) holds concerns you can't yet phrase precisely enough for an inline `[TODO: ...]` — don't force premature options onto something still vague. Name components, events, and flows with the canonical terms from Step 1.4 — never a word listed under `_Avoid_`.
+
+**Update the glossary** with what was confirmed in the Step 1.7 recap:
+- **No `docs/glossary/` yet** — create the folder, `docs/glossary/context-map.md`, and the context's glossary file together (for a `module` scope, the context is this arch spec's module).
+- **`module` scope** — add or update this context's row in the map, with its Arch spec column linking `docs/arch/<name>.arch.md`, and add or edit terms in its glossary file. A changed definition is edited in place, never duplicated.
+- **`system` / `integration` scope** — add the confirmed Relationships or Translations rows to the map.
+- Record a resolved conflict from Step 1.4 under the relevant file's `## Resolved Ambiguities`, linking this arch spec.
 
 #### Trust boundaries (section 4.3) — assess applicability first
 
@@ -263,6 +285,7 @@ After creating the file:
 2. Summarize the key architectural decisions documented
 3. List any `[TODO: ...]` items that remain open
 4. If section 10 has entries, list them separately from the `[TODO: ...]` items — they're concerns still being sharpened, not pending decisions
+5. List the glossary changes: files created, terms added or redefined, context-map rows added
 
 ---
 
@@ -275,6 +298,8 @@ After creating the file:
 
 ```
 docs/arch/<name>.arch.md
+docs/glossary/context-map.md        (created or updated when the domain language changed)
+docs/glossary/<context-slug>.md     (created or updated when the domain language changed)
 ```
 
 ## Additional Resources

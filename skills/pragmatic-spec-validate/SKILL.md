@@ -158,7 +158,7 @@ Produce the report in this format:
 ### Output Rules
 
 - Print the full report; do **not** modify the spec file or any glossary file
-- **If a Domain Language WARN is present:** recommend `pragmatic-spec-update` to replace avoided terms in the spec, and list each undefined term as a candidate entry for `docs/glossary/<context-slug>.md` (format in `pragmatic-spec-create`'s `references/glossary-template.md`)
+- **If a Domain Language WARN is present:** recommend `pragmatic-spec-update`, which replaces avoided terms in the spec and adds each undefined term to `docs/glossary/<context-slug>.md`; list the undefined terms so the update has them
 - List FAILs first with concrete suggestions for each
 - N/A checks are not counted in Passed/Warnings/Failed summary totals
 - Overall Status is FAIL if any check is FAIL; WARN if any check is WARN and none are FAIL; PASS if all checks are PASS or N/A

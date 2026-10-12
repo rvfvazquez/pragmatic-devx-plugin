@@ -61,12 +61,15 @@ Find the spec file from the user's context. Common locations:
 
 Read the full file and understand its current content and structure.
 
+If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns or a linked arch spec).
+
 ### Step 2 — Understand the Change
 
 Analyze what needs to change:
 - If a description is provided, identify the relevant sections
 - If no description is given, scan for `[TODO: ...]` placeholders
 - Map which sections are directly affected and which may be indirectly impacted (a change to the data model may also affect the API and acceptance criteria)
+- **Domain language cascade:** if the change introduces a new domain concept, renames or redefines an existing one, or the request uses a word listed under a term's `_Avoid_`, then the context's glossary is in scope too. A request coming from a `pragmatic-spec-validate` Domain Language WARN is this case by definition: replace each avoided term in the spec, and add each undefined term to the glossary.
 - **Security cascade:** if the change adds or modifies an endpoint or handler, an authentication or authorization check, or the data the feature touches (new PII, new user-owned resource), then section 8's Security item — and, when any sub-item becomes applicable, the section 7 security acceptance criterion — are in scope even if the user did not name them.
 
 ### Step 3 — Confirm Scope, Intent, and Technology Decisions
@@ -110,6 +113,15 @@ Before I apply any changes, let me confirm my understanding of this update:
 - After this update, what should the spec reflect that it doesn't today? (select all that apply)
   Options: new requirement captured, TODO resolved, incorrect info corrected,
            acceptance criteria updated, status/version bumped
+
+[Include the following block only if the Step 2 domain language cascade applies.]
+
+**Domain Language**
+- [Each conflict, quoting the glossary entry:] The glossary defines **Customer** as a person or
+  company that places Orders and lists "account" under Avoid — here "account" means Customer?
+  ➡️ Customer — matches the glossary; I'll replace "account" in sections X and Y
+- [New or redefined terms, drafted:] **<Term>** — <one-line definition>; Avoid: <synonyms>
+  ➡️ Add as drafted
 
 [Include the following block only if the spec has open [TODO: decide — ...] items OR if the
  requested change introduces new technology decisions. Omit for purely textual updates.]
@@ -163,6 +175,7 @@ Known contradiction shapes to check for:
 | New or corrected Acceptance Criterion | Existing Acceptance Criteria | The new criterion contradicts or supersedes one that wasn't marked for change |
 | New scope item | "Related Sections to Cascade" answer | A section the user said would NOT cascade actually depends on the change |
 | New endpoint / auth change | Section 8 Security item (unchanged) | The change adds a user-owned resource path but section 8 still says Authorization is `N/A`, or has no abuse case for the new surface |
+| Redefined or renamed glossary term | Untouched sections of this spec | Sections outside the update still use the old name, or rely on the old meaning |
 
 If no contradiction is found, skip straight to the recap below.
 
@@ -172,7 +185,7 @@ If no contradiction is found, skip straight to the recap below.
 
 Once clear, present a short recap and require explicit confirmation before writing:
 
-> Here's what I'm about to change: [sections in scope, one line each]. Everything else in the spec stays as-is. Confirm before I apply this?
+> Here's what I'm about to change: [sections in scope, one line each; glossary terms added, redefined, or renamed]. Everything else in the spec stays as-is. Confirm before I apply this?
 
 **STOP. Do not proceed to Step 4 until the user explicitly confirms.**
 
@@ -187,7 +200,13 @@ When modifying the spec:
    - Patch bump (`1.0.0` → `1.0.1`) for minor corrections or clarifications
    - Minor bump (`1.0.0` → `1.1.0`) for significant new requirements or design changes
 5. **Deprecate** removed content with `~~strikethrough~~` rather than deleting it, unless it is clearly obsolete noise
-6. **Append** a changelog entry at the **end of the file**, after section 9 (Open Questions):
+6. **Update the glossary** if the domain language cascade applied, following `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`:
+   - Create `docs/glossary/`, `context-map.md`, and the context file together if none exist yet
+   - Edit a redefined term in place — never keep two definitions
+   - On a rename, the old name moves into the new term's `_Avoid_`, and the old meaning is recorded under `## Resolved Ambiguities` when it was a real confusion, linking this spec
+   - Replace every use of an avoided or renamed term in this spec, including untouched sections — terminology is not "preserved content"
+   - Do **not** edit other specs or arch specs. Search `docs/specs/` and `docs/arch/` for the old name and report each file that still uses it in Step 6
+7. **Append** a changelog entry at the **end of the file**, after section 9 (Open Questions):
 
 ```markdown
 ---
@@ -204,6 +223,7 @@ After applying changes, verify:
 - No section is left inconsistent with the changes applied
 - Acceptance criteria still reflect the updated solution
 - Version and status fields are updated
+- If the glossary changed: no word listed under `_Avoid_` remains in this spec, and every domain term it uses is defined
 
 ### Step 6 — Output Summary
 
@@ -211,6 +231,7 @@ Report:
 1. A concise summary of what was changed
 2. Any remaining `[TODO: ...]` items still present in the document
 3. Sections that may need human review due to the changes
+4. Glossary changes (terms added, redefined, or renamed), and every other spec or arch spec that still uses an old term — those need their own `pragmatic-spec-update` / `pragmatic-arch-spec-update`
 
 > **Spec updated** — `docs/specs/<feature-slug>.md`.
 >

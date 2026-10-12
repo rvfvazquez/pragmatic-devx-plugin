@@ -100,24 +100,18 @@ Before writing, scan the codebase for:
 - Existing code, README files, or prior specs that reveal current decisions and constraints
 - Related architecture specs in `docs/arch/`
 - The project constitution loaded in Pre-condition 0, if one exists — its Global Tech Stack, Security Baseline, and Cross-Module Rules constrain this arch spec and must not be re-litigated here
-- `docs/glossary/context-map.md`, if it exists, and the glossary file of every context this scope touches — the domain language and context relationships this arch spec must stay consistent with
+- The domain language — call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** for every context this scope touches
 
 ### Step 1.4 — Domain Language and Context
 
-Templates and rules for the glossary files are in `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`. What this step settles depends on the scope:
+Apply **§2 Interview Checks** of `pragmatic-domain-language` to the user's input. On top of the terms it drafts, what this step settles depends on the scope:
 
 - **`module`** — a module-scope arch spec documents one bounded context. Find its row in the context map (by name, Purpose, or Owns). If there is none, this arch spec introduces a new context: draft its row — name (same as this arch spec), one-line Purpose, the terms it Owns — and its glossary file with the module's central domain terms.
 - **`system`** — the arch spec spans several contexts. Draft any context-map Relationships rows (From → To, mechanism, what crosses) the system design implies and the map doesn't have yet.
 - **`integration`** — the external system almost always names things differently. Draft a Translations row for each external concept that maps to one of ours (e.g. the provider's "Charge" is our **Payment**), so the adapter's vocabulary is explicit.
 - **`layer`** — read the glossary for naming only; a horizontal layer rarely introduces domain terms.
 
-**Ambiguous context:** if this scope could belong to two or more existing contexts, ask which one (via `AskUserQuestion`, recommending the context whose Owns covers the scope's central concept) — don't pick silently.
-
-**Overloaded and vague words**, whether or not a glossary exists: a word the user has used for more than one thing, or one too fuzzy to define in one sentence, gets split or sharpened into canonical terms — never fold two concepts into one.
-
-**Boundary scenarios:** next to each new or disputed term's drafted definition, give one concrete edge case and say which side the draft puts it on ("a refund issued after shipping: is it owned by Ordering or Billing? My draft says Billing"). Show it in the Step 1.7 recap; if the user moves the case, the definition or the Owns column changes.
-
-In every scope, flag immediately — through `AskUserQuestion`, with a recommended answer (`➡️`) from the glossary first, then the code's naming — any word the user uses that is listed under a term's `_Avoid_`, any defined term used with a different meaning, and any concept the code models differently from how the user describes it. Draft new terms and map rows yourself rather than asking one question per item; they are confirmed in the Step 1.7 recap. Use the confirmed canonical terms in the Step 1.5 questions and throughout the document.
+Draft the map rows above yourself, with a boundary scenario where the row is disputed ("a refund issued after shipping: owned by Ordering or Billing? The draft says Billing"). Terms and rows are confirmed in the Step 1.7 recap; if the user moves a boundary case, the definition or the Owns column changes. Use the confirmed canonical terms in the Step 1.5 questions and throughout the document.
 
 A context's **Owns** column must not contradict a Cross-Module Rule in the constitution (e.g. the constitution names AuthModule as the single source of identity, but this context claims to own users) — flag it the same way as any constitution conflict.
 
@@ -251,11 +245,7 @@ Fill every section with concrete content. Use `[TODO: ...]` only for information
 
 **Section 5 — Key Design Decisions:** apply the three-part filter in `references/template.md` (hard to reverse, surprising without context, a real trade-off) to every decision confirmed in the interview. Only decisions passing all three become an ADR; the rest are stated plainly in the section they govern. If the user explicitly asks for a decision to be recorded as an ADR, record it — the filter decides the default, not the final word. Section 5 still needs at least one ADR; if nothing passes the filter, the most consequential decision is it.
 
-**Update the glossary** with what was confirmed in the Step 1.7 recap:
-- **No `docs/glossary/` yet** — create the folder, `docs/glossary/context-map.md`, and the context's glossary file together (for a `module` scope, the context is this arch spec's module).
-- **`module` scope** — add or update this context's row in the map, with its Arch spec column linking `docs/arch/<name>.arch.md`, and add or edit terms in its glossary file. A changed definition is edited in place, never duplicated.
-- **`system` / `integration` scope** — add the confirmed Relationships or Translations rows to the map.
-- Record a resolved conflict from Step 1.4 under the relevant file's `## Resolved Ambiguities`, linking this arch spec.
+**Update the glossary** with what was confirmed in the Step 1.7 recap: apply **§3 Write the Glossary** of `pragmatic-domain-language`. For a `module` scope, the context is this arch spec's module and its map row's Arch spec column links `docs/arch/<name>.arch.md`; for `system` / `integration` scopes, the confirmed Relationships or Translations rows go into the map.
 
 #### Trust boundaries (section 4.3) — assess applicability first
 

@@ -32,6 +32,7 @@ Claude Code plugin focused on Developer Experience — structured specs, archite
 | [`pragmatic-spec-build`](#pragmatic-spec-build) | Implement an approved spec, guided by arch rules and constitution |
 | [`pragmatic-spec-check`](#pragmatic-spec-check) | Verify the implementation matches the spec's acceptance criteria |
 | [`pragmatic-reverse-engineer`](#pragmatic-reverse-engineer) | Generate a spec/arch spec from existing undocumented code |
+| [`pragmatic-domain-language`](#pragmatic-domain-language) | Change the glossary or context map directly; shared domain-language procedures for the other skills |
 
 ## Installation
 
@@ -602,6 +603,24 @@ Claude reads every acceptance criterion, locates the corresponding code, and rep
 
 ---
 
+### `pragmatic-domain-language`
+
+Owns the project's domain language in `docs/glossary/`: `context-map.md` (contexts, who owns which concept, how contexts relate, translations) plus one glossary file per context (term, definition, words to avoid, identifier in code). It is also the single source of the procedures the other skills apply — locate the context (§1), challenge words during an interview (§2), write the glossary (§3), validate against it (§4), and name things in code (§5) — so `spec-create`, `arch-spec-create`, the update, validate, check, and build skills, the initiative skills, and the constitution skills all follow one set of rules.
+
+**Triggers when you say things like:**
+- "Rename Account to Customer in the glossary"
+- "Add a term to the glossary"
+- "Record that Billing owns Invoice"
+- "Update the context map"
+
+**Example:**
+
+> You: "We call it Account in the glossary but the business says Customer — and 'account' also means the login. Fix that."
+
+Claude locates the context, proposes splitting the word into **Customer** (who buys) and **User** (who logs in) with a boundary case for each, lists the specs and arch specs that still say "Account", and — once you confirm — renames the term (moving "account" under Avoid), adds User, and records the resolved ambiguity. It never rewrites the specs themselves: each one is listed with the update skill it needs.
+
+---
+
 ### `pragmatic-reverse-engineer`
 
 Generates a feature spec or architecture spec by scanning existing, undocumented code — instead of interviewing a human about something not yet built.
@@ -712,6 +731,11 @@ pragmatic-devx-plugin/
 │   │   └── SKILL.md
 │   ├── pragmatic-arch-spec-update/
 │   │   └── SKILL.md
+│   ├── pragmatic-domain-language/
+│   │   ├── SKILL.md               # §1–§5 shared domain-language procedures + direct edits
+│   │   └── references/
+│   │       ├── glossary-template.md     # docs/glossary/<context>.md format
+│   │       └── context-map-template.md  # docs/glossary/context-map.md format
 │   ├── pragmatic-reverse-engineer/
 │   │   ├── SKILL.md
 │   │   ├── references/

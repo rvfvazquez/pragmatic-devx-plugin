@@ -97,7 +97,7 @@ For each spec in scope:
    - **NFRs with structural implications** — e.g., "no direct DB access outside the repository layer"
    - **Trust boundaries** — from section 4.3, if it lists any: each boundary (from → to), what crosses it, and the control that must be applied on crossing; the declared attack surface; the section 9 **Security** row. If section 4.3 states a single trust domain, record that and skip check H.
 
-   - **Domain language** — if `docs/glossary/context-map.md` exists: the glossary of every context this spec covers (each term's code identifier and `_Avoid_` words), the map's **Owns** column for those contexts, and the map's **Relationships** rows between them. If no glossary exists, record that and skip check I.
+   - **Domain language** — if `docs/glossary/context-map.md` exists (call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`); apply §1 without asking, and §5 for the naming rules): the glossary of every context this spec covers (each term's code identifier and `_Avoid_` words), the map's **Owns** column for those contexts, and the map's **Relationships** rows between them. If no glossary exists, record that and skip check I.
 
 3. Build a rule list before scanning the codebase. Each rule should be traceable to a specific section of the spec.
 

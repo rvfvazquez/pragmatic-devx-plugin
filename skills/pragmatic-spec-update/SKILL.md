@@ -61,7 +61,7 @@ Find the spec file from the user's context. Common locations:
 
 Read the full file and understand its current content and structure.
 
-If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns or a linked arch spec). If two or more contexts plausibly fit, ask the user which one — don't pick silently.
+For the domain language, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context**.
 
 ### Step 2 — Understand the Change
 
@@ -118,6 +118,7 @@ Before I apply any changes, let me confirm my understanding of this update:
 [Include the following block only if the Step 2 domain language cascade applies.]
 
 **Domain Language**
+[Apply §2 Interview Checks of `pragmatic-domain-language` to the request; present its results here.]
 - [Each conflict, quoting the glossary entry:] The glossary defines **Customer** as a person or
   company that places Orders and lists "account" under Avoid — here "account" means Customer?
   ➡️ Customer — matches the glossary; I'll replace "account" in sections X and Y
@@ -205,12 +206,7 @@ When modifying the spec:
    - Patch bump (`1.0.0` → `1.0.1`) for minor corrections or clarifications
    - Minor bump (`1.0.0` → `1.1.0`) for significant new requirements or design changes
 5. **Deprecate** removed content with `~~strikethrough~~` rather than deleting it, unless it is clearly obsolete noise
-6. **Update the glossary** if the domain language cascade applied, following `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`:
-   - Create `docs/glossary/`, `context-map.md`, and the context file together if none exist yet
-   - Edit a redefined term in place — never keep two definitions
-   - On a rename, the old name moves into the new term's `_Avoid_`, and the old meaning is recorded under `## Resolved Ambiguities` when it was a real confusion, linking this spec
-   - Replace every use of an avoided or renamed term in this spec, including untouched sections — terminology is not "preserved content"
-   - Do **not** edit other specs or arch specs. Search `docs/specs/` and `docs/arch/` for the old name and report each file that still uses it in Step 6
+6. **Update the glossary** if the domain language cascade applied: apply **§3 Write the Glossary** of `pragmatic-domain-language` (a resolved ambiguity links this spec). Then replace every use of an avoided or renamed term in this spec, including untouched sections — terminology is not "preserved content". §3's list of other documents still using an old name goes into Step 6
 7. **Append** a changelog entry at the **end of the file**, after section 9 (Open Questions):
 
 ```markdown

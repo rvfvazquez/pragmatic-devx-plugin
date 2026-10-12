@@ -59,7 +59,7 @@ Read the full document and understand:
 - Component boundaries and dependency rules
 - Any `[TODO: ...]` items already present
 
-If `docs/glossary/context-map.md` exists, read it and the glossary file of every context this arch spec touches — for a `module` scope, the context whose row links this arch spec.
+For the domain language, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** — every context this arch spec touches; for a `module` scope, the context whose row links this arch spec.
 
 ### Step 2 — Understand the Change
 
@@ -119,7 +119,8 @@ Are there sections that should also be updated as a consequence?
   updated attack surface, and does the section 9 Security row still hold?
   ➡️ Yes if the change adds an inbound entry point or moves an authorization check
 - If the Step 2 domain language cascade applies: which terms, Owns entries, Relationships, or
-  Translations change? Draft each one; flag every conflict with the glossary, quoting the entry.
+  Translations change? Apply §2 Interview Checks of `pragmatic-domain-language`: draft each one with
+  its boundary scenario, and flag every conflict with the glossary, quoting the entry.
   ➡️ The draft as written — matches the glossary where one exists
 
 **Motivation**
@@ -233,12 +234,7 @@ When modifying the arch spec:
    - Minor bump (`1.0.0` → `1.1.0`) for new ADRs, updated component boundaries, or new integrations
    - Major bump (`1.0.0` → `2.0.0`) for fundamental architecture changes (e.g., new dependency direction, major component restructuring)
 5. **Deprecate** superseded ADRs — mark them with `~~strikethrough~~` and add a note referencing the new decision. Never delete prior ADRs.
-6. **Update the glossary and context map** if the domain language cascade applied, following `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`:
-   - Create `docs/glossary/`, `context-map.md`, and the context file together if none exist yet
-   - Edit a redefined term in place — never keep two definitions; on a rename, the old name moves into the new term's `_Avoid_`
-   - Update the map's Owns, Relationships, or Translations rows to match the change; a renamed module renames its context row and file, and the map's Arch spec link follows
-   - Replace every use of an avoided or renamed term in this arch spec, including untouched sections — terminology is not "preserved content"
-   - Do **not** edit other specs or arch specs. Search `docs/specs/` and `docs/arch/` for the old name and report each file that still uses it in Step 5
+6. **Update the glossary and context map** if the domain language cascade applied: apply **§3 Write the Glossary** of `pragmatic-domain-language` — terms, Owns, Relationships, Translations, and a renamed module's context row and file. Then replace every use of an avoided or renamed term in this arch spec, including untouched sections — terminology is not "preserved content". §3's list of other documents still using an old name goes into Step 5
 7. **Append** a changelog entry at the end of the document:
 
 ```markdown

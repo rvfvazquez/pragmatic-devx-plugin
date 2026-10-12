@@ -26,7 +26,7 @@ Use when the user describes a problem too large for a single feature spec — mu
 
 Before anything else, check whether `docs/constitution.md` exists. If it does, load it in full — every feature this initiative eventually produces will inherit its tech stack and Security Baseline decisions. If it doesn't, follow the same disclosure `pragmatic-spec-create` Pre-condition 0 uses: offer to create one first, or continue with a note that global constraints won't be available yet.
 
-Also read `docs/glossary/context-map.md` if it exists, and the glossary file of every context the destination plausibly touches. The breakdown names features and concepts with these terms.
+For the domain language, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** for every context the destination plausibly touches. The breakdown names features and concepts with these terms.
 
 ### Pre-condition 1 — Check for Existing Initiative
 
@@ -47,7 +47,7 @@ Extract from the user's message: the problem or goal in their own words, why it 
 
 Use `AskUserQuestion` to confirm your understanding of the destination and surface any obvious hard constraint (deadline, must-integrate-with-X, explicitly out of scope). One round — not the full depth of `pragmatic-spec-create` Step 2.
 
-In the same round, run a light domain-language check on the destination: a word listed under a glossary term's `_Avoid_`, a word the user uses for more than one thing, or a destination that could belong to more than one existing context — each flagged with a recommended answer (`➡️`). Definitions and boundary scenarios are not drafted here; they belong to Step 4.5 and to each feature's spec.
+In the same round, run a light version of **§2 Interview Checks** on the destination: a word listed under a glossary term's `_Avoid_`, a word the user uses for more than one thing, or a destination that could belong to more than one existing context — each flagged with a recommended answer (`➡️`). Definitions and boundary scenarios are not drafted here; they belong to Step 4.5 and to each feature's spec.
 
 **STOP. Do not proceed to Step 3 until the destination is confirmed.**
 
@@ -90,9 +90,9 @@ Name features and write descriptions with the glossary's canonical terms.
 
 `pragmatic-initiative-deliver` creates each feature's spec in Lean mode, one at a time — and Lean mode does not ask about new terms beyond the acceptance criteria. Without a shared vocabulary set up front, two features of the same initiative coin different names for the same concept.
 
-From the breakdown, pick the domain concepts **used by more than one feature** — at most 8. Skip any already defined in the glossary. For each, draft a glossary entry (canonical term, one-sentence definition, `_Avoid_` synonyms heard so far, `_In code_` if the codebase already names it) and the context it belongs to. Present the drafts, together with each feature's context assignment, in one `AskUserQuestion` round, ➡️ "as drafted". Concepts used by a single feature are left to that feature's own spec.
+From the breakdown, pick the domain concepts **used by more than one feature** — at most 8. Skip any already defined in the glossary. For each, draft a glossary entry as **§2** describes (canonical term, one-sentence definition, `_Avoid_`, `_In code_`, context) — boundary scenarios stay with each feature's spec. Present the drafts, together with each feature's context assignment, in one `AskUserQuestion` round, ➡️ "as drafted". Concepts used by a single feature are left to that feature's own spec.
 
-On confirmation, write them to the glossary following `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`: create `docs/glossary/`, the context map, and context files as needed. A **new context** from Step 3 gets its context-map row now (Arch spec column `—` until its arch spec exists) so its terms have a home. List the seeded terms in the initiative's `## Domain Language` section.
+On confirmation, apply **§3 Write the Glossary** of `pragmatic-domain-language`: it creates `docs/glossary/`, the context map, and context files as needed. A **new context** from Step 3 gets its context-map row now (Arch spec column `—` until its arch spec exists) so its terms have a home. List the seeded terms in the initiative's `## Domain Language` section.
 
 If the user declines, skip the write and record "not seeded" — the specs will create terms as they go.
 

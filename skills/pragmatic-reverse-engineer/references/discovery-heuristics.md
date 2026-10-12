@@ -136,7 +136,7 @@ Run this pass on every target, after the branch's own scan. It proposes terms; i
 
 1. **Collect candidate concepts** from what the code names: domain types and entities, table and collection names, enum values that name states, route nouns, event and message names. Ignore general programming constructs (handlers, DTOs, configs, clients, utilities).
 2. **Group synonyms** — the same concept under several names across the code (`Account`, `Customer`, `Client` all pointing at the same table) is one candidate with several names; pick the dominant one as the proposed identifier and list the rest as proposed `_Avoid_`.
-3. **Compare with the glossary**, if `docs/glossary/context-map.md` exists (read it and the context this target belongs to):
+3. **Compare with the glossary**, if `docs/glossary/context-map.md` exists — locate the context per §1 of `pragmatic-domain-language`, and judge names per its §5:
    - the code uses the term's `_In code_` identifier → **CONFIRMED** term
    - the code names a defined concept differently, or uses a word under its `_Avoid_` → **DIVERGENCE** (cite file:line, the code name, the glossary identifier)
    - a concept the glossary doesn't define → **NEW**, with an **INFERRED** one-sentence definition drawn from how the code uses it

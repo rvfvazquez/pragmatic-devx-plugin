@@ -68,7 +68,7 @@ Before scanning code, map everything that will be verified:
 - **Interfaces, structs, type definitions, endpoints** — from sections 6.1 and 6.2
 - **Security controls** — each non-`N/A` entry in the section 8 Security item (authentication, authorization, untrusted-input validation, sensitive-data handling). Skip any control already fully expressed by a section 7 criterion — it is covered under Dimension 1.
 - **Open TODOs** — all `[TODO: ...]` items from any section
-- **Domain names** — if `docs/glossary/context-map.md` exists, the glossary file of this spec's context: each term the spec uses, with its code identifier (`_In code_`, or the term itself) and its `_Avoid_` words
+- **Domain names** — if `docs/glossary/context-map.md` exists, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`), apply **§1 Locate the Context** without asking, and take from this spec's context, per **§5 Names in Code**: each term the spec uses, with its code identifier (`_In code_`, or the term itself) and its `_Avoid_` words
 
 Mark Dimension 2 as `N/A` only if sections 6.1 and 6.2 are absent or contain no verifiable elements **and** the section 8 Security item has no applicable (non-`N/A`) entry.
 If no open `[TODO: ...]` items exist in the spec → mark Dimension 3 as `N/A`.

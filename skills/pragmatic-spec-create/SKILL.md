@@ -187,32 +187,19 @@ Before writing, search for:
 - Related files or modules that reveal existing patterns and **technology already in use**
 - Prior specs in `docs/specs/` that may overlap
 - Type definitions, interfaces, or configuration files that reveal tech stack choices
-- `docs/glossary/context-map.md`, if it exists — identify which context this feature belongs to (by its Purpose and Owns columns, or a linked arch spec) and read that context's `docs/glossary/<context-slug>.md` in full. If two or more contexts plausibly fit, ask the user which one (via `AskUserQuestion`, recommending the context whose Owns column covers the feature's central concept) — don't pick silently; a feature that genuinely spans two contexts is a signal for the Step 2.5 scope test.
+- The domain language — call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context**. A feature that genuinely spans two contexts is a signal for the Step 2.5 scope test.
 
 Note any technology already committed to in the codebase — these don't need to be asked again.
 
 ### Step 3.5 — Domain Language
 
-Check the words used so far — the user's description and the Step 2 answers — against the domain language. Only domain concepts specific to this project count (orders, invoices, members, shipments), not general programming terms.
+Apply **§2 Interview Checks** of `pragmatic-domain-language` to the user's description and the Step 2 answers. The drafts it produces are confirmed in the Step 4.6 recap, each shown with its boundary scenario.
 
-**If a glossary was found in Step 3**, flag each of these immediately, quoting the glossary entry:
-- **Conflict** — the user used a word listed under a term's `_Avoid_`, or used a defined term with a different meaning: "The glossary defines **Customer** as a person or company that places Orders, and lists 'account' under Avoid. You said 'account' — do you mean Customer, or something else?"
-- **Contradiction with code** — the user describes a concept differently from how the code models it (e.g. partial cancellation, when the code only cancels whole orders). Surface it; don't pick a side.
-- **New term** — a domain concept the glossary doesn't define yet.
-
-**Whether or not a glossary exists**, also flag:
-- **Overloaded word** — a word the user has used for more than one thing in this conversation ("account" for the person who buys and for the login). Propose splitting it into distinct terms and ask which meaning each use had; never fold two concepts into one term.
-- **Vague word** — a word too fuzzy to define in one sentence ("item", "record", "entry", "data"). Propose a precise canonical term.
-
-**If no glossary exists**, every domain concept central to this feature is a new term.
-
-**Test each new or disputed term with a boundary scenario.** Alongside the drafted definition, give one concrete case that sits on the edge of it and say which side your draft puts it on — "cancelling 1 of 3 items in an Order: is that a **Cancellation**? My draft says no — Cancellation ends the whole Order." Pick the case most likely to be decided differently by two people reading the definition. Show it in the Step 4.6 recap next to the term; if the user moves the case to the other side, the definition changes, not the scenario.
-
-Resolve conflicts and code contradictions through `AskUserQuestion`, each with a recommended answer (`➡️`) taken from the glossary first, then the code's naming. For new terms, draft the entry yourself (canonical term, one-sentence definition, `_Avoid_` synonyms heard in the conversation, `_In code_` identifier if the code already names it) — don't ask a question per term; the drafts are confirmed in the Step 4.6 recap. **In Lean mode**, still ask about conflicts and contradictions — a misnamed concept in a spec is not a small change — but limit new terms to the ones the acceptance criteria will use.
-
-Use the confirmed canonical terms everywhere from here on, including in your own questions in Step 4.
+**In Lean mode**, still resolve avoided words, overloaded words, and code contradictions — a misnamed concept in a spec is not a small change — but draft only the new terms the acceptance criteria will use.
 
 Skip this step only when the feature introduces no domain concept at all (pure infrastructure or tooling), and say so in the recap.
+
+Done when §2's completion criterion holds and you are using the canonical terms in your own Step 4 questions.
 
 ### Step 4 — Technology Discovery Interview
 
@@ -346,11 +333,7 @@ Fill every section with concrete content:
 - Section 9 (Open Questions) holds concerns you can't yet phrase precisely enough for `[TODO: decide — <options>]` — don't force premature options onto something still vague
 - Use the canonical terms from Step 3.5 throughout the spec — never a word listed under `_Avoid_`
 
-**Update the glossary** with the terms confirmed in the Step 4.6 recap, following `references/glossary-template.md` and `references/context-map-template.md`:
-- **No `docs/glossary/` yet** — create the folder, `docs/glossary/context-map.md` (one row; name the context as the context-map template says), and `docs/glossary/<context-slug>.md` together.
-- **Folder exists, feature fits an existing context** — add or edit entries in that context's file. When an existing term's definition changed, edit it in place; never keep two definitions.
-- **Folder exists, feature belongs to a context not yet in the map** — confirm the new context with the user before creating it, then add its file and its row to the map.
-- Record a resolved conflict from Step 3.5 under that file's `## Resolved Ambiguities`, linking this spec.
+**Update the glossary** with the terms confirmed in the Step 4.6 recap: apply **§3 Write the Glossary** of `pragmatic-domain-language`. A resolved conflict is recorded linking this spec.
 
 **Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then the system SHALL [observable result]`. The **SHALL** in the Then clause is required (EARS notation) — it states the behavior as a mandatory system obligation, not a soft expectation ("should"/"will"). Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
 
@@ -416,8 +399,7 @@ docs/glossary/<context-slug>.md     (created or updated when domain terms were c
 ### Reference Files
 
 - **`references/template.md`** — Full spec template with all sections and formatting guidance
-- **`references/glossary-template.md`** — Format and rules for a context's glossary file in `docs/glossary/`
-- **`references/context-map-template.md`** — Format and rules for `docs/glossary/context-map.md`
+- **`pragmatic-domain-language`** — glossary and context-map procedures (§1–§3) and their templates
 
 ### Example Files
 

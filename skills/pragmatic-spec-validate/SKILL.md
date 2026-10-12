@@ -45,7 +45,7 @@ Record the chosen language and use it for **all report content** — section hea
 
 Find the spec file. Common locations: `docs/specs/`, `specs/`, or the path provided. Read the full document before running any checks.
 
-If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns or a linked arch spec; if several contexts plausibly apply, read each). These feed the Domain Language checks in Step 2.
+For the Domain Language checks in Step 2, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** — without asking: if several contexts plausibly apply, read each.
 
 ### Step 1.5 — Pre-scan: Detect Open TODO Items
 
@@ -120,11 +120,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
   *(may be N/A — see table above)*
 
 #### Domain Language
-These checks report **WARN at most, never FAIL** — a young glossary produces false positives, and a wording finding should not block a spec. Quote the glossary entry in each note.
-- **No avoided terms** — no word listed under a term's `_Avoid_` is used in the spec to mean that term. WARN, naming each occurrence's section and the canonical term to use instead. A word that appears under `_Avoid_` but is clearly used for an unrelated concept is not a finding. *(may be N/A — see table above)*
-- **Domain terms defined** — the domain concepts the spec's goals and acceptance criteria rely on are defined in the context's glossary. WARN, listing each undefined term. General programming vocabulary (timeout, cache, retry) is never a finding. *(may be N/A — see table above)*
-- **Context map consistent** — every `docs/glossary/*.md` other than the map is listed in its Contexts table, every Glossary and Arch spec link in the map resolves to an existing file, and no term is defined in two context files without a row in the map's Translations section. WARN for each mismatch. *(may be N/A — see table above)*
-- **Glossary hygiene** — the glossary files read in Step 1 follow the content rules in `pragmatic-spec-create`'s `references/glossary-template.md`. WARN for each entry that: has a definition longer than two sentences or describing behavior instead of what the concept is; contains implementation detail (table or column names, endpoints, field lists, types); defines a general programming concept rather than a domain one (timeout, retry, DTO, cache); has no definition. Also WARN when two terms in one context share the same `_In code_` identifier, or a word under one term's `_Avoid_` is the canonical name of another term in the same context. Check only the context files this document touches, not the whole folder. *(may be N/A — see table above)*
+Run the **base checks 1–4 of §4 Validation Checks** in `pragmatic-domain-language` against this spec, one report row each: **No avoided terms**, **Domain terms defined**, **Context map consistent**, **Glossary hygiene**. WARN at most, never FAIL; quote the glossary entry in each note. *(may be N/A — see table above)*
 
 #### Scope
 - **Single feature focus** — Section 7 (acceptance criteria) describes one cohesive feature. WARN if criteria span multiple independent user workflows with no shared data model or flow — such a spec is better split into separate documents. *(may be N/A — see table above)*

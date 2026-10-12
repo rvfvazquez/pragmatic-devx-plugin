@@ -62,7 +62,7 @@ Read `docs/constitution.md` in full. Note:
 
 Also read `.claude/rules/00-project-constitution.md` if it exists — it will need to be regenerated after the update.
 
-If `docs/glossary/context-map.md` exists, read it too — its **Owns** column must keep agreeing with the Cross-Module Rules.
+If `docs/glossary/context-map.md` exists, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply §1 — the map's **Owns** column must keep agreeing with the Cross-Module Rules.
 
 ---
 
@@ -187,7 +187,7 @@ When modifying `docs/constitution.md`:
 6. **Increment** the version (if the constitution has one):
    - Patch bump for wording corrections or minor clarifications
    - Minor bump for new rules, updated decisions, or deprecated constraints
-7. **Update the context map** if the ownership cascade applied and the user confirmed it: move the concept in the **Owns** column to the context the rule names, following `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`. Do **not** edit arch specs or feature specs — list every `docs/arch/` file for a context whose Owns changed, since its component boundaries likely need `pragmatic-arch-spec-update`
+7. **Update the context map** if the ownership cascade applied and the user confirmed it: move the concept in the **Owns** column to the context the rule names by applying **§3 Write the Glossary** of `pragmatic-domain-language`. Do **not** edit arch specs or feature specs — list every `docs/arch/` file for a context whose Owns changed, since its component boundaries likely need `pragmatic-arch-spec-update`
 8. **Append** a changelog entry at the end of the file:
 
 ```markdown

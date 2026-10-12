@@ -76,7 +76,7 @@ Before the discovery interview, read:
 - `.claude/rules/` — extract rules already in force
 - `CLAUDE.md` at project root — understand any existing project-level instructions
 - `docs/specs/` — scan a sample to infer the project domain and tech stack
-- `docs/glossary/context-map.md`, if it exists — its contexts and **Owns** column already state which module is the source of truth for which concept; Area 4 answers must agree with it
+- The context map, if `docs/glossary/context-map.md` exists (call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply §1) — its contexts and **Owns** column already state which module is the source of truth for which concept; Area 4 answers must agree with it
 
 From this scan, build a preliminary picture of what the project already is. Bring decisions already documented into the discovery interview as defaults — do not ask the user to re-decide what is already evident. Only ask about what is genuinely unknown or not documented anywhere.
 
@@ -193,7 +193,7 @@ If no contradiction is found, skip straight to the recap below.
 
 > ⚠️ Possible contradiction: [Decision A, Area X] says "...", but [Decision B, Area Y] says "...". These look inconsistent because [reason]. Which should hold — or is there context I'm missing?
 
-**Seed the domain language (only when `docs/glossary/` does not exist yet).** If the Area 1 answers name the product's central concepts (who the customers are, what they buy or manage) or an Area 4 answer declares a module the single source of truth for a concept, offer once — via `AskUserQuestion`, ➡️ Yes — to start the glossary with them: the first context named after the product (per `pragmatic-spec-create`'s `references/context-map-template.md`), a drafted one-sentence definition per central concept, and each Area 4 ownership rule as that context's **Owns** entry. Keep it to the handful of concepts every feature will use; the rest arrive with the specs. If the user declines, skip it — feature specs will create the glossary when they need it.
+**Seed the domain language (only when `docs/glossary/` does not exist yet).** If the Area 1 answers name the product's central concepts (who the customers are, what they buy or manage) or an Area 4 answer declares a module the single source of truth for a concept, offer once — via `AskUserQuestion`, ➡️ Yes — to start the glossary with them: the first context named after the product (per `pragmatic-domain-language`'s `references/context-map-template.md`), a drafted one-sentence definition per central concept, and each Area 4 ownership rule as that context's **Owns** entry. Keep it to the handful of concepts every feature will use; the rest arrive with the specs. If the user declines, skip it — feature specs will create the glossary when they need it.
 
 If a glossary already exists, add one more contradiction shape to the check above: an Area 4 ownership rule that disagrees with the context map's **Owns** column (the rule names AuthModule the source of identity, but the map says the Accounts context owns User).
 
@@ -300,7 +300,7 @@ Render these sections into the canonical rules file and every cross-tool destina
 
 ### Step 4.5 — Seed the Glossary (if accepted)
 
-If the seed was accepted in Step 2.6, create `docs/glossary/context-map.md` and `docs/glossary/<context-slug>.md` together, following `pragmatic-spec-create`'s `references/glossary-template.md` and `references/context-map-template.md`. The map gets one row: the product context, its Purpose from Area 1, and its Owns from the Area 4 ownership rules.
+If the seed was accepted in Step 2.6, apply **§3 Write the Glossary** of `pragmatic-domain-language` to create `docs/glossary/context-map.md` and `docs/glossary/<context-slug>.md` together. The map gets one row: the product context, its Purpose from Area 1, and its Owns from the Area 4 ownership rules.
 
 ### Step 5 — Output Summary
 

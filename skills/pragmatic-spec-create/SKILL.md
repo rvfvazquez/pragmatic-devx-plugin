@@ -187,8 +187,26 @@ Before writing, search for:
 - Related files or modules that reveal existing patterns and **technology already in use**
 - Prior specs in `docs/specs/` that may overlap
 - Type definitions, interfaces, or configuration files that reveal tech stack choices
+- `docs/glossary/context-map.md`, if it exists — identify which context this feature belongs to (by its Purpose and Owns columns, or a linked arch spec) and read that context's `docs/glossary/<context-slug>.md` in full
 
 Note any technology already committed to in the codebase — these don't need to be asked again.
+
+### Step 3.5 — Domain Language
+
+Check the words used so far — the user's description and the Step 2 answers — against the domain language. Only domain concepts specific to this project count (orders, invoices, members, shipments), not general programming terms.
+
+**If a glossary was found in Step 3**, flag each of these immediately, quoting the glossary entry:
+- **Conflict** — the user used a word listed under a term's `_Avoid_`, or used a defined term with a different meaning: "The glossary defines **Customer** as a person or company that places Orders, and lists 'account' under Avoid. You said 'account' — do you mean Customer, or something else?"
+- **Contradiction with code** — the user describes a concept differently from how the code models it (e.g. partial cancellation, when the code only cancels whole orders). Surface it; don't pick a side.
+- **New term** — a domain concept the glossary doesn't define yet.
+
+**If no glossary exists**, every domain concept central to this feature is a new term.
+
+Resolve conflicts and code contradictions through `AskUserQuestion`, each with a recommended answer (`➡️`) taken from the glossary first, then the code's naming. For new terms, draft the entry yourself (canonical term, one-sentence definition, `_Avoid_` synonyms heard in the conversation, `_In code_` identifier if the code already names it) — don't ask a question per term; the drafts are confirmed in the Step 4.6 recap. **In Lean mode**, still ask about conflicts and contradictions — a misnamed concept in a spec is not a small change — but limit new terms to the ones the acceptance criteria will use.
+
+Use the confirmed canonical terms everywhere from here on, including in your own questions in Step 4.
+
+Skip this step only when the feature introduces no domain concept at all (pure infrastructure or tooling), and say so in the recap.
 
 ### Step 4 — Technology Discovery Interview
 
@@ -277,7 +295,7 @@ Run this check once. A second round should not itself spawn a third round unless
 
 ### Step 4.6 — Final Consistency Check
 
-Before generating the document, assemble every decision confirmed across Steps 2, 2.5, 4, and 4.5 into one list, grouped by area. Scan pairwise across areas for **contradiction** — not completeness (that is `pragmatic-spec-validate`'s job) — only cases where one confirmed decision makes another confirmed decision incoherent, redundant, or impossible.
+Before generating the document, assemble every decision confirmed across Steps 2, 2.5, 3.5, 4, and 4.5 into one list, grouped by area. Scan pairwise across areas for **contradiction** — not completeness (that is `pragmatic-spec-validate`'s job) — only cases where one confirmed decision makes another confirmed decision incoherent, redundant, or impossible.
 
 Known contradiction shapes to check for:
 
@@ -302,6 +320,7 @@ Once no contradictions remain (or none were found), present the full recap and r
 > **Constraints:** [one-line summary]
 > **Security & Abuse:** [who must not do this; the abuse case; data sensitivity — or "not applicable because ..."]
 > **Technology Decisions:** [one-line summary per area from Step 4]
+> **Domain Language:** [context name; each new or changed term with its one-line definition and _Avoid_ list — or "no new domain terms"]
 >
 > Confirm this is complete, or tell me what's missing or wrong.
 
@@ -319,6 +338,13 @@ Fill every section with concrete content:
 - Use `[TODO: decide — <options>]` for choices the user marked as undecided, listing the options discussed
 - Use `[TODO: describe ...]` for information that cannot be inferred and needs human input
 - Section 9 (Open Questions) holds concerns you can't yet phrase precisely enough for `[TODO: decide — <options>]` — don't force premature options onto something still vague
+- Use the canonical terms from Step 3.5 throughout the spec — never a word listed under `_Avoid_`
+
+**Update the glossary** with the terms confirmed in the Step 4.6 recap, following `references/glossary-template.md` and `references/context-map-template.md`:
+- **No `docs/glossary/` yet** — create the folder, `docs/glossary/context-map.md` (one row; name the context as the context-map template says), and `docs/glossary/<context-slug>.md` together.
+- **Folder exists, feature fits an existing context** — add or edit entries in that context's file. When an existing term's definition changed, edit it in place; never keep two definitions.
+- **Folder exists, feature belongs to a context not yet in the map** — confirm the new context with the user before creating it, then add its file and its row to the map.
+- Record a resolved conflict from Step 3.5 under that file's `## Resolved Ambiguities`, linking this spec.
 
 **Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then the system SHALL [observable result]`. The **SHALL** in the Then clause is required (EARS notation) — it states the behavior as a mandatory system obligation, not a soft expectation ("should"/"will"). Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.
 
@@ -346,6 +372,7 @@ After writing the file in Step 5, read it back with fresh eyes before summarizin
 2. **Internal consistency** — does section 6 (Detailed Design) match section 5's technology decisions? Does section 7 (Acceptance Criteria) cover every Goal listed in section 3? Does section 8's Security item align with the Step 2 Security & Abuse answers?
 3. **TODO / Open Questions placement** — every `[TODO: decide — <options>]` lists real options, not a bare TODO; nothing in section 9 is precise enough that it should have been an inline TODO instead (per `references/template.md`'s own rule for that section).
 4. **Diagram correctness** — if a Mermaid diagram was added, its type matches the "When to add diagrams" table above and the syntax is valid.
+5. **Domain language** — every domain term the spec uses is defined in the context's glossary, and no word listed under `_Avoid_` appears in the spec.
 
 Fix anything found directly in the file. No need to re-run this check after fixing — fix and move on.
 
@@ -356,6 +383,7 @@ After the self-review:
 2. Summarize the key decisions captured, especially technology choices
 3. List any `[TODO: ...]` items that remain open, indicating who needs to decide
 4. If section 9 has entries, list them separately from the `[TODO: ...]` items — they're concerns still being sharpened, not pending decisions
+5. List the glossary changes: files created, terms added or redefined, ambiguities recorded
 
 ---
 
@@ -370,6 +398,8 @@ After the self-review:
 
 ```
 docs/specs/<feature-slug>.md
+docs/glossary/context-map.md        (created or updated when domain terms were confirmed)
+docs/glossary/<context-slug>.md     (created or updated when domain terms were confirmed)
 ```
 
 ## Additional Resources
@@ -377,6 +407,8 @@ docs/specs/<feature-slug>.md
 ### Reference Files
 
 - **`references/template.md`** — Full spec template with all sections and formatting guidance
+- **`references/glossary-template.md`** — Format and rules for a context's glossary file in `docs/glossary/`
+- **`references/context-map-template.md`** — Format and rules for `docs/glossary/context-map.md`
 
 ### Example Files
 

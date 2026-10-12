@@ -45,6 +45,8 @@ Record the chosen language and use it for **all report content** — section hea
 
 Find the spec file. Common locations: `docs/specs/`, `specs/`, or the path provided. Read the full document before running any checks.
 
+If `docs/glossary/context-map.md` exists, read it and the glossary file of the context this spec belongs to (match by the map's Purpose and Owns columns or a linked arch spec; if several contexts plausibly apply, read each). These feed the Domain Language checks in Step 2.
+
 ### Step 1.5 — Pre-scan: Detect Open TODO Items
 
 **This is a mandatory step before running any checks.**
@@ -76,6 +78,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 | Security considerations addressed | N/A only if ALL hold: no network surface, no persistence of user or third-party data, no external input. Must be asserted explicitly in the report, not assumed. |
 | Security criteria testable | N/A if section 8's Security item has no applicable entries (all `N/A — <reason>`) |
 | Single feature focus | N/A if the spec explicitly documents a bounded context that intentionally includes multiple related subsystems |
+| Domain Language checks (all three) | N/A if `docs/glossary/` does not exist — the project has no glossary yet |
 
 #### Completeness
 - **Title & Status** — Has a clear title and a defined status (Draft/Review/Approved)
@@ -114,6 +117,12 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
   - **PASS** if every sub-item is addressed (handled or `N/A — <reason>`) and, where applicable, section 7 contains at least one testable security criterion
   *(may be N/A — see table above)*
 
+#### Domain Language
+These checks report **WARN at most, never FAIL** — a young glossary produces false positives, and a wording finding should not block a spec. Quote the glossary entry in each note.
+- **No avoided terms** — no word listed under a term's `_Avoid_` is used in the spec to mean that term. WARN, naming each occurrence's section and the canonical term to use instead. A word that appears under `_Avoid_` but is clearly used for an unrelated concept is not a finding. *(may be N/A — see table above)*
+- **Domain terms defined** — the domain concepts the spec's goals and acceptance criteria rely on are defined in the context's glossary. WARN, listing each undefined term. General programming vocabulary (timeout, cache, retry) is never a finding. *(may be N/A — see table above)*
+- **Context map consistent** — every `docs/glossary/*.md` other than the map is listed in its Contexts table, every Glossary and Arch spec link in the map resolves to an existing file, and no term is defined in two context files without a row in the map's Translations section. WARN for each mismatch. *(may be N/A — see table above)*
+
 #### Scope
 - **Single feature focus** — Section 7 (acceptance criteria) describes one cohesive feature. WARN if criteria span multiple independent user workflows with no shared data model or flow — such a spec is better split into separate documents. *(may be N/A — see table above)*
 
@@ -148,7 +157,8 @@ Produce the report in this format:
 
 ### Output Rules
 
-- Print the full report; do **not** modify the spec file
+- Print the full report; do **not** modify the spec file or any glossary file
+- **If a Domain Language WARN is present:** recommend `pragmatic-spec-update` to replace avoided terms in the spec, and list each undefined term as a candidate entry for `docs/glossary/<context-slug>.md` (format in `pragmatic-spec-create`'s `references/glossary-template.md`)
 - List FAILs first with concrete suggestions for each
 - N/A checks are not counted in Passed/Warnings/Failed summary totals
 - Overall Status is FAIL if any check is FAIL; WARN if any check is WARN and none are FAIL; PASS if all checks are PASS or N/A

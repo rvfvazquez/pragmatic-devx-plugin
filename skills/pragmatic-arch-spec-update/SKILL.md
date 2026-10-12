@@ -145,6 +145,8 @@ Do **not** proceed to Step 2.6 until:
 
 **Apply this step when the update includes a new or updated ADR.**
 
+First check the new decision against the three-part filter in `pragmatic-arch-spec-create`'s `references/template.md` section 5: hard to reverse, surprising without context, and a real trade-off. If it fails any of the three, propose stating it plainly in the section it governs instead of as an ADR, and skip the questions below for it. Record it as an ADR anyway if the user asks to.
+
 Use `AskUserQuestion` to ensure the ADR is fully documented. **Every question here must carry a recommended answer (`➡️`)**, derived in this priority order: (1) constraints or quality attributes already recorded elsewhere in this spec, (2) patterns evident in the codebase, (3) a pragmatic default stated as such.
 
 ```

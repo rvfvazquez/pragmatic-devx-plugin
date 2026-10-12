@@ -249,6 +249,8 @@ Create the file at `docs/arch/<name>.arch.md` using the full template in `refere
 
 Fill every section with concrete content. Use `[TODO: ...]` only for information that genuinely cannot be inferred and requires a human decision. Section 10 (Open Questions) holds concerns you can't yet phrase precisely enough for an inline `[TODO: ...]` — don't force premature options onto something still vague. Name components, events, and flows with the canonical terms from Step 1.4 — never a word listed under `_Avoid_`.
 
+**Section 5 — Key Design Decisions:** apply the three-part filter in `references/template.md` (hard to reverse, surprising without context, a real trade-off) to every decision confirmed in the interview. Only decisions passing all three become an ADR; the rest are stated plainly in the section they govern. If the user explicitly asks for a decision to be recorded as an ADR, record it — the filter decides the default, not the final word. Section 5 still needs at least one ADR; if nothing passes the filter, the most consequential decision is it.
+
 **Update the glossary** with what was confirmed in the Step 1.7 recap:
 - **No `docs/glossary/` yet** — create the folder, `docs/glossary/context-map.md`, and the context's glossary file together (for a `module` scope, the context is this arch spec's module).
 - **`module` scope** — add or update this context's row in the map, with its Arch spec column linking `docs/arch/<name>.arch.md`, and add or edit terms in its glossary file. A changed definition is edited in place, never duplicated.

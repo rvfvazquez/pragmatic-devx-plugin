@@ -15,12 +15,17 @@ PROJECT_ROOT="${PWD}"
 constitution_path="${PROJECT_ROOT}/docs/constitution.md"
 specs_dir="${PROJECT_ROOT}/docs/specs"
 arch_dir="${PROJECT_ROOT}/docs/arch"
+glossary_dir="${PROJECT_ROOT}/docs/glossary"
+context_map_path="${glossary_dir}/context-map.md"
 
 has_constitution=false
+has_context_map=false
 spec_files=()
 arch_files=()
+glossary_contexts=()
 
 [ -f "$constitution_path" ] && has_constitution=true
+[ -f "$context_map_path" ] && has_context_map=true
 
 if [ -d "$specs_dir" ]; then
     while IFS= read -r -d '' f; do
@@ -34,11 +39,19 @@ if [ -d "$arch_dir" ]; then
     done < <(find "$arch_dir" -maxdepth 1 -name "*.md" -print0 2>/dev/null | sort -z)
 fi
 
+if [ -d "$glossary_dir" ]; then
+    while IFS= read -r -d '' f; do
+        name="$(basename "$f" .md)"
+        [ "$name" = "context-map" ] && continue
+        glossary_contexts+=("$name")
+    done < <(find "$glossary_dir" -maxdepth 1 -name "*.md" -print0 2>/dev/null | sort -z)
+fi
+
 # ── Exit silently if no pragmatic artifacts found ────────────────────────────
 # This keeps the plugin invisible in projects that don't use pragmatic docs,
 # and avoids any noise alongside superpowers or other plugins.
 
-if ! $has_constitution && [ ${#spec_files[@]} -eq 0 ] && [ ${#arch_files[@]} -eq 0 ]; then
+if ! $has_constitution && ! $has_context_map && [ ${#spec_files[@]} -eq 0 ] && [ ${#arch_files[@]} -eq 0 ]; then
     exit 0
 fi
 
@@ -64,6 +77,17 @@ if [ ${#arch_files[@]} -gt 0 ]; then
     lines+=("Architecture specs (${#arch_files[@]}): ${arch_files[*]}")
 else
     lines+=("Architecture specs: none")
+fi
+
+if $has_context_map; then
+    if [ ${#glossary_contexts[@]} -gt 0 ]; then
+        lines+=("Domain glossary: docs/glossary/context-map.md ✓ — contexts (${#glossary_contexts[@]}): ${glossary_contexts[*]}")
+    else
+        lines+=("Domain glossary: docs/glossary/context-map.md ✓ — no context files yet")
+    fi
+    lines+=("Before naming a domain concept (a type, test, event, or doc term), read the context map and the relevant context's glossary, and use its terms — never a word listed under _Avoid_.")
+elif [ ${#glossary_contexts[@]} -gt 0 ]; then
+    lines+=("Domain glossary: docs/glossary/ has context files but no context-map.md — run pragmatic-spec-validate to report the inconsistency")
 fi
 
 lines+=("")

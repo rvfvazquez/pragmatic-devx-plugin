@@ -312,3 +312,5 @@ Use these examples as calibration targets for output structure, ADR depth, compo
 
 - **`examples/example-payments-arch.md`** — Payments module with anti-corruption layer and transactional outbox. Showcases `graph TD` for component dependencies, `flowchart TD` for dependency direction, and `sequenceDiagram` for synchronous multi-step flows
 - **`examples/example-notification-service-arch.md`** — Event-driven notification service with multiple channels (email + push). Showcases consumer/dispatcher pattern, `sequenceDiagram` for async flows, and `flowchart LR` for opt-out/skip branching logic
+
+Both examples also calibrate two behaviors: the **three-part ADR filter** (each opens with a note naming the decision it deliberately keeps out of section 5, and where it went instead) and the **domain language** (the context each spec represents, its canonical terms, and — for the system-scope spec — the context-map relationships it defines). The matching glossary and context map are in `pragmatic-domain-language/examples/`.

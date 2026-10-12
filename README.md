@@ -733,9 +733,10 @@ pragmatic-devx-plugin/
 │   │   └── SKILL.md
 │   ├── pragmatic-domain-language/
 │   │   ├── SKILL.md               # §1–§5 shared domain-language procedures + direct edits
-│   │   └── references/
-│   │       ├── glossary-template.md     # docs/glossary/<context>.md format
-│   │       └── context-map-template.md  # docs/glossary/context-map.md format
+│   │   ├── references/
+│   │   │   ├── glossary-template.md     # docs/glossary/<context>.md format
+│   │   │   └── context-map-template.md  # docs/glossary/context-map.md format
+│   │   └── examples/                    # context map + one glossary per context
 │   ├── pragmatic-reverse-engineer/
 │   │   ├── SKILL.md
 │   │   ├── references/

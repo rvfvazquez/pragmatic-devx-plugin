@@ -173,4 +173,4 @@ Overall Status:
 ## Additional Resources
 
 - **`references/report-format.md`** — Annotated report format with inline explanations of each field
-- **`examples/example-auth-check.md`** — Worked conformance check example against the JWT authentication spec
+- **`examples/example-auth-check.md`** — Worked conformance check example against the JWT authentication spec, including a Dimension 4 (Domain Names) PASS and WARN

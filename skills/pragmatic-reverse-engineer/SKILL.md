@@ -230,6 +230,7 @@ docs/reverse-engineering/<session-slug>-<date>.report.md
 - **`references/report-template.md`** — session report template
 - **`examples/example-session-report.md`** — a complete session report for a
   repo-wide Feature pass, showing a produced document, a document skipped
-  by the existing-file guard, unselected candidates, and a corrected
-  INFERRED item. Use as a calibration target for output structure and level
-  of detail.
+  by the existing-file guard, unselected candidates, a corrected
+  INFERRED item, and the Domain Vocabulary section (glossary created, a
+  corrected term, and a pending rename). Use as a calibration target for
+  output structure and level of detail.

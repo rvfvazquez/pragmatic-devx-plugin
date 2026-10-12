@@ -2,6 +2,8 @@
 
 > This is a complete example of an architecture tech spec produced by pragmatic-arch-spec-create-
 > Use it as a reference for output structure, level of detail, ADR format, and writing style.
+> **ADR filter showcased:** Decisions 1 and 2 pass all three tests (hard to reverse, surprising without context, a real trade-off). The dependency direction is conventional, so it fails the second test and is stated directly in section 6.2 instead of as an ADR.
+> **Domain language showcased:** the module is a bounded context in `docs/glossary/context-map.md`, and the spec uses its terms (*Payer*, *Transaction*) instead of loose ones (*account*).
 
 ---
 
@@ -19,6 +21,8 @@
 The payments module handles all financial transactions in the platform: charge initiation, payment provider integration, refunds, and transaction history. Prior to this architecture, payment logic was scattered across the order service and user service with direct SDK calls to the payment provider embedded throughout the codebase.
 
 The goal of this architecture is to isolate all payment concerns behind a single module boundary, enforce a clean dependency direction, and make the payment provider swappable without touching business logic.
+
+In the project's domain language this module is the **Payments** context (`docs/glossary/context-map.md`): it owns **Transaction**, **Charge**, **Refund**, and **Payer**, and references an Order by `OrderId` only.
 
 ## 3. Goals & Constraints
 
@@ -74,7 +78,7 @@ The module has more than one trust level: it exposes an authenticated HTTP API, 
 
 | Boundary (from → to) | What crosses it | Control applied on crossing |
 |---|---|---|
-| Internet → `payments/handler` | HTTP charge / refund requests | platform authN middleware, request schema validation, per-actor authorization (a caller may only act on transactions belonging to their own account) |
+| Internet → `payments/handler` | HTTP charge / refund requests | platform authN middleware, request schema validation, per-actor authorization (a caller may only act on Transactions where they are the Payer) |
 | `payments/gateway` ← Stripe API | webhook callbacks and SDK responses | Stripe signature verification on webhooks; every response re-validated and mapped through the ACL, never trusted as-is |
 | `payments/service` → PostgreSQL | transaction reads/writes | parameterized queries only; no raw SQL from request input |
 | `payments/outbox` → SQS | domain events | events carry no card data — only transaction id, status, amount |
@@ -98,14 +102,6 @@ The module has more than one trust level: it exposes an authenticated HTTP API, 
 - **Decision**: Payment events are written to an `outbox` table in the same PostgreSQL transaction as the transaction record. A background worker reads the outbox and publishes to SQS, then marks events as published.
 - **Rationale**: Guarantees at-least-once delivery without distributed transactions. Eliminates the dual-write problem.
 - **Consequences**: Requires an outbox worker process. Events may be published more than once — consumers must be idempotent.
-
-### Decision 3: Dependency Direction (Domain Independence)
-
-- **Status**: Accepted
-- **Context**: Previous codebase mixed infrastructure imports into domain files, making unit testing painful and creating tight coupling.
-- **Decision**: Dependency direction is strictly: `handler → service → domain`. Infrastructure components (`repository`, `gateway`, `outbox`) depend on domain interfaces, never the reverse. The domain package has zero external imports.
-- **Rationale**: Domain logic is unit-testable with no mocks required for external systems. Infrastructure is replaceable.
-- **Consequences**: All external dependencies must be injected. The service layer wires everything together via dependency injection at startup.
 
 ## 6. Architecture Patterns & Conventions
 
@@ -154,6 +150,8 @@ flowchart TD
 ```
 
 **Forbidden:** `payments/domain` must never import from `handler`, `repository`, `gateway`, or `outbox`.
+
+Why: the previous codebase mixed infrastructure imports into domain files, which made unit testing painful and coupling tight. Keeping the domain free of external imports means its logic is unit-testable with no mocks for external systems, and infrastructure stays replaceable. Every external dependency is injected; the service layer wires them together at startup. (This is a standard layering rule rather than a surprising choice, so it lives here and not in section 5.)
 
 ### 6.3 Communication Style
 
@@ -235,7 +233,7 @@ sequenceDiagram
 | Maintainability | Payment provider must be swappable in < 1 day | Anti-corruption layer (`payments/gateway`) |
 | Observability | All transaction state changes must be traceable | Structured logging with `transaction_id` on every log entry |
 | Performance | `POST /payments/charge` < 500ms p95 | Stripe is the bottleneck; no additional latency introduced by this module |
-| Security | Every boundary in 4.3 enforces its stated control; a caller can only act on its own account's transactions; no card data in events, logs, or the outbox; Stripe keys from injected env only | authZ check in `payments/handler`, Stripe webhook signature verification, parameterized queries, structured logging allow-list |
+| Security | Every boundary in 4.3 enforces its stated control; a caller can only act on Transactions where it is the Payer; no card data in events, logs, or the outbox; Stripe keys from injected env only | authZ check in `payments/handler`, Stripe webhook signature verification, parameterized queries, structured logging allow-list |
 
 ## 10. Open Questions
 

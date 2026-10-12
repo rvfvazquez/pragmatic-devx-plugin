@@ -105,11 +105,13 @@ flowchart LR
 **Consumer steps:**
 1. Receive SQS message with `OrderStatusChangedEvent`
 2. Check if `new_status` is `shipped` or `delivered` — if not, skip (record `skipped`) and ack message
-3. Fetch customer email and name via `customer_id` from the user service
+3. Look up the Recipient's email and name by `customer_id` (the Identity user service — a Customer and a User share the same id)
 4. Select the Dynamic Template ID corresponding to the status
 5. Trigger send via SendGrid with order data
 6. Persist result to `order_notifications` (sent/failed)
 7. Ack the SQS message regardless of send result — delivery failures do not trigger reprocessing
+
+**Domain language** (`docs/glossary/notifications.md`): the person notified is the **Recipient** — for order events, the Order's Customer. Each attempt is a **Notification** with an outcome of sent, skipped, or failed. An **Opt-out** is the Recipient's choice per Channel; SendGrid's name for it is *unsubscribe*, which stays in the provider integration and out of the domain language.
 
 ## 7. Acceptance Criteria
 

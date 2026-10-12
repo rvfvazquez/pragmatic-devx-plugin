@@ -131,6 +131,8 @@ stateDiagram-v2
 
 Any transition not listed above returns `ErrInvalidTransition`.
 
+**Domain language** (`docs/glossary/ordering.md`): `shipped → cancelled` is a **Cancellation** — the Order is ended before delivery, here because it was returned in transit. `delivered → refunded` is a return, **not** a Cancellation. The `refunded` status records that Payments completed a **Refund**; the Refund itself belongs to Payments, and this spec only reacts to its callback.
+
 ## 7. Acceptance Criteria
 
 - [ ] `OrderStateMachine.Transition` returns `ErrInvalidTransition` for any transition not in the table above

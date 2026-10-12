@@ -4,7 +4,7 @@
 > Spec source: `skills/pragmatic-spec-create/examples/example-auth-spec.md`
 > Hypothetical implementation: `internal/auth/`
 >
-> The example is intentionally crafted to demonstrate PASS, WARN, and FAIL across all three
+> The example is intentionally crafted to demonstrate PASS, WARN, and FAIL across all four
 > dimensions. It is not based on a real codebase — use it to calibrate output structure,
 > finding detail level, and action tag usage.
 
@@ -17,8 +17,8 @@
 **Overall Status:** WARN
 
 ### Summary
-- Passed:   10 checks
-- Warnings: 4 checks
+- Passed:   13 checks
+- Warnings: 5 checks
 - Failed:   1 check
 - N/A:      0 checks
 
@@ -67,9 +67,22 @@
 
 ---
 
+### Dimension 4 — Domain Names
+**Status:** WARN
+
+| Term | Status | Finding |
+|------|--------|---------|
+| User | PASS | `types.go:14` — `type User struct` matches `_In code_: User` |
+| Access Token | WARN | `token.go:9` — `type SessionToken struct`; the glossary identifier is `AccessToken` ("session token" is listed under Avoid) |
+
+> The glossary lives in `docs/glossary/identity.md`. A naming divergence is WARN at most — never FAIL — and a concept the code does not represent at all is not reported here (Dimensions 1 and 2 cover missing types).
+
+---
+
 ### Recommended Actions
 
 1. `[FAIL][pragmatic-spec-update]` The middleware opt-in/opt-out decision was never formally made — use `pragmatic-spec-update` to record the decision (current code applies middleware to all routes) and close the TODO
 2. `[WARN][code]` Add a dedicated test for expired token returning 401 — indirect coverage in `middleware_test.go` is insufficient for a security-critical criterion
 3. `[WARN][code]` Add `validate:"min=8"` to `LoginRequest.Password.validate` tag in `types.go:34`, or explicitly remove the constraint from spec section 6.1 if it was intentionally dropped
 4. `[WARN][pragmatic-spec-update]` Confirm whether rate limiting is explicitly out of scope — if yes, close the TODO via `pragmatic-spec-update`; if deferred, create a follow-up spec
+5. `[WARN][code]` Rename `SessionToken` to `AccessToken` in `token.go:9` and its call sites, or — if "session token" is the term the team actually uses — change the glossary's identifier via `pragmatic-spec-update` / `pragmatic-domain-language`

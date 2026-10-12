@@ -7,6 +7,14 @@ description: This skill should be used when the user asks to "add a term to the 
 
 The project's domain language — what each concept is called, what it means, which context owns it, and how contexts relate — kept in `docs/glossary/`. This skill is the single source for how that language is read, challenged, written, validated, and used.
 
+## Example Files
+
+Use these as calibration targets for format and level of detail. They describe one project — the order, payment, notification, and authentication specs in the other skills' examples — so the terms line up across the plugin:
+
+- **`examples/example-context-map.md`** — four contexts, an event relationship defined by a system-scope arch spec, shared types, a synchronous call, and translations (including *Customer* meaning different things in two contexts and in Stripe)
+- **`examples/example-glossary-ordering.md`** — terms that border another context's vocabulary, and resolved ambiguities
+- **`examples/example-glossary-payments.md`**, **`example-glossary-notifications.md`**, **`example-glossary-identity.md`** — a context with an avoided word common in prose, one that keeps a provider's word out of the domain language, and a deliberately small context
+
 ## Two Ways This Skill Is Used
 
 **Loaded by another pragmatic skill.** The calling skill names a section below (e.g. "apply §2 Interview Checks"). Apply **only that section**, within the caller's own step, then continue with the caller's next step. Do not run the Direct Edit flow, do not ask the questions in it, and do not end the caller's skill. The caller's own gates (recaps, STOPs, confirmations) still govern when anything is written.

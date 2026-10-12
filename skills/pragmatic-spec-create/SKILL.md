@@ -408,3 +408,5 @@ Use these examples as calibration targets for output structure, level of detail,
 - **`examples/example-auth-spec.md`** — JWT authentication feature. Showcases `sequenceDiagram` for multi-step request/response flows (login + middleware validation)
 - **`examples/example-order-notifications-spec.md`** — Async email notifications via SQS. Showcases `flowchart LR` for event-driven and asynchronous processing flows
 - **`examples/example-order-lifecycle-spec.md`** — Order status state machine. Showcases `stateDiagram-v2` for features with explicit state transitions and validity rules
+
+All three also show the **Test seam** row in section 5 and an **Invariants** table in section 6.2 whose rows each name a verifying criterion. The lifecycle and notifications examples end section 6.3 with a **Domain language** note — canonical terms and the boundary they settle (a Cancellation vs. a return; a Recipient vs. a Customer) — matching the example glossary in `pragmatic-domain-language/examples/`.

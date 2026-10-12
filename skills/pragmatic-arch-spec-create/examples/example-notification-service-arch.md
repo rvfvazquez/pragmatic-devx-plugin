@@ -5,6 +5,8 @@
 > multiple notification channels, and a dispatcher pattern.
 > Use it as a reference for documenting services that are triggered by events rather
 > than direct API calls, and for architectures with multiple outbound integrations.
+> **ADR filter showcased:** Decisions 1 and 2 are recorded as ADRs. Consulting preferences at runtime is easy to reverse and unsurprising, so it is stated directly in section 6.3.
+> **Domain language showcased:** a system-scope spec that defines context relationships (Ordering → Notifications, Payments → Notifications) for the context map, and uses the canonical terms *Recipient* and *Opt-out*.
 
 ---
 
@@ -19,11 +21,13 @@
 
 ## 2. Context & Motivation
 
-User notifications were scattered across the system: the order service sent emails directly via the SendGrid SDK, the payment service sent other emails through a shared utility function, and push notifications had never been implemented due to the lack of a centralized place to do so.
+Notifications were scattered across the system: the order service sent emails directly via the SendGrid SDK, the payment service sent other emails through a shared utility function, and push notifications had never been implemented due to the lack of a centralized place to do so.
 
 This dispersion caused logic duplication, made it impossible to track notification history in a unified way, and created direct coupling between business logic and provider-specific details.
 
 The Notification Service centralizes all notification delivery. Other services publish events — the Notification Service decides how and when to notify.
+
+In the project's domain language this service is the **Notifications** context (`docs/glossary/context-map.md`), owning **Notification**, **Recipient**, **Channel**, and **Opt-out**. This system-scope spec defines two relationships in the map: Ordering → Notifications and Payments → Notifications, both events (on `order-events` and `payment-events`, section 6.3).
 
 ## 3. Goals & Constraints
 
@@ -46,7 +50,7 @@ The Notification Service centralizes all notification delivery. Other services p
 
 ## 4. High-Level Design
 
-The Notification Service is an SQS consumer that receives domain events from other services, maps them to concrete notifications, and dispatches them to the correct channel via adapters. A central dispatcher decides which channel to use based on the event type and user preferences.
+The Notification Service is an SQS consumer that receives domain events from other services, maps them to concrete notifications, and dispatches them to the correct channel via adapters. A central dispatcher decides which Channel to use based on the event type and the Recipient's preferences.
 
 ### 4.1 Component Diagram
 
@@ -70,11 +74,11 @@ graph TD
 | Component | Responsibility | Public Interface |
 |-----------|---------------|-----------------|
 | `notification/consumer` | Receives and parses SQS messages; maps to `NotificationRequest` | `Consumer` (polling goroutine) |
-| `notification/dispatcher` | Decides channel(s) based on event type and user preferences | `Dispatcher` interface |
+| `notification/dispatcher` | Decides channel(s) based on event type and the Recipient's preferences | `Dispatcher` interface |
 | `notification/channels/email` | SendGrid adapter — formats and sends email | `Channel` interface |
 | `notification/channels/push` | FCM adapter — formats and sends push notification | `Channel` interface |
 | `notification/repository` | Persists and queries notification history | `NotificationRepository` interface |
-| `notification/preferences` | Queries user channel preferences (opt-out, preferred channel) | `PreferencesRepository` interface |
+| `notification/preferences` | Queries a Recipient's channel preferences (Opt-out, preferred Channel) | `PreferencesRepository` interface |
 
 > No **Trust level** column: every component runs inside a single trust domain — the service has no inbound network surface (see 4.3).
 
@@ -82,7 +86,7 @@ graph TD
 
 This service has **no inbound network surface**. It is a background SQS consumer; its only input is domain events published by other first-party services, and SQS access is scoped by IAM. There is no authenticated request path and no multi-actor access to guard here.
 
-The one boundary worth naming is **outbound**: customer contact data (email address, push token) and order details — classified as PII — leave the trust domain when dispatched to SendGrid and Firebase FCM.
+The one boundary worth naming is **outbound**: Recipient contact data (email address, push token) and order details — classified as PII — leave the trust domain when dispatched to SendGrid and Firebase FCM.
 
 | Boundary (from → to) | What crosses it | Control applied on crossing |
 |---|---|---|
@@ -106,16 +110,8 @@ The one boundary worth naming is **outbound**: customer contact data (email addr
 - **Status**: Accepted
 - **Context**: Delivery failures in SendGrid or FCM must not cause infinite SQS message reprocessing.
 - **Decision**: The consumer always acks the SQS message after a dispatch attempt, regardless of the result. Delivery failures are recorded in the database with `status=failed` and can be retried by a separate job if needed.
-- **Rationale**: Provider failures are transient and do not justify redelivering the original message. Uncontrolled reprocessing can result in user spam.
+- **Rationale**: Provider failures are transient and do not justify redelivering the original message. Uncontrolled reprocessing can result in spamming the Recipient.
 - **Consequences**: Failed notifications require active monitoring. A retry job for `status=failed` records must be implemented in a future iteration.
-
-### Decision 3: Channel Preferences Consulted at Runtime
-
-- **Status**: Accepted
-- **Context**: Users may have opted out of certain channels (email unsubscribe, push disabled).
-- **Decision**: The dispatcher consults `PreferencesRepository` before dispatching to any channel. If the user has opted out of that channel, the send is skipped and recorded as `skipped`.
-- **Rationale**: Centralizing preference checks in the dispatcher prevents each adapter from reimplementing opt-out logic.
-- **Consequences**: Each dispatch adds a database read for preferences. Consider an in-memory cache with a short TTL if volume is high.
 
 ## 6. Architecture Patterns & Conventions
 
@@ -174,7 +170,7 @@ flowchart TD
 
 - `consumer → dispatcher`: synchronous function call within the same processing context (Go: direct call in same goroutine; TypeScript: `await dispatcher.dispatch()`; Python: direct method call in same thread; Rust: direct call in same tokio task)
 - `dispatcher → channels`: synchronous calls via the `Channel` interface; the dispatcher waits for each channel result before recording
-- `dispatcher → repository / preferences`: synchronous calls via injected interfaces
+- `dispatcher → repository / preferences`: synchronous calls via injected interfaces. The dispatcher consults `PreferencesRepository` before dispatching to any Channel; if the Recipient has an Opt-out for that Channel, the send is skipped and recorded as `skipped`. Centralizing the check here keeps each adapter from reimplementing it, at the cost of one database read per dispatch (an in-memory cache with a short TTL is the option if volume grows — see section 10). Reversible and unsurprising, so it is stated here rather than as an ADR
 - `consumer ← SQS`: async polling every 5s; up to 10 messages per batch
 
 ### 6.4 Error Handling Strategy
@@ -212,7 +208,7 @@ sequenceDiagram
     Consumer->>SQS: ack message
 ```
 
-### Flow 2: User with email opt-out
+### Flow 2: Recipient with email Opt-out
 
 ```mermaid
 flowchart LR

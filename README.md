@@ -612,7 +612,7 @@ Owns the project's domain language in `docs/glossary/`: `context-map.md` (contex
 - "Add a term to the glossary"
 - "Record that Billing owns Invoice"
 - "Update the context map"
-- "Sync the glossary with the code" (or `sync`, `sync payments`)
+- "Sync the glossary with the code" (or the flags `--sync`, `--sync --context payments`)
 
 **Example:**
 
@@ -620,7 +620,7 @@ Owns the project's domain language in `docs/glossary/`: `context-map.md` (contex
 
 Claude locates the context, proposes splitting the word into **Customer** (who buys) and **User** (who logs in) with a boundary case for each, lists the specs and arch specs that still say "Account", and — once you confirm — renames the term (moving "account" under Avoid), adds User, and records the resolved ambiguity. It never rewrites the specs themselves: each one is listed with the update skill it needs.
 
-**Syncing with the code.** `sync` reconciles the glossary with what the code now says. It runs `scripts/glossary-drift.sh` (read-only, `grep`-based, usable on its own in CI or a pre-commit hook) to find `_In code_` identifiers that no longer exist and avoided words used as identifiers, scans only the files changed since the map's `Last synced` commit for new candidate terms, and groups what it found for you to confirm. Each item goes either way — the code is right and the glossary changes, or the glossary is right and a rename is recorded as pending — and nothing is written, and no code is touched, before you confirm. It does not check ownership or relationships yet.
+**Syncing with the code.** `--sync` (or a plain request, or the bare word `sync`) reconciles the glossary with what the code now says. It runs `scripts/glossary-drift.sh` (read-only, `grep`-based, usable on its own in CI or a pre-commit hook) to find `_In code_` identifiers that no longer exist and avoided words used as identifiers, scans only the files changed since the map's `Last synced` commit for new candidate terms, and groups what it found for you to confirm. Each item goes either way — the code is right and the glossary changes, or the glossary is right and a rename is recorded as pending — and nothing is written, and no code is touched, before you confirm. It does not check ownership or relationships yet.
 
 > You: "sync the glossary with the code"
 >

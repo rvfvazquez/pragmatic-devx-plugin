@@ -32,7 +32,8 @@ name a build chose for a type was nobody's decision.
   Invoice") run a confirm-then-write flow. It never rewrites specs: it lists
   the specs and arch specs still using an old name and the update skill each
   one needs.
-- **Sync from Code** (`sync`, or "sync the glossary with the code"):
+- **Sync from Code** (`--sync [--context <name>]`, the bare word `sync`, or
+  "sync the glossary with the code"; the skill declares an `argument-hint`):
   reconciles an existing glossary with the code. The context map gains an
   optional `Code` column (paths per context) and a `Last synced` commit
   marker. `scripts/glossary-drift.sh` — read-only, grep-based, usable alone in

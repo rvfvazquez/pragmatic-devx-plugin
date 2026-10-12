@@ -1,6 +1,7 @@
 ---
 name: pragmatic-domain-language
 description: This skill should be used when the user asks to "add a term to the glossary", "rename a domain term", "redefine what X means", "update the glossary", "update the context map", "add a bounded context", "record who owns X", or wants to change the project's domain language in docs/glossary/ directly, outside of writing a spec. Also use it to "sync the glossary with the code", "the code drifted from the glossary", "check the glossary against the code", or "update the glossary from the code". Also loaded by the other pragmatic skills for the shared glossary and context-map procedures they apply.
+argument-hint: "[--sync] [--context <name>]"
 ---
 
 # pragmatic-domain-language
@@ -21,7 +22,7 @@ Use these as calibration targets for format and level of detail. They describe o
 
 **Invoked directly to change the language** — the user wants to change the domain language itself, outside of writing or updating a spec: add, rename, or redefine a term, add a context, record ownership, add a relationship or translation. Run the **Direct Edit** flow at the end of this file.
 
-**Invoked directly to sync with the code** — the invocation carries the argument `sync` (optionally followed by a context name, e.g. `sync payments`), or the user asks to reconcile or check the glossary against the code. Run the **Sync from Code** flow at the end of this file. When the request could be either, ask which with `AskUserQuestion`, ➡️ Sync when it mentions the code, Direct Edit otherwise.
+**Invoked directly to sync with the code** — the invocation carries the flag `--sync`, optionally with `--context <name>` to limit it to one context (`--sync --context payments`). `--context` on its own also means sync. The bare word `sync` (`sync payments`) is accepted as an alias, and so is a plain-language request to reconcile or check the glossary against the code. Run the **Sync from Code** flow at the end of this file. When the request could be either, ask which with `AskUserQuestion`, ➡️ Sync when it mentions the code, Direct Edit otherwise.
 
 ## Files
 
@@ -148,7 +149,7 @@ Run this only when the user invoked this skill to change the domain language its
 
 Run this only when the user invoked this skill to reconcile the glossary with the code. It never edits code, specs, or arch specs, and it never writes without confirmation. The code can tell you **facts** — an identifier is gone, a type appeared, a word you avoid is in use — not the business word or the definition, which stay the user's decisions.
 
-1. **Locate** — apply §1 to every context in the map, or only the one named. For a context whose Code column is empty or `—`, ask once through `AskUserQuestion` for its paths, ➡️ the directories whose names match the context name or its Owns terms (list the project's directories to find them), or skip that context. Answers are written to the Code column in step 5.
+1. **Locate** — apply §1 to every context in the map, or only the one named with `--context`. For a context whose Code column is empty or `—`, ask once through `AskUserQuestion` for its paths, ➡️ the directories whose names match the context name or its Owns terms (list the project's directories to find them), or skip that context. Answers are written to the Code column in step 5.
 2. **Detect** — run `scripts/glossary-drift.sh --root . [--context <name>]` from the project root when `bash` is available. Otherwise do the same search yourself with Grep: every `_In code_` identifier no longer in the Code paths (STALE), and every `_Avoid_` word used as an identifier (AVOIDED), skipping a term's own `_In code_` identifier (§5). The match is textual — a comment can hide a STALE or raise an AVOIDED — so treat each finding as a question.
    Then read `Last synced` in the map. If it names a commit that exists in this repository, run §6 only on files changed since it (`git diff --name-only <sha>..HEAD -- <paths>`) and, for each STALE identifier, look for its successor (`git log -S'<old>' --oneline -- <paths>`, and renames in that diff). If the marker is missing or unknown, run §6 on the whole Code paths and say so.
 3. **Classify** the results into groups, skipping empty ones:

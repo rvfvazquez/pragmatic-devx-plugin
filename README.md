@@ -613,12 +613,15 @@ Owns the project's domain language in `docs/glossary/`: `context-map.md` (contex
 - "Record that Billing owns Invoice"
 - "Update the context map"
 - "Sync the glossary with the code" (or the flags `--sync`, `--sync --context payments`)
+- "Create the glossary and context map from the code" (also what `--sync` does when the project has no glossary yet)
 
 **Example:**
 
 > You: "We call it Account in the glossary but the business says Customer — and 'account' also means the login. Fix that."
 
 Claude locates the context, proposes splitting the word into **Customer** (who buys) and **User** (who logs in) with a boundary case for each, lists the specs and arch specs that still say "Account", and — once you confirm — renames the term (moving "account" under Avoid), adds User, and records the resolved ambiguity. It never rewrites the specs themselves: each one is listed with the update skill it needs.
+
+**Creating it from the code.** In a project with no `docs/glossary/`, a request to create the glossary from the code — or `--sync`, which has nothing to reconcile — runs **Bootstrap from Code**: it proposes one context per source directory (you confirm, merge, or rename them), scans each one, and presents a draft of contexts and terms with definitions marked as inferred, plus a boundary case per term. It shows relationships only when the code does, and says what the code cannot tell (the business word, the real definition, who owns what). Only after you confirm does it create `context-map.md` and one file per context together, with the `Code` and `Synced` columns filled in.
 
 **Syncing with the code.** `--sync` (or a plain request, or the bare word `sync`) reconciles the glossary with what the code now says. It runs `scripts/glossary-drift.sh` (read-only, `grep`-based, usable on its own in CI or a pre-commit hook) to find `_In code_` identifiers that no longer exist and avoided words used as identifiers, scans only the files changed since each context's own `Synced` commit (a column in the map) for new candidate terms, and groups what it found for you to confirm. Each item goes either way — the code is right and the glossary changes, or the glossary is right and a rename is recorded as pending — and nothing is written, and no code is touched, before you confirm. It does not check ownership or relationships yet.
 

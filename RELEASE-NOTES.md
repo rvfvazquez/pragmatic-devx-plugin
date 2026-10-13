@@ -1,5 +1,45 @@
 # Pragmatic DevX — Release Notes
 
+## v0.15.1 (2026-10-13)
+
+### Create the Glossary and Context Map from the Code
+
+Reported against v0.15.0: the new `pragmatic-domain-language` skill did not
+create `docs/glossary/context-map.md` and the glossary. Reproduced headlessly
+on a small project with no `docs/glossary/`:
+
+- `--sync` stopped with "nothing to sync" and pointed at `pragmatic-spec-create`,
+  `pragmatic-arch-spec-create` and `pragmatic-reverse-engineer` — skills that
+  produce specs. No path created the glossary from code alone.
+- A plain "create the glossary and context map from the code" worked only by
+  the model improvising: the written Direct Edit flow edits terms one by one
+  and never scans code. It drafted contexts and terms and, correctly, wrote
+  nothing before confirmation.
+
+Changes to `pragmatic-domain-language`:
+
+- **New flow: Bootstrap from Code.** Proposes one context per source
+  directory (generic ones left out; a single-module repo gets one context named
+  after the product), scans each with §6, drafts contexts and terms
+  (definitions marked inferred, what-it-is rather than field lists, a boundary
+  case per term), shows relationships only when the code shows them and never
+  deduces a mechanism, says what the code cannot tell, and after confirmation
+  creates `context-map.md` and one file per context together, with `Code` and
+  `Synced` filled in. It never edits code or specs.
+- **`--sync` with no context map bootstraps** instead of stopping. Direct Edit
+  hands a "create it from the code" request to the same flow.
+- The description gains trigger phrases ("create the glossary from the code",
+  "bootstrap the context map"); a `pragmatic-domain-language.bootstrap.txt`
+  prompt covers it.
+
+Verified, before/after, with headless `claude -p` runs on a fixture project
+(each run once — the model is not deterministic): after the change `--sync`
+with no map announces the bootstrap and drafts without writing; a request
+with the confirmation given up front creates the map and two glossaries with
+`Code` and `Synced` set, and `scripts/glossary-drift.sh` reads them back with
+0 findings. Not verified: the interactive confirmation round with a real
+reply, repositories with many modules, and single-module repositories.
+
 ## v0.15.0 (2026-10-12)
 
 ### Domain Language Layer, Test Seam, Invariants, and a PR Draft from the Spec

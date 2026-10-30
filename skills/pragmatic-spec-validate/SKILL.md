@@ -80,6 +80,7 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 | Single feature focus | N/A if the spec explicitly documents a bounded context that intentionally includes multiple related subsystems |
 | Invariants verified | N/A if section 6.2 states `None — <reason>`, or the spec introduces or changes no data model |
 | Domain Language checks (all four) | N/A if `docs/glossary/` does not exist — the project has no glossary yet |
+| Operational characteristics addressed | N/A if the feature involves no background/async processing, no concurrent/shared-state workflows, and no user interface |
 
 #### Completeness
 - **Title & Status** — Has a clear title and a defined status (Draft/Review/Approved)
@@ -117,6 +118,12 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
   - **FAIL** if the Security item has an applicable entry (authorization, sensitive data, untrusted input, abuse case) but section 7 has no corresponding security acceptance criterion
   - **WARN** if the Security item is present but the *Abuse case* sub-item is empty or unaddressed
   - **PASS** if every sub-item is addressed (handled or `N/A — <reason>`) and, where applicable, section 7 contains at least one testable security criterion
+  *(may be N/A — see table above)*
+- **Operational characteristics addressed** — Evaluate resilience and runtime behavior according to the feature's operational context (never impose an arbitrary universal checklist or re-ask discovered facts):
+  - **Background / Async / Job processing** (queues, events, webhooks, cron, batch workers): evaluate whether retry policy, idempotency / replay mechanisms, and failure / dead-letter handling are addressed. **WARN** if the spec defines async processing or workers but omits recovery or idempotency.
+  - **Concurrency / Shared state**: evaluate whether race condition handling, atomic updates, or locking/isolation invariants are specified. **WARN** if concurrent mutations to shared state are specified without consistency controls.
+  - **User interfaces (UI)**: evaluate whether empty states, loading/error feedback, and accessible interactions are defined. **WARN** if UI interactions are specified without error/empty states.
+  - **PASS** if applicable operational characteristics are addressed with concrete behavior or explicit decisions.
   *(may be N/A — see table above)*
 
 #### Domain Language

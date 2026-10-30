@@ -1,0 +1,15 @@
+{
+  "id": "check-failing-test",
+  "skill": "pragmatic-spec-check",
+  "spec": "docs/specs/counter.md",
+  "kind": "conformance-failing",
+  "required_patterns": [
+    "Overall Status[^\\n]*FAIL",
+    "Coverage",
+    "Execution",
+    "AC-1[^\\n]*PASS[^\\n]*FAIL[^\\n]*FAIL"
+  ],
+  "forbidden_patterns": [
+    "Story can be marked as done"
+  ]
+}

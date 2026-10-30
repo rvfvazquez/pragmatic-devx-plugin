@@ -1,0 +1,1 @@
+Implement customer registration as described in docs/specs/customer-registration.md. Use the project's documentation workflow. Respond in English.

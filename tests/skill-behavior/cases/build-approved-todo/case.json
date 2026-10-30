@@ -1,0 +1,8 @@
+{
+  "id": "build-approved-todo",
+  "skill": "pragmatic-spec-build",
+  "kind": "gate",
+  "spec": "docs/specs/customer-registration.md",
+  "spec_status": "Approved",
+  "critical_todo": true
+}

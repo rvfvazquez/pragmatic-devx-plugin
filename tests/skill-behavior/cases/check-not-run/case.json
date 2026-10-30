@@ -1,0 +1,16 @@
+{
+  "id": "check-not-run",
+  "skill": "pragmatic-spec-check",
+  "spec": "docs/specs/counter.md",
+  "kind": "conformance-static",
+  "expected_execution": "NOT_RUN",
+  "required_patterns": [
+    "Overall Status[^\\n]*WARN",
+    "Coverage",
+    "Execution",
+    "AC-1[^\\n]*PASS[^\\n]*NOT_RUN[^\\n]*WARN"
+  ],
+  "forbidden_patterns": [
+    "Story can be marked as done"
+  ]
+}

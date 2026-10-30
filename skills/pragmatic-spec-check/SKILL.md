@@ -9,7 +9,7 @@ Verify that an existing implementation conforms to its technical specification.
 
 ## Purpose
 
-Produce a structured conformance report organized by three independent dimensions — acceptance criteria coverage, structural adherence, and open items resolved. Does not modify code or spec; only reports findings and recommends actions with explicit direction (fix in code or use `pragmatic-spec-update`).
+Produce a structured conformance report organized by four independent dimensions — acceptance criteria coverage, structural adherence, open items resolved, and domain language alignment. Does not modify code or spec; only reports findings and recommends actions with explicit direction (fix in code or use `pragmatic-spec-update`).
 
 ## When This Skill Applies
 
@@ -78,7 +78,13 @@ If `docs/glossary/` does not exist → mark Dimension 4 as `N/A`.
 
 For each element extracted in Step 2:
 
-- **Acceptance criteria** → search test files for test cases that exercise the criterion. Common patterns by language: Go (`*_test.go`, `*_integration_test.go`), TypeScript/JavaScript (`*.test.ts`, `*.spec.ts`, `*.test.js`, `**/__tests__/*`), Python (`*.test.py`, `*_test.py`, `test_*.py`, `tests/`), Java/Kotlin (`*Test.java`, `*Tests.java`, `*Test.kt`), Rust (`*_test.rs`, `tests/`), C# (`*Tests.cs`, `*Test.cs`), Ruby (`*_spec.rb`, `*_test.rb`), Scala (`*Spec.scala`, `*Suite.scala`). If the project's test naming convention is not in this list, detect it from existing test files before scanning. A criterion is PASS if a test clearly covers it, WARN if only indirectly covered, FAIL if no test is found.
+- **Acceptance criteria** → search test files for test cases that exercise the criterion. Common patterns by language: Go (`*_test.go`, `*_integration_test.go`), TypeScript/JavaScript (`*.test.ts`, `*.spec.ts`, `*.test.js`, `**/__tests__/*`), Python (`*.test.py`, `*_test.py`, `test_*.py`, `tests/`), Java/Kotlin (`*Test.java`, `*Tests.java`, `*Test.kt`), Rust (`*_test.rs`, `tests/`), C# (`*Tests.cs`, `*Test.cs`), Ruby (`*_spec.rb`, `*_test.rb`), Scala (`*Spec.scala`, `*Suite.scala`). If the project's test naming convention is not in this list, detect it from existing test files before scanning. Record **Coverage** separately from **Execution**. Coverage is PASS if a non-stub test clearly asserts the criterion, WARN if only indirect, FAIL if no meaningful assertion is found. Finding a test never establishes that it passed.
+
+  **Execution evidence:** detect the project's documented test command and run the relevant existing tests when execution is permitted and the environment is available. Do not install dependencies, start external services, or change source/tests/spec to obtain a green result. Respect inspection-only requests. Evidence must identify the command, working directory, outcome/exit code, and the tests actually selected; a successful process with zero selected tests or skipped matching tests is not a passing criterion. Existing evidence may be reused only when it identifies the current code/test revision, command and relevant passing cases; a stale Build Log or an implementer's unsupported claim is not evidence.
+
+  Execution is `PASS` for relevant assertions observed passing, `FAIL` for a relevant assertion failure, `SKIPPED` when the relevant test did not execute, `NOT_RUN` when execution was not attempted/permitted or no current evidence exists, and `ERROR` for a setup/tool/environment failure that prevents evaluating the assertion. Report the reason for SKIPPED/NOT_RUN/ERROR; never label them PASS. Do not run a suite just to turn an inspection-only check green.
+
+  The criterion's **Status** is FAIL if Coverage is FAIL or Execution is FAIL; otherwise WARN if Coverage is WARN or Execution is SKIPPED/NOT_RUN/ERROR; PASS only when both Coverage and Execution are PASS. Static-only reviews remain useful but cannot mark the story done. Test execution does not substitute for inspecting whether assertions cover the criterion.
 
 - **Interfaces, structs, endpoints** → search source files for type definitions, function signatures, and route registrations. PASS if matches spec exactly, WARN if present but deviates in a minor way (with details), FAIL if not found.
 
@@ -87,6 +93,12 @@ For each element extracted in Step 2:
 - **Open TODOs** → search source files and config files for evidence of resolution (a decision implemented, a comment resolving the question). PASS if clear evidence found, WARN if partial or ambiguous, FAIL if no evidence found.
 
 - **Domain names** → in the implementation scope only, find the types, exported functions, endpoints, events, and test names that represent each glossary concept the spec uses. PASS if they use the term's code identifier. WARN if a concept is represented under a different name, or an identifier uses a word listed under the term's `_Avoid_` (the term's own code identifier is never a finding, even when it contains a word listed under `_Avoid_`) (cite file:line, the name found, and the expected identifier). A concept the code has no representation of is not a Dimension 4 finding — Dimensions 1 and 2 already cover missing behavior and types. Dimension 4 is **WARN at most, never FAIL**. Tag each action `[code]` (rename in code) or `[pragmatic-spec-update]` (the glossary's identifier should change instead).
+
+- **Divergence (Contradictions & Unrequested Scope)** → search the implementation scope of this feature for code or tests that deviate from the approved intent:
+  - **Contradictory behavior (`[contradicts]`)**: code or test assertions that directly violate a stated requirement, invariant, status code, or explicit non-goal (e.g. spec requires 401 on missing auth, but implementation allows anonymous pass-through or returns 200). Report under Dimension 2 as **FAIL** with Finding explaining the direct contradiction.
+  - **Unrequested scope (`[unrequested]`)**: newly added public endpoints, exported methods, or significant capabilities inside the feature module that have no origin in the spec (neither in goals, interfaces, ACs, dependencies, nor legitimate scaffold).
+    - **False-positive guard:** limit strictly to the feature's package/directory and files modified for this feature. Existing codebase files, legacy utilities, or pre-existing dependencies outside the feature boundary must **never** be flagged as unrequested.
+    - Report under Dimension 2 as **WARN** (or **FAIL** if it directly implements a stated Non-goal). Action tagged `[code]` (remove unrequested code) or `[pragmatic-spec-update]` (update spec to formalize the scope addition).
 
 > **Scope note:** Scanning is limited to current code files (source, test, config). Git commit history is not scanned — that is a future enhancement.
 
@@ -110,8 +122,14 @@ See `references/report-format.md` for the annotated format. The report structure
 ### Dimension 1 — Acceptance Criteria Coverage
 **Status:** PASS | WARN | FAIL
 
-| Criterion | Status | Finding |
-|-----------|--------|---------|
+| Criterion | Coverage | Execution | Status | Finding |
+|-----------|----------|-----------|--------|---------|
+
+### Test Execution Evidence
+| Command / working directory | Outcome / exit code | Relevant tests | Revision / evidence |
+|---|---|---|---|
+
+> For inspection-only checks, record NOT_RUN and the reason instead of inventing a command result.
 
 ### Dimension 2 — Structural & Security-Control Adherence
 **Status:** PASS | WARN | FAIL | N/A
@@ -119,8 +137,9 @@ See `references/report-format.md` for the annotated format. The report structure
 | Element | Status | Finding |
 |---------|--------|---------|
 
-> N/A only when sections 6.1 and 6.2 have no verifiable elements AND the section 8 Security item has no applicable entry.
+> N/A only when sections 6.1 and 6.2 have no verifiable elements, the section 8 Security item has no applicable entry, and no unrequested/contradictory code is found.
 > Security controls from section 8 not already covered by a section 7 criterion are verified here.
+> Scope divergence (contradictions marked `[contradicts]` and unrequested scope marked `[unrequested]`) is reported here.
 
 ### Dimension 3 — Open Items Resolved
 **Status:** PASS | WARN | FAIL | N/A
@@ -157,13 +176,15 @@ Overall Status:
 - `WARN` if any evaluated dimension is WARN and none are FAIL
 - `PASS` if all evaluated dimensions are PASS or N/A
 
+**Execution evidence:** include command, working directory, outcome/exit code, selected relevant tests and revision when reusing a prior run. Missing runtime evidence makes Dimension 1 WARN at best.
+
 **Finding column:** Always populate, even for passing rows (e.g., cite the test file and line number). Empty findings are not acceptable.
 
 **Security criteria:** A FAIL on a security criterion in Dimension 1 (a negative assertion — non-owner blocked, unauthorized role blocked, malformed input rejected) is always a `[code]` action and blocks "done". Never downgrade it to WARN because the happy path works, and never aggregate it away — call it out by name in Recommended Actions.
 
 **Recommended Actions rules:**
 - FAILs listed before WARNs
-- Each action is tagged `[code]` (fix belongs in the implementation) or `[pragmatic-spec-update]` (decision or clarification needed in the spec)
+- Each action is tagged `[code]` (implementation fix), `[pragmatic-spec-update]` (spec decision), or `[verification]` (run/repair the test environment or obtain current execution evidence; no implementation defect established)
 - N/A checks are not counted in Summary totals
 - If all dimensions are PASS or N/A: omit Recommended Actions and output a **Strengths** section summarizing what was verified and confirmed correct
 - **After a FAIL report:** assert explicitly — "**This implementation does not conform to spec.** Fix `[code]` items before marking the story as done. For `[pragmatic-spec-update]` items — these represent decisions not yet captured in the spec; use `pragmatic-spec-update` before the next conformance check."

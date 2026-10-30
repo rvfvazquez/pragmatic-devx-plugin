@@ -1,5 +1,17 @@
 # Pragmatic DevX — Release Notes
 
+## v0.16.0 (2026-10-29)
+
+### Observable Spec Verification, Task Provenance, and Behavioral Runner
+
+This release strengthens verification and evidence across the spec lifecycle, making guarantees observable without requiring new top-level skills or lifecycles:
+
+- **Behavioral Test Runner & Multimodel Harness Support (`tests/skill-behavior/`)**: Added a dependency-free test runner and Codex/Claude adapter with 32 unit tests verifying model adherence to skill gates (such as refusing implementation of Draft specs or specs with critical technology TODOs).
+- **Separation of Coverage and Runtime Execution (`pragmatic-spec-check`)**: Dimension 1 now separately assesses static coverage (`Coverage`) and runtime test execution (`Execution`). Conformance checks require documented test execution evidence; static inspection alone produces `WARN (NOT_RUN)` and cannot mark a story as done without running tests.
+- **Task Provenance and Obligation Coverage (`pragmatic-spec-build`)**: Step 6 now requires a `Sources` column in the Build Log, audits bidirectional obligation coverage, and flags orphan tasks (`[ORPHAN]`) without silent deletion or premature scheduling.
+- **Contextual Operational Validation (`pragmatic-spec-validate`)**: Added `Operational characteristics addressed` check to evaluate resilience based on feature context (retry/idempotency for async jobs, concurrency controls for shared state, empty/error states and a11y for UI).
+- **Divergence Categorization (`pragmatic-spec-check`)**: Explicitly flags `[contradicts]` (behavior violating requirements or Non-goals, failing the check) and `[unrequested]` (scope added inside the feature without spec origin, generating a warning), protected by a strict feature-scope guard to prevent false positives on legacy code.
+
 ## v0.15.1 (2026-10-13)
 
 ### Create the Glossary and Context Map from the Code

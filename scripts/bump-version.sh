@@ -36,6 +36,7 @@ FILES=(
     ".codex-plugin/plugin.json"
     ".cursor-plugin/plugin.json"
     "gemini-extension.json"
+    "package.json"
 )
 
 echo "Bumping version to $NEW_VERSION in:"

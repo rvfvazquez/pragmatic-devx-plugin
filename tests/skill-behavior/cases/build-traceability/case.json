@@ -1,0 +1,15 @@
+{
+  "id": "build-traceability",
+  "skill": "pragmatic-spec-build",
+  "spec": "docs/specs/customer.md",
+  "kind": "traceability",
+  "required_patterns": [
+    "\\|[^\\n]*Sources[^\\n]*\\|",
+    "\\| Source \\| Task",
+    "OPS-1",
+    "INV-1",
+    "orphan",
+    "unscheduled|unresolved"
+  ],
+  "forbidden_patterns": []
+}

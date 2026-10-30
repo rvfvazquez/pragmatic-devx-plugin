@@ -1,4 +1,4 @@
-﻿# pragmatic-spec-check — Report Format Reference
+# pragmatic-spec-check — Report Format Reference
 
 This file defines the canonical format for a `pragmatic-spec-check` conformance report with inline annotations explaining each field. Annotations use `>` blockquotes and must not appear in the actual report output.
 
@@ -6,7 +6,7 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 
 ## Spec Conformance Report
 
-> Header block: always present. "Overall Status" is derived from the three dimension statuses
+> Header block: always present. "Overall Status" is derived from the four dimension statuses
 > using the aggregation rules defined in SKILL.md — do not set it manually before filling in dimensions.
 
 **Spec:** `docs/specs/<feature-slug>.md`
@@ -49,15 +49,31 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 > - WARN if any row is WARN and none are FAIL
 > - PASS if all rows are PASS
 
-| Criterion | Status | Finding |
-|-----------|--------|---------|
-| `<verbatim criterion from spec section 7>` | PASS | `handler_test.go:42` — covers happy path |
-| `<criterion>` | WARN | Only indirectly covered via `integration_test.go:88` — no dedicated test case |
-| `<criterion>` | FAIL | No test found in codebase |
+| Criterion | Coverage | Execution | Status | Finding |
+|-----------|----------|-----------|--------|---------|
+| `<criterion>` | PASS | PASS | PASS | `handler_test.go:42` — direct assertion; passed in the run below |
+| `<criterion>` | PASS | FAIL | FAIL | Matching assertion ran and failed; include actual vs expected |
+| `<criterion>` | PASS | NOT_RUN | WARN | Test found; inspection-only review, no runtime result |
+| `<criterion>` | PASS | SKIPPED | WARN | Matching test was skipped; process exit 0 does not prove it |
+| `<criterion>` | PASS | ERROR | WARN | Test environment failed before assertions ran |
+| `<criterion>` | FAIL | NOT_RUN | FAIL | No meaningful test found |
 
-> Row-level status values: PASS, WARN, FAIL
-> Finding column: always populate. For PASS, cite the file and line. For WARN/FAIL, explain what
-> is missing or why coverage is indirect. Never leave Finding empty.
+> Coverage: PASS (direct non-stub assertions), WARN (indirect), FAIL (absent).
+> Execution: PASS, FAIL, SKIPPED, NOT_RUN or ERROR. Status: FAIL if coverage or execution
+> is FAIL; otherwise WARN unless both are PASS. Each row needs a finding and test file/line
+> where available. Never interpret static coverage as runtime success.
+
+### Test Execution Evidence
+
+| Command / working directory | Outcome / exit code | Relevant tests | Revision / evidence |
+|---|---|---|---|
+| `go test ./internal/auth -run TestLogin -v` / repository root | PASS / 0 | `TestLogin` selected and passed | Current working tree, run during this check |
+| Not attempted | NOT_RUN / N/A | `<matching tests>` | User requested inspection only |
+
+> Record the real command, directory, result and selected relevant tests; do not fabricate
+> execution when using this reference. Zero tests, skipped tests and stale/unsupported prior
+> claims cannot give a criterion Execution PASS. Reused evidence must identify the current
+> code/test revision. No dependency installation or external-service startup to force green.
 
 ---
 
@@ -81,9 +97,12 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 | `POST /auth/login` endpoint | FAIL | Route not registered in `routes.go` |
 | Security §8 — Authorization: ownership check before resource returned | FAIL | `handler.go:53` loads the invoice by `id` and returns it with no comparison against the caller identity — spec section 8 requires a per-resource ownership check |
 | Security §8 — Sensitive data: no secret in source | PASS | grep of the scanned scope found no hardcoded credential; keys read from env in `config.go:11` |
+| Divergence — `[contradicts]` Non-goal §3 | FAIL | `handler.go:88` allows anonymous guest bypass; spec section 3 explicitly forbids unauthenticated access |
+| Divergence — `[unrequested]` `POST /auth/impersonate` | WARN | Route in `routes.go:42` has no basis in spec sections 2, 6, 7 or 8. Guard: only code within the feature package is scanned; pre-existing legacy code outside the feature is never flagged |
 
 > For WARN rows: always specify what deviates and what the spec expects.
-> For FAIL rows: confirm the element truly doesn't exist (search exhaustively before marking FAIL).
+> For FAIL rows: confirm the element truly doesn't exist (search exhaustively before marking FAIL) or directly contradicts stated rules.
+> For unrequested scope: restrict strictly to the feature's package/diff. Never flag pre-existing or external code.
 > For a hardcoded-secret finding: cite file and line only — never reproduce the secret value.
 
 ---
@@ -140,6 +159,7 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 > Each action is tagged with:
 >   [code]        → the fix belongs in the implementation
 >   [pragmatic-spec-update] → a decision or clarification is needed in the spec document
+>   [verification] → execution evidence or environment is missing; no code defect established
 >
 > If Overall Status is PASS: replace this section with a "Strengths" section summarizing
 > what was verified and confirmed correct.

@@ -1,0 +1,1 @@
+Inspect whether src/counter.py conforms to docs/specs/counter.md, including whether AC-1 is done. Use the project conformance-check workflow. This is an inspection-only review: do not execute tests or change files. Respond in English.

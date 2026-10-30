@@ -1,4 +1,4 @@
-﻿# Example: Conformance Check — JWT Authentication
+# Example: Conformance Check — JWT Authentication
 
 > This is a worked example of a `pragmatic-spec-check` report.
 > Spec source: `skills/pragmatic-spec-create/examples/example-auth-spec.md`
@@ -14,7 +14,7 @@
 **Spec:** `docs/specs/auth.md`
 **Implementation:** `internal/auth/`
 **Date:** 2026-04-01
-**Overall Status:** WARN
+**Overall Status:** FAIL
 
 ### Summary
 - Passed:   13 checks
@@ -27,16 +27,24 @@
 ### Dimension 1 — Acceptance Criteria Coverage
 **Status:** WARN
 
-| Criterion | Status | Finding |
-|-----------|--------|---------|
-| `POST /auth/login` with valid credentials returns 200 with signed JWT | PASS | `handler_test.go:42` — happy path covered |
-| `POST /auth/login` with invalid password returns 401 with `invalid_credentials` | PASS | `handler_test.go:67` — covers invalid password case |
-| `POST /auth/login` with non-existent email returns 401 (not 404) | WARN | Only indirectly covered via `handler_test.go:88` — no assertion that status is specifically 401 and not 404 |
-| JWT is signed with HS256 and expires in 24 hours | PASS | `token_test.go:15` — asserts algorithm and expiry |
-| Protected endpoints return 401 when no `Authorization` header is present | PASS | `middleware_test.go:23` — missing header case covered |
-| Protected endpoints return 401 when token is expired or signature is invalid | WARN | `middleware_test.go:31` covers invalid signature but no test for expired token |
-| Valid token grants access and injects user context | PASS | `middleware_test.go:45` — context injection asserted |
-| `AUTH_JWT_SECRET` is read from environment variable, never hardcoded | PASS | `config_test.go:8` — asserts env var is used; grep confirms no hardcoded secret in source |
+| Criterion | Coverage | Execution | Status | Finding |
+|-----------|----------|-----------|--------|---------|
+| `POST /auth/login` with valid credentials returns 200 with signed JWT | PASS | PASS | PASS | `handler_test.go:42` — happy path covered |
+| `POST /auth/login` with invalid password returns 401 with `invalid_credentials` | PASS | PASS | PASS | `handler_test.go:67` — covers invalid password case |
+| `POST /auth/login` with non-existent email returns 401 (not 404) | WARN | NOT_RUN | WARN | Only indirectly covered via `handler_test.go:88` — no assertion that status is specifically 401 and not 404 |
+| JWT is signed with HS256 and expires in 24 hours | PASS | PASS | PASS | `token_test.go:15` — asserts algorithm and expiry |
+| Protected endpoints return 401 when no `Authorization` header is present | PASS | PASS | PASS | `middleware_test.go:23` — missing header case covered |
+| Protected endpoints return 401 when token is expired or signature is invalid | WARN | NOT_RUN | WARN | `middleware_test.go:31` covers invalid signature but no test for expired token |
+| Valid token grants access and injects user context | PASS | PASS | PASS | `middleware_test.go:45` — context injection asserted |
+| `AUTH_JWT_SECRET` is read from environment variable, never hardcoded | PASS | PASS | PASS | `config_test.go:8` — asserts env var is used; grep confirms no hardcoded secret in source |
+
+### Test Execution Evidence
+
+| Command / working directory | Outcome / exit code | Relevant tests | Revision / evidence |
+|---|---|---|---|
+| `go test ./internal/auth -v` / repository root | PASS / 0 | The six directly covering cases cited above passed; the two indirectly covered criteria lack complete execution evidence | Hypothetical current working tree, same check |
+
+> All runtime evidence in this worked example is hypothetical; these are not results from this repository. A green suite does not make the incompletely covered criteria PASS.
 
 ---
 
@@ -52,6 +60,7 @@
 | `Claims` struct embedding `jwt.RegisteredClaims` | PASS | `types.go:48` — matches spec |
 | `POST /auth/login` endpoint registered | PASS | `routes.go:22` — route registered with correct method and path |
 | Security §8 — Sensitive data: passwords and token secrets never logged | PASS | grep for `log.*password` / `log.*secret` across `internal/auth/` found no match; auth failures log only `email` and `outcome` (`handler.go:71`) |
+| Divergence — `[unrequested]` `POST /auth/refresh` | WARN | Endpoint registered in `routes.go:30`; spec section 3 explicitly lists token refresh as out of scope |
 
 > Note: section 8 "Authorization" is `N/A` in this spec (RBAC is an explicit Non-Goal), so no ownership check is expected. "Untrusted input" and "Authentication" controls are covered by section 7 criteria and reported under Dimension 1.
 
@@ -86,3 +95,6 @@
 3. `[WARN][code]` Add `validate:"min=8"` to `LoginRequest.Password.validate` tag in `types.go:34`, or explicitly remove the constraint from spec section 6.1 if it was intentionally dropped
 4. `[WARN][pragmatic-spec-update]` Confirm whether rate limiting is explicitly out of scope — if yes, close the TODO via `pragmatic-spec-update`; if deferred, create a follow-up spec
 5. `[WARN][code]` Rename `SessionToken` to `AccessToken` in `token.go:9` and its call sites, or — if "session token" is the term the team actually uses — change the glossary's identifier via `pragmatic-spec-update` / `pragmatic-domain-language`
+6. `[WARN][code]` Remove unrequested `POST /auth/refresh` from `routes.go:30`, or use `pragmatic-spec-update` to formally add token refresh to the spec scope
+
+**This implementation does not conform to spec.** Resolve the FAIL item and address WARNs before marking the story done.

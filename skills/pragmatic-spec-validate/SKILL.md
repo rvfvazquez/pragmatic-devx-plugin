@@ -45,6 +45,8 @@ Record the chosen language and use it for **all report content** — section hea
 
 Find the spec file. Common locations: `docs/specs/`, `specs/`, or the path provided. Read the full document before running any checks.
 
+For the Alignment checks in Step 2, look for `docs/constitution.md` and for the arch spec(s) in `docs/arch/` that cover this feature's module, layer or integration (match on the feature slug, component names and boundaries in the arch spec's section 4.2). If several arch specs plausibly apply, read each; if none matches, there is none. Do not ask — absence is an `N/A`, not a question.
+
 For the Domain Language checks in Step 2, call the Skill tool with `pragmatic-domain-language` (once per session — without a Skill tool, read `../pragmatic-domain-language/SKILL.md`) and apply **§1 Locate the Context** — without asking: if several contexts plausibly apply, read each.
 
 ### Step 1.5 — Pre-scan: Detect Open TODO Items
@@ -79,6 +81,8 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
 | Security criteria testable | N/A if section 8's Security item has no applicable entries (all `N/A — <reason>`) |
 | Single feature focus | N/A if the spec explicitly documents a bounded context that intentionally includes multiple related subsystems |
 | Invariants verified | N/A if section 6.2 states `None — <reason>`, or the spec introduces or changes no data model |
+| Constitution alignment | N/A if `docs/constitution.md` does not exist |
+| Architecture alignment | N/A if no arch spec in `docs/arch/` covers this feature |
 | Domain Language checks (all four) | N/A if `docs/glossary/` does not exist — the project has no glossary yet |
 | Operational characteristics addressed | N/A if the feature involves no background/async processing, no concurrent/shared-state workflows, and no user interface |
 
@@ -126,6 +130,11 @@ Evaluate each criterion below. Report **PASS**, **WARN**, **FAIL**, or **N/A** w
   - **PASS** if applicable operational characteristics are addressed with concrete behavior or explicit decisions.
   *(may be N/A — see table above)*
 
+#### Alignment
+Compare only what the spec states; a decision the spec does not mention is silence, never a conflict. A contradiction is a **documented deviation** only when the spec names the constitution or arch spec entry it departs from and gives a reason (in the Rationale cell of section 5, or in the section 8 Security item). A documented deviation is `PASS` with the deviation quoted in the note — do not re-litigate it.
+- **Constitution alignment** — Compare section 5 (Technology Decisions) and the section 8 Security item with the constitution's Global Tech Stack (section 2), Security Baseline (section 3) and Cross-Module Rules (section 4). **FAIL** if a decision contradicts a constitution entry (a different database or language, a different authentication or authorization model, a data category the Security Baseline bars from logs, a rule against importing another module's data layer) and is not a documented deviation. Quote both sides in the note: the spec's decision and the constitution entry. *(may be N/A — see table above)*
+- **Architecture alignment** — Compare sections 5, 6 and 8 with the arch spec's Component Boundaries (4.2), Dependency Direction (6.2), Communication Style (6.3), Error Handling (6.4) and External Integrations (8). **FAIL** if the spec places code outside its component's boundary, imports across a forbidden direction, uses a communication style the arch spec forbids, or adds an integration the arch spec does not list as permitted, and it is not a documented deviation. Quote both sides in the note. *(may be N/A — see table above)*
+
 #### Domain Language
 Run the **base checks 1–4 of §4 Validation Checks** in `pragmatic-domain-language` against this spec, one report row each: **No avoided terms**, **Domain terms defined**, **Context map consistent**, **Glossary hygiene**. WARN at most, never FAIL; quote the glossary entry in each note. *(may be N/A — see table above)*
 
@@ -164,6 +173,7 @@ Produce the report in this format:
 ### Output Rules
 
 - Print the full report; do **not** modify the spec file or any glossary file
+- **If an Alignment FAIL is present:** state the resolution paths without choosing one — change the spec's decision to match, record it as a documented deviation in the Rationale (with the reason), or, if the constitution or arch spec is the outdated side, update it with `pragmatic-project-constitution-update` or `pragmatic-arch-spec-update`. Which side moves is the user's decision
 - **If a Domain Language WARN is present:** recommend `pragmatic-spec-update`, which replaces avoided terms in the spec and adds each undefined term to `docs/glossary/<context-slug>.md`; list the undefined terms so the update has them
 - List FAILs first with concrete suggestions for each
 - N/A checks are not counted in Passed/Warnings/Failed summary totals

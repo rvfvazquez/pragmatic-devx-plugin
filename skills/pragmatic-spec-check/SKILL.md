@@ -185,6 +185,7 @@ Overall Status:
 **Recommended Actions rules:**
 - FAILs listed before WARNs
 - Each action is tagged `[code]` (implementation fix), `[pragmatic-spec-update]` (spec decision), or `[verification]` (run/repair the test environment or obtain current execution evidence; no implementation defect established)
+- Each action carries a finding ID `C-<n>` (numbered from 1 in list order) and a **gap type**: `missing` (the work is absent), `partial` (present but falls short), `contradicts` (the code violates a requirement or Non-goal), `unrequested` (code with no origin in the spec), or `unverified` (a `[verification]` action: no current execution evidence). Format: `1. C-1 [FAIL][code][missing] ...`. IDs are scoped to one report — a later report renumbers — and the gap type lets `pragmatic-spec-build` turn the action into a tracked task (its Convergence Loop) without re-deriving it
 - N/A checks are not counted in Summary totals
 - If all dimensions are PASS or N/A: omit Recommended Actions and output a **Strengths** section summarizing what was verified and confirmed correct
 - **After a FAIL report:** assert explicitly — "**This implementation does not conform to spec.** Fix `[code]` items before marking the story as done. For `[pragmatic-spec-update]` items — these represent decisions not yet captured in the spec; use `pragmatic-spec-update` before the next conformance check."

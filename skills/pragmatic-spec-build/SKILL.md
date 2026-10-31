@@ -305,8 +305,19 @@ Run the check. Show the output. Only then claim completion.
 | "spec-check is overkill for this" | No exceptions — one FAIL missed is a bug shipped. |
 | "This is a prototype / proof of concept" | The spec defines done. Run the check. |
 
-If `pragmatic-spec-check` returns FAIL or PARTIAL: address the gaps, re-run, confirm PASS. Then close.
+If `pragmatic-spec-check` returns FAIL or WARN: run the Convergence Loop below, which re-runs the check until PASS. Then close.
 </HARD-GATE>
+
+---
+
+### Convergence Loop — Closing `pragmatic-spec-check` Findings
+
+Entered whenever the check above returns FAIL or WARN. Each pass is a **round**, numbered from 1 for the first check after Step 7. This skill never edits the check's report; it turns the report's findings into tracked work.
+
+1. **Turn findings into Build Log rows.** For each Recommended Action tagged `[code]`, append a row to the `## Build Log` (never reset, reorder or rewrite an existing row — a task already `done` stays `done`; the new row records that the check disproved it). **Sources** is `spec-check round <N> C-<n> (<gap type>)` plus the spec element the finding is about (e.g. `Spec §7 AC-2`). Apply Step 6's dependency and wave rules to the new rows, and extend the Obligation Coverage table if a finding exposes an obligation that had no coverage.
+2. **Do not turn these into tasks.** A `[pragmatic-spec-update]` action, or an `unrequested` finding whose resolution could go either way (remove the code, or formalize it in the spec), goes to the user as a decision: remove it as a `[code]` task, or use `pragmatic-spec-update`. A `[verification]` action is resolved by running or repairing the test environment, not by writing code.
+3. **Confirm, then execute.** Present only the new rows with the same checkpoint as Step 6 (file targets, dependencies, waves), and stop until the user confirms. Run the confirmed rows through Step 7 (7a–7f), then re-run `pragmatic-spec-check`.
+4. **Terminate.** Converged means the check returns PASS: close with Step 8. After round 3 without PASS, **stop**: set unresolved rows to `blocked`, and report each remaining finding with its gap type, `file:line`, what each round tried, and the decision needed. Do not start a round 4 on the user's behalf.
 
 ---
 

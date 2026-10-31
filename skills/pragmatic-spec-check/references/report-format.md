@@ -161,10 +161,18 @@ This file defines the canonical format for a `pragmatic-spec-check` conformance 
 >   [pragmatic-spec-update] → a decision or clarification is needed in the spec document
 >   [verification] → execution evidence or environment is missing; no code defect established
 >
+> Each action also carries a finding ID `C-<n>` (from 1, in list order) and a gap type:
+>   [missing]     → the work is absent
+>   [partial]     → the work exists but falls short
+>   [contradicts] → the code violates a requirement or an explicit Non-goal
+>   [unrequested] → code with no origin in the spec
+>   [unverified]  → no current execution evidence (pairs with [verification])
+> IDs are scoped to this report; a later report renumbers.
+>
 > If Overall Status is PASS: replace this section with a "Strengths" section summarizing
 > what was verified and confirmed correct.
 
-1. `[FAIL][code]` Add a dedicated test for token expiry — criterion "JWT expirado retorna 401" has no test coverage
-2. `[FAIL][pragmatic-spec-update]` Token storage TODO has no decision — use `pragmatic-spec-update` to record the chosen approach
-3. `[WARN][code]` Add `validate:"min=8"` to `LoginRequest.Password` or explicitly remove the constraint from the spec
-4. `[WARN][pragmatic-spec-update]` Confirm whether rate limiting is intentionally out of scope — if yes, close the TODO via `pragmatic-spec-update`
+1. `C-1` `[FAIL][code][missing]` Add a dedicated test for token expiry — criterion "JWT expirado retorna 401" has no test coverage
+2. `C-2` `[FAIL][pragmatic-spec-update][missing]` Token storage TODO has no decision — use `pragmatic-spec-update` to record the chosen approach
+3. `C-3` `[WARN][code][partial]` Add `validate:"min=8"` to `LoginRequest.Password` or explicitly remove the constraint from the spec
+4. `C-4` `[WARN][pragmatic-spec-update][unrequested]` Confirm whether rate limiting is intentionally out of scope — if yes, close the TODO via `pragmatic-spec-update`

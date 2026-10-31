@@ -1,0 +1,13 @@
+{
+  "id": "validate-complexity-within",
+  "skill": "pragmatic-spec-validate",
+  "spec": "docs/specs/export-job.md",
+  "kind": "validation",
+  "required_patterns": [
+    "Complexity alignment[^\\n]*PASS"
+  ],
+  "forbidden_patterns": [
+    "No complexity budget",
+    "Complexity alignment[^\\n]*(FAIL|WARN)"
+  ]
+}

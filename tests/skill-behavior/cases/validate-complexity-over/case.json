@@ -1,0 +1,13 @@
+{
+  "id": "validate-complexity-over",
+  "skill": "pragmatic-spec-validate",
+  "spec": "docs/specs/export-job.md",
+  "kind": "validation",
+  "required_patterns": [
+    "Complexity alignment[^\\n]*FAIL",
+    "DynamoDB",
+    "Redis",
+    "SQS[\\s\\S]{0,400}(documented|deviation|7 min)"
+  ],
+  "forbidden_patterns": []
+}

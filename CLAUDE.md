@@ -66,4 +66,4 @@ PRs that restructure skill content "for clarity" without evidence of improved be
 
 ## Versioning
 
-All five `version` fields (`plugin.json`, `.codex-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `gemini-extension.json`, `.claude-plugin/marketplace.json`) must match. Update all of them together when bumping. A future `bump-version.sh` script will automate this.
+All five `version` fields (`plugin.json`, `.codex-plugin/plugin.json`, `.cursor-plugin/plugin.json`, `gemini-extension.json`, `.claude-plugin/marketplace.json`) must match. Update all of them together when bumping. `scripts/bump-version.sh <version>` updates them (and `package.json`) together; after the bump PR and its `RELEASE-NOTES.md` section are merged, `scripts/release.sh <version>` creates the tag and the GitHub release (`--dry-run` first).

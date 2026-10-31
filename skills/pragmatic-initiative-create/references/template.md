@@ -52,4 +52,8 @@ The table is an index. Detail for each feature lives below, one subsection per r
 
 ## Not Yet Specified
 
-<!-- concerns too vague to break into a feature yet — see the same sharpness test used in each spec's own Open Questions section -->
+<!-- the fog: in-scope concerns you can tell are coming but can't yet state as a feature, because they hang on features still unbuilt. One line each: the suspected capability and what it waits on. Same sharpness test as each spec's Open Questions. A patch graduates (moves into the Features table) once a Checked feature makes it specifiable, and is then removed from here. "None" if empty. -->
+
+## Out of Scope
+
+<!-- work consciously ruled outside this initiative's destination. One line each: the gist and why it is out. Never graduates; it returns only if the destination is redrawn, as a new initiative. "None" if empty. -->

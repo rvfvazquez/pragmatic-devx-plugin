@@ -75,6 +75,12 @@ Record both in the initiative's `## Domain Language` section. Do not edit the co
 
 Decompose the destination into a list of features. Each one must pass the same cohesion test a single feature spec should pass on its own: removing it would still leave every other feature a complete, independently shippable capability.
 
+Each feature is also a **vertical slice**: it cuts a narrow but complete path through every layer it needs (data, API, UI, tests) and is demonstrable or verifiable on its own. A feature that delivers one horizontal layer ("the database schema", "the admin screens") and only has value once another feature lands fails this test — reshape it around behavior a user or caller can observe, even if small.
+
+Two sequencing patterns, applied only when they genuinely fit:
+- **Prefactoring first.** When the user names, or the codebase (if any) shows, a restructuring that would make the features easy to build ("make the change easy, then make the easy change"), make it the first feature — behavior-preserving, with every feature it eases listing it under Depends on. Do not invent one to look thorough.
+- **Wide refactors are the exception to slicing.** One mechanical change whose blast radius spans the codebase (rename a column, retype a shared symbol) breaks too many call sites at once for any slice to land green. Sequence it as **expand–contract**: an *expand* feature adds the new form beside the old; *migrate* features move call sites over in batches sized by blast radius (per package or directory), each depending on the expand; a *contract* feature removes the old form, depending on every migrate. Only the contract feature may fail the independently-shippable test.
+
 For each feature, capture:
 - A short name
 - A short description (2-4 sentences) — what it does and why it's needed; enough context that `pragmatic-spec-create` doesn't have to re-derive intent from scratch later, but still not a full spec
@@ -85,6 +91,10 @@ For each feature, capture:
 Name features and write descriptions with the glossary's canonical terms.
 
 **Order the table topologically** — a feature never appears above a feature it depends on. Among features with no dependency between them, put the one that introduces a concept before the ones that consume it — the first spec to define a term is the one other features will read it from. If a dependency cycle is detected, stop and ask the user to resolve it before proceeding; do not silently pick an order.
+
+**Fog and scope.** Anything the user mentioned (or the research surfaced) that did not become a feature goes in exactly one of two places:
+- **Not Yet Specified** (in scope, not sharp) — the test is whether you can state the capability precisely *now*, not whether you can build it now. If you can state it, it is a feature, even if blocked. If it hangs on something a feature below will reveal, write one loose line (what it is and what it waits on); do not pre-slice fog into feature-sized pieces.
+- **Out of Scope** (ruled outside the destination) — one line with the reason. Scope, not sharpness, puts it here; it never graduates.
 
 ### Step 4.5 — Shared Vocabulary
 
@@ -114,7 +124,7 @@ Record the result in the initiative's `## Notes` section as `autonomous executio
 
 ### Step 6 — Generate the Initiative Document
 
-Create `docs/initiatives/<initiative-slug>.md` using the template in `references/template.md`. Every feature row starts at `Spec: not created yet`, `Status: Not started`, `Build: Not started`, with its **Context** column from Step 4. Fill `## Domain Language` from Steps 3 and 4.5. Below the table, write one subsection per feature with the description and any `Watch for` note captured in Step 4 — the table stays a scannable index; the subsections hold the context.
+Create `docs/initiatives/<initiative-slug>.md` using the template in `references/template.md`. Every feature row starts at `Spec: not created yet`, `Status: Not started`, `Build: Not started`, with its **Context** column from Step 4. Fill `## Domain Language` from Steps 3 and 4.5, and `## Not Yet Specified` / `## Out of Scope` from Step 4. Below the table, write one subsection per feature with the description and any `Watch for` note captured in Step 4 — the table stays a scannable index; the subsections hold the context.
 
 ### Step 7 — Output Summary
 
@@ -123,7 +133,7 @@ After writing the file:
 2. List the features in delivery order, with their dependencies
 3. State whether architecture work is needed first, and which arch spec(s)
 4. State the contexts touched, any new context or relationship, and the glossary terms seeded (with file paths)
-5. State the autonomy setting recorded
+5. State the autonomy setting recorded, and how many items sit in Not Yet Specified and Out of Scope
 6. Tell the user the next step is `pragmatic-initiative-deliver` on this file
 
 **Charting is one session's work.** This skill hands nothing off automatically — `pragmatic-initiative-deliver` only runs when the user explicitly invokes it afterward.

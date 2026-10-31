@@ -17,7 +17,7 @@ Use when an initiative document already exists and the user wants it executed.
 
 **Do not use when:**
 - No initiative exists yet → use `pragmatic-initiative-create` first.
-- The user wants to change the breakdown itself (add, remove, or reorder features) → that's a `pragmatic-initiative-create` concern, not this skill.
+- The user wants to change the breakdown itself (add, remove, or reorder features) → that's a `pragmatic-initiative-create` concern, not this skill. The one exception is the Step 2.7 fog check: graduating a `## Not Yet Specified` line into a new last row, or descoping a feature, with the user's explicit confirmation.
 
 ## How to Deliver an Initiative
 
@@ -42,6 +42,8 @@ For each feature row not yet `Build: Checked`, in table order (already topologic
 5. **Build** — dispatch `pragmatic-spec-build`, then `pragmatic-spec-check`. Update the row's `Build` column (`In progress` → `Done` → `Checked`, matching `pragmatic-spec-check`'s Overall Status of PASS).
 6. **Update the initiative document** after every sub-step above — it is the running log of this delivery, not a summary written once at the end. Table columns record the *what* (current Status/Build state); when a feature reaches `Build: Checked`, also append one line to `## Decisions So Far` recording the *why* — e.g. "Feature X: validated PASS on first pass, built and checked" or "Feature X: validate FAIL (open TODO in section 8), one `pragmatic-spec-update` pass, then checked." If the feature's spec added or redefined glossary terms, name them in that same line — later features will read them. Only append on a feature's terminal outcome for this run (`Checked`, or the blocker reported in Step 3) — not on every sub-step transition, or the section turns into noise.
 
+7. **Fog check** — when a feature reaches `Build: Checked`, read `## Not Yet Specified`. For each line that this feature's outcome has made statable as a feature (the thing it was waiting on now exists), and for any not-yet-built feature that the outcome shows to lie beyond the destination, **propose it — never apply it silently**: list the graduation candidates (with the proposed feature description, context and Depends on) and the proposed Out of Scope moves, and ask the user to confirm. On confirmation, append the new row at the end of the table (never reorder existing rows), add its subsection, remove the graduated line from `## Not Yet Specified`, and append one line to `## Decisions So Far`; a confirmed out-of-scope move goes to `## Out of Scope` with its reason, the row marked `Descoped` in the table. If the user declines or does not answer, leave the document unchanged and carry the candidates into the Step 4 summary.
+
 ### Step 3 — Handle Real Blockers
 
 If a feature's `pragmatic-spec-validate` still fails after one `pragmatic-spec-update` pass, or `pragmatic-spec-check` returns FAIL after build, **stop walking the table** and report exactly which feature and which check blocked. Append one line to `## Decisions So Far` recording the blocker before stopping — e.g. "Feature X: blocked, pragmatic-spec-check FAIL on AC-2 after build, see docs/specs/x.md" — so resuming later starts from a record, not just memory of the conversation. Do not skip ahead to features further down the table without the user's say-so — the dependency order already encodes what's genuinely independent; anything downstream of a blocked row may depend on it even if its own `Depends on` column doesn't name it directly (a later feature can inherit an assumption from an earlier one without listing it as a formal dependency).
@@ -50,7 +52,8 @@ If a feature's `pragmatic-spec-validate` still fails after one `pragmatic-spec-u
 
 1. State which features reached `Checked` this run
 2. State which are still pending, and why — waiting on human approval vs. genuinely blocked
-3. Point to the initiative document as the full record
+3. State any unconfirmed fog-check candidates (graduations and descopes proposed in Step 2.7)
+4. Point to the initiative document as the full record
 
 ## Guard
 

@@ -1,0 +1,5 @@
+Create the project constitution for this repository (its README describes the product). I have already answered the discovery interview, so go straight to the project's final recap before writing: present the complete picture, then stop without writing any file. Do not modify any file and use only file reading tools (no shell).
+
+My answers: internal reporting tool for analysts, single tenant, no compliance requirements. Stack: Python 3.12 and PostgreSQL only. Security: OIDC validated at the gateway, per-resource ownership checks, secrets from injected environment only, no PII in logs, OWASP Top 10 as the reference. Cross-module rules and AI guardrails: none defined yet. For every question I did not answer above, accept your recommendation.
+
+Respond in English.

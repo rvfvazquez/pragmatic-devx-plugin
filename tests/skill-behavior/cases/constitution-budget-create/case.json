@@ -1,0 +1,11 @@
+{
+  "id": "constitution-budget-create",
+  "skill": "pragmatic-project-constitution",
+  "spec": "README.md",
+  "kind": "recap",
+  "required_patterns": [
+    "Complexity budget",
+    "[Aa]t most (1|one)"
+  ],
+  "forbidden_patterns": []
+}

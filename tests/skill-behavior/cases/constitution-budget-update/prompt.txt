@@ -1,0 +1,3 @@
+Update the project constitution: add a complexity budget saying a feature may add at most one new infrastructure component without a recorded justification. Scope, motivation and consistency were already confirmed with me, and for any dependent question I accept your recommendation, so go straight to the project's pre-write recap: present what you are about to change, then stop before writing anything. Do not modify any file and use only file reading tools (no shell).
+
+Respond in English.

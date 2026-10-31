@@ -1,0 +1,18 @@
+{
+  "id": "build-convergence",
+  "skill": "pragmatic-spec-build",
+  "spec": "docs/specs/customer.md",
+  "kind": "traceability",
+  "required_patterns": [
+    "\\|[^\\n]*Sources[^\\n]*\\|",
+    "spec-check[^\\n]*round 1",
+    "C-1",
+    "\\bmissing\\b",
+    "\\bpartial\\b",
+    "C-3[\\s\\S]{0,800}pragmatic-spec-update",
+    "(rows?|tasks?) 1.{0,20}(stay|remain|unchanged|preserved|untouched)"
+  ],
+  "forbidden_patterns": [
+    "\\| 1 \\| AC-1[^\\n]*pending"
+  ]
+}

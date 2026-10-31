@@ -1,0 +1,8 @@
+All three Build Log tasks in docs/specs/customer.md are marked done, and pragmatic-spec-check was just run against it. Its report:
+
+Overall Status: FAIL
+1. C-1 [FAIL][code][missing] AC-2 (non-owner raises PermissionError): Coverage FAIL, no test asserts it, and src/customer.py returns the record without comparing owner to actor.
+2. C-2 [WARN][code][partial] OPS-1 (audit event): src/audit.py records the event but includes the customer's email field.
+3. C-3 [WARN][code][unrequested] src/promotion.py exports send_promo_email(), which the spec's scope excludes. Resolve with [code] (remove) or [pragmatic-spec-update] (formalize).
+
+Continue the project's build workflow to close these findings. Work only through the task-breakdown checkpoint for the new work: present the proposed Build Log rows for confirmation, then stop before implementation. Do not change source or tests, and use only file reading tools (no shell). Respond in English.

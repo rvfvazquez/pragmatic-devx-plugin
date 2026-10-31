@@ -18,7 +18,7 @@ Check `.github/pull_request_template.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `P
 | **Evidence** | Build Log + spec-check report | The test command and its passing result; mention that each task's test was seen failing before its implementation (red → green) |
 | **Decisions worth knowing** | Spec section 5 | Only rows a reviewer would question or could get wrong — always include the Test seam row |
 | **Security** | Spec section 8 Security item | Non-`N/A` entries only, plus the security AC index. Omit the section if every entry is `N/A` |
-| **Open items** | Build Log `### Parked Findings`, remaining `[TODO: ...]`, spec section 9 | One line each. Omit if empty |
+| **Open items** | Build Log `### Parked Findings`, `### Deferred Minors` triaged `fix before merge`, `### Rulings` that cost rework if wrong, remaining `[TODO: ...]`, spec section 9 | One line each. Omit if empty |
 | **Merge risk** | Spec section 8 (breaking changes, data model, dependencies) and section 6.2 | **Door:** `one-way` if the merge can't be undone by a revert alone (schema migration, published contract, data rewrite, breaking change for callers), otherwise `two-way`. **Blast radius:** one line naming what else is affected |
 | **Links** | — | Spec path and its Build Log anchor |
 

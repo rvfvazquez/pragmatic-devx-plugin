@@ -783,7 +783,7 @@ pragmatic-devx-plugin/
 │       └── SKILL.md               # disable-model-invocation: true — internal use only
 ├── agents/
 │   ├── tdd-implementer.md         # Dispatched by pragmatic-spec-build (Interleaved strategy)
-│   ├── task-reviewer.md           # Dispatched by pragmatic-spec-build after each task (read-only review)
+│   ├── task-reviewer.md           # Dispatched by pragmatic-spec-build after each task, on fix rounds, and once for the whole build (read-only review)
 │   └── fact-finder.md             # Dispatched by *-create skills for external fact lookups
 ├── assets/
 │   ├── logo.svg                   # 100×100 plugin logo

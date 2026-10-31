@@ -790,6 +790,7 @@ pragmatic-devx-plugin/
 │   └── icon-small.svg             # 32×32 compact icon
 ├── scripts/
 │   ├── bump-version.sh            # Updates version in all 5 manifests atomically
+│   ├── release.sh                 # Tags origin/main and publishes the GitHub release from RELEASE-NOTES.md
 │   └── sync-agents.sh             # Syncs CLAUDE.md → AGENTS.md
 ├── tests/
 │   ├── glossary-drift/

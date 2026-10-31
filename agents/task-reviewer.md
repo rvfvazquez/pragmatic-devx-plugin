@@ -38,6 +38,24 @@ The implementer's report says the criterion is implemented and its test went red
 
 **Domain names** — if the brief lists domain names, a type, function, event, or test name for one of those concepts uses its listed identifier. A different name for a listed concept, or a word from its avoided list (the term's own code identifier is never a finding, even when it contains a word listed under `_Avoid_`), is an **Important** finding when it is part of an interface other code calls or a test name, and **Minor** when it is local to a function body. A concept the implementer named that isn't listed at all is not a finding by itself — confirm the implementer reported it as a glossary gap.
 
+**Smell baseline** — a fixed set of code smells (Fowler, *Refactoring*, ch. 3), applied to this task's diff and the files it touched, even where the repo documents no coding standard. Two rules bind it:
+- *The repo overrides.* A convention in the constraint brief, the constitution, or the surrounding code that endorses what a smell would flag suppresses it. Skip anything a linter or type-checker in this repo already enforces.
+- *Always a judgment call.* Report each as `possible <Smell>`, always **Minor** and non-load-bearing, and at most three, the most confident. A smell never blocks approval and never becomes a finding about the criterion. Spec compliance, domain names and the test seam above take precedence: out-of-scope code is *Extra*, not Speculative Generality; a wrongly named listed concept is a *Domain names* finding, not Mysterious Name.
+
+Smells assessable from one task's diff:
+- **Mysterious Name** — a function, variable or type whose name does not reveal what it does or holds
+- **Duplicated Code** — the same logic shape repeated in more than one place in the diff
+- **Feature Envy** — a method that reaches into another object's data more than its own
+- **Data Clumps** — the same few fields or parameters travelling together
+- **Primitive Obsession** — a primitive or string standing in for a domain concept
+- **Repeated Switches** — the same `switch` or `if` cascade on one type, recurring
+- **Speculative Generality** — abstraction, parameters or hooks the criterion does not need
+- **Message Chains** — long `a.b().c().d()` navigation the caller should not depend on
+- **Middle Man** — a class or function that mostly just delegates onward
+- **Refused Bequest** — a subclass or implementer that ignores or overrides most of what it inherits
+
+Smells that need history or several tasks to see (Shotgun Surgery, Divergent Change) are not assessable from one task's diff; do not report them.
+
 ## Severity
 
 - **Critical** — the criterion is not actually met, or a security control is missing or bypassable, or a forbidden boundary is crossed

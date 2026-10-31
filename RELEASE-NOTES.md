@@ -1,6 +1,23 @@
 # Pragmatic DevX — Release Notes
 
+## v0.19.0 (2026-10-31)
+
+### Convergence Loop, Cross-Artifact Validation, Decision Trail, and Complexity Budget
+
+Four additions to the spec lifecycle, found by comparing this plugin with another spec tool, plus a build review-loop extension and the OpenCode adapter first described under v0.18.0 (prepared but never tagged, so it ships here). No new top-level skills.
+
+- **Convergence loop (`pragmatic-spec-check`, `pragmatic-spec-build`)**: each Recommended Action carries a finding ID `C-<n>` and a gap type (`missing`, `partial`, `contradicts`, `unrequested`, `unverified`); `pragmatic-spec-check` stays read-only. After a FAIL or WARN, `pragmatic-spec-build` turns `[code]` findings into new Build Log rows sourced to the check round (`spec-check round N C-n (<gap type>)`), never rewrites existing rows, sends `[pragmatic-spec-update]` and ambiguous `unrequested` findings to the user as decisions, and stops after three rounds without PASS.
+- **Cross-artifact validation (`pragmatic-spec-validate`)**: **Constitution alignment** and **Architecture alignment** run by default. An undocumented contradiction with the constitution or the covering arch spec is FAIL; a documented deviation (the spec names the entry it departs from and gives a reason) is PASS; a missing artifact is N/A. **Behavior change:** specs with an undocumented conflict now fail validation.
+- **Decision trail (`pragmatic-spec-create`, `pragmatic-spec-update`)**: a dated `## Clarifications` section after section 9 records each decision the user was asked as `Q → A`, tagged `accepted recommendation: <source>` or `user decision`. `pragmatic-spec-update` shows the entries in its pre-write recap.
+- **Complexity budget (`pragmatic-project-constitution`, `-update`, `pragmatic-spec-validate`)**: the constitution interview asks how many new infrastructure components a feature may add and records a section 2 row labeled `Complexity budget`. `pragmatic-spec-validate` then checks **Complexity alignment**: over budget without a documented deviation is FAIL, a justification with neither a measurable figure nor a reference is WARN, a justified deviation is PASS, no budget row is N/A. When there is no budget row and the spec adds two or more new components, a one-line adoption note suggests defining one; it never invents a limit.
+- **Build review loop (`pragmatic-spec-build`, `task-reviewer`)**: `### Rulings` and `### Deferred Minors` in the Build Log, a Step 6 pre-flight table of task pairs that share a file or interface, a scoped re-review mode, and one whole-build review before the first `spec-check`.
+- **OpenCode adapter**: one plugin for OpenCode 1.x and 2.x registers the skills and injects `pragmatic-howto`; the subagents are not installed there. Verified on OpenCode 2.0.26 with a local path only.
+- **Release tooling**: `scripts/release.sh <version> [--dry-run]` tags `origin/main` and publishes the release from the matching section of this file; `scripts/bump-version.sh` is executable.
+- **Evidence and limits**: eight new scenarios under `tests/skill-behavior/cases/`, each run on the previous skills and on the new ones, except the control, which only checks that a conforming input stays PASS. They run at confirmation points, so they do not exercise file writes, the three-round cap, or the `pragmatic-spec-create` path, and the WARN rung of the complexity check has no scenario of its own. The evidence is reproduced scenarios and informal user feedback, not incident logs.
+
 ## v0.18.0 (2026-10-31)
+
+> Never tagged; shipped as part of v0.19.0.
 
 ### OpenCode Adapter
 

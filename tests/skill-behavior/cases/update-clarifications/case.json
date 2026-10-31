@@ -1,0 +1,13 @@
+{
+  "id": "update-clarifications",
+  "skill": "pragmatic-spec-update",
+  "spec": "docs/specs/export-job.md",
+  "kind": "recap",
+  "required_patterns": [
+    "## Clarifications",
+    "### Session \\d{4}-\\d{2}-\\d{2}",
+    "Q:[^\\n]*(storage)[^\\n]*A:[^\\n]*PostgreSQL[^\\n]*accepted recommendation[^\\n]*constitution",
+    "Q:[^\\n]*format[^\\n]*A:[^\\n]*JSON Lines[^\\n]*user decision"
+  ],
+  "forbidden_patterns": []
+}

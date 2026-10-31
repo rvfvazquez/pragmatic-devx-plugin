@@ -1,0 +1,7 @@
+Update docs/specs/export-job.md to resolve its two open technology decisions. Scope, motivation and consistency were already confirmed with me, so go straight to the project's pre-write recap: present what you are about to change, then stop before writing anything. Do not modify any file and use only file reading tools (no shell).
+
+The two decisions, as asked and answered:
+- Data storage. Your recommendation was PostgreSQL (the constitution's Database decision). I accept it.
+- Export format. Your recommendation was CSV (a pragmatic default). I chose JSON Lines instead, because the downstream tool reads it.
+
+Respond in English.

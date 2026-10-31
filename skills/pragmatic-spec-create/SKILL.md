@@ -333,6 +333,18 @@ Fill every section with concrete content:
 - Section 9 (Open Questions) holds concerns you can't yet phrase precisely enough for `[TODO: decide — <options>]` — don't force premature options onto something still vague
 - Use the canonical terms from Step 3.5 throughout the spec — never a word listed under `_Avoid_`
 
+**Record the decisions** asked in Steps 2, 4, 4.5 and 4.6 under a `## Clarifications` section placed right after section 9, with one `### Session <today's date>` subheading and one line per decision:
+
+```markdown
+## Clarifications
+
+### Session <YYYY-MM-DD>
+- Q: <the question as asked> → A: <the answer> (accepted recommendation: <constitution | related spec | codebase | pragmatic default>)
+- Q: <the question as asked> → A: <the answer> (user decision)
+```
+
+Record only decisions the user was asked (not the language or interview-depth selection). Tag `accepted recommendation: <source>` when the user took the `➡️` answer, naming where it came from (constitution, related spec, codebase or pragmatic default); tag `user decision` when they chose differently or there was no recommendation. A choice left undecided stays an inline `[TODO: decide — <options>]` and is not recorded here. The answer still goes into its own section — Clarifications records how it was decided, and this section is generated like the Changelog, not part of `references/template.md`.
+
 **Update the glossary** with the terms confirmed in the Step 4.6 recap: apply **§3 Write the Glossary** of `pragmatic-domain-language`. A resolved conflict is recorded linking this spec.
 
 **Section 7 — Acceptance Criteria:** Write every criterion in **Given/When/Then** format: `Given [context], When [action], Then the system SHALL [observable result]`. The **SHALL** in the Then clause is required (EARS notation) — it states the behavior as a mandatory system obligation, not a soft expectation ("should"/"will"). Each criterion must be specific enough for a developer to write a test case directly from it — no interpretation required. Include at minimum one happy-path criterion and one error or edge-case criterion. If the Security item in section 8 has any applicable (non-`N/A`) entry, also include the conditional security criterion the template requires — a negative assertion (non-owner → `404`, unauthorized role → `403`, malformed input rejected) with an explicit status code.

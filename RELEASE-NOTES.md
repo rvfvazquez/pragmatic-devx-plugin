@@ -1,5 +1,16 @@
 # Pragmatic DevX — Release Notes
 
+## v0.17.0 (2026-10-31)
+
+### Vertical Slices, Initiative Fog, Parallel Delivery by Claims, and a Smell Baseline
+
+Four additions to the initiative layer and the build review, found by comparing this plugin with another skills collection; no new top-level skills:
+
+- **Vertical slices, prefactoring and expand–contract (`pragmatic-initiative-create`, `pragmatic-spec-build`)**: each feature in a breakdown must be a vertical slice demonstrable on its own. A behavior-preserving prefactoring feature (or build task, citing the criteria it eases) can come first, and wide mechanical refactors are sequenced expand → migrate in batches → contract.
+- **Fog and Out of Scope (`pragmatic-initiative-create`, `pragmatic-initiative-deliver`)**: `Not Yet Specified` now holds in-scope concerns that cannot yet be stated as a feature, and a new `Out of Scope` section records work ruled outside the destination. After each `Checked` feature, delivery proposes graduating fog into new last rows or descoping, applied only with user confirmation.
+- **Parallel delivery by feature claims (`pragmatic-initiative-deliver`)**: several sessions can deliver one initiative. Each picks a takeable feature (dependencies all `Checked`, not held by another session) and claims it with an exclusive claim file under the git directory shared by all worktrees of a clone, mirrored in a new `Claimed by` column. One session behaves as before; every gate in the dispatched skills is unchanged. Separate clones are not protected, and abandoned claims are cleared only on the user's instruction.
+- **Smell baseline (`task-reviewer`)**: ten code smells assessable from one task's diff are reported as `possible <Smell>`, always Minor, at most three, never blocking approval; repo conventions and spec, domain-name and test-seam findings take precedence.
+
 ## v0.16.0 (2026-10-29)
 
 ### Observable Spec Verification, Task Provenance, and Behavioral Runner

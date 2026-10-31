@@ -1,0 +1,1 @@
+Validate docs/specs/case-refund.md using the project's spec validation workflow. Do not modify any file, and use only file reading tools (no shell). Respond in English.

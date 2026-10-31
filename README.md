@@ -683,7 +683,7 @@ Walks an existing initiative's feature table end-to-end — creating, validating
 
 > You: "Deliver docs/initiatives/multi-tenant-support.md."
 
-Claude dispatches `pragmatic-arch-spec-create` for the named arch spec first, then walks the feature table: `pragmatic-spec-create` (Lean mode) → `pragmatic-spec-validate` → `pragmatic-spec-build` → `pragmatic-spec-check` per feature, updating the initiative document's Status/Build columns after every step. If the initiative was charted as autonomous, it proceeds through validated specs without waiting for a human to set `Approved`; every `HARD-GATE` in the dispatched skills still applies exactly as it would if you ran them one by one.
+Claude dispatches `pragmatic-arch-spec-create` for the named arch spec first, then walks the feature table: `pragmatic-spec-create` (Lean mode) → `pragmatic-spec-validate` → `pragmatic-spec-build` → `pragmatic-spec-check` per feature, updating the initiative document's Status/Build columns after every step. If the initiative was charted as autonomous, it proceeds through validated specs without waiting for a human to set `Approved`; every `HARD-GATE` in the dispatched skills still applies exactly as it would if you ran them one by one. To deliver independent features in parallel, run `pragmatic-initiative-deliver` in several sessions: each claims a feature whose dependencies are all `Checked` through the table's `Claimed by` column, so no two sessions pick the same one.
 
 ---
 

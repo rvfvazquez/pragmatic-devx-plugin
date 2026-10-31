@@ -124,7 +124,7 @@ Record the result in the initiative's `## Notes` section as `autonomous executio
 
 ### Step 6 — Generate the Initiative Document
 
-Create `docs/initiatives/<initiative-slug>.md` using the template in `references/template.md`. Every feature row starts at `Spec: not created yet`, `Status: Not started`, `Build: Not started`, with its **Context** column from Step 4. Fill `## Domain Language` from Steps 3 and 4.5, and `## Not Yet Specified` / `## Out of Scope` from Step 4. Below the table, write one subsection per feature with the description and any `Watch for` note captured in Step 4 — the table stays a scannable index; the subsections hold the context.
+Create `docs/initiatives/<initiative-slug>.md` using the template in `references/template.md`. Every feature row starts at `Spec: not created yet`, `Status: Not started`, `Build: Not started`, `Claimed by: —`, with its **Context** column from Step 4. Fill `## Domain Language` from Steps 3 and 4.5, and `## Not Yet Specified` / `## Out of Scope` from Step 4. Below the table, write one subsection per feature with the description and any `Watch for` note captured in Step 4 — the table stays a scannable index; the subsections hold the context.
 
 ### Step 7 — Output Summary
 

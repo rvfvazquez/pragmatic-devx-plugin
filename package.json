@@ -1,6 +1,6 @@
 {
   "name": "pragmatic-devx-plugin",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Structured specs, architecture documentation, and pragmatic engineering patterns.",
   "type": "module",
   "main": "index.js",

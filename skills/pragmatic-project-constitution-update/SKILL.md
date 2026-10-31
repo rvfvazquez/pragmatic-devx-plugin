@@ -73,9 +73,11 @@ Analyze what needs to change. Classify the update by area:
 | Area | Examples |
 |---|---|
 | **Project Identity** | New compliance requirement (LGPD, GDPR), change in tenancy model, updated product scope |
-| **Global Tech Stack** | Add permitted technology, remove forbidden one, update a stack decision and rationale |
+| **Global Tech Stack** | Add permitted technology, remove forbidden one, update a stack decision and rationale, add or change the complexity budget |
 | **Security Baseline** | New or changed authentication or authorization model, secrets-management rule, data-classification category, security baseline reference (OWASP ASVS, etc.) |
 | **Cross-Module Rules** | New inter-module constraint, updated ownership boundary, deprecated rule |
+
+**Complexity budget:** it is a row of section 2 labeled exactly `Complexity budget`, never a Cross-Module Rule or a free-text guardrail — `pragmatic-spec-validate` finds it by that label. Write it as `Existing stack by default. At most <N> new infrastructure component(s) per feature, each justified in the spec's Rationale.` A new infrastructure component is a datastore engine, queue or broker, cache, external service or SaaS, or deployable not already listed in the stack; a new table in a listed database, or a library, is not. See Step 3 of `pragmatic-project-constitution`.
 
 **Ownership cascade:** if the change adds, moves, or removes a "single source of truth" rule (a module owning identity, customers, payments…) and a context map exists, the map's **Owns** column is in scope: every context whose Owns now contradicts the rule, and the context the rule names as owner.
 | **AI Behavior Guardrails** | New action Claude must always ask before taking, removed guardrail, updated trigger condition |
@@ -137,6 +139,7 @@ After the user answers Step 3, check whether any answer unlocks a **dependent de
 | New authorization model or auth-provider decision | Does a Cross-Module Rule or AI guardrail need to reference it — e.g. "no module runs its own permission check"? |
 | New data-classification category (PII/financial/health) | Does this require a new AI guardrail — "always ask before logging or persisting data in category X"? |
 | Secrets-management rule added | Does an AI guardrail need to forbid the agent from committing a secret or adding one to config? |
+| Complexity budget added or changed | Offer to run `pragmatic-spec-validate` on the existing specs that may exceed it — an offer only; existing specs are not re-checked automatically. Does an AI guardrail about new dependencies or services need to reference it? |
 
 If any dependent question applies, ask it now via `AskUserQuestion` — **with a recommended answer, following the same rule as Step 3** — instead of leaving it implicit. Only questions whose parent decision itself remained undecided should still become an open item.
 
@@ -154,6 +157,7 @@ Known contradiction shapes to check for:
 | New AI guardrail | Existing Global Tech Stack decision | The guardrail implies a technology choice the stack section doesn't list as permitted |
 | Deprecated rule | Other rules referencing it | Another active rule still depends on the rule being deprecated |
 | New or changed ownership rule | Context map **Owns** column | The rule names one module the source of truth for a concept, but the map records a different context as its owner, or two contexts as owners |
+| New or changed complexity budget | Untouched Global Tech Stack, Cross-Module Rules or AI guardrails | The budget allows N new components per feature, but a stack decision or rule already presupposes more |
 | New/changed Security Baseline decision | Untouched Cross-Module Rules or Global Tech Stack | The security decision assumes an entry point, provider, or storage rule the other sections do not establish — e.g. "all auth via the gateway" while a Cross-Module Rule lets a module be called directly |
 
 If no contradiction is found, skip straight to the recap below.
@@ -164,7 +168,7 @@ If no contradiction is found, skip straight to the recap below.
 
 Once clear, present a short recap and require explicit confirmation before writing:
 
-> Here's what I'm about to change: [sections in scope, one line each; context-map Owns rows to change, if the ownership cascade applied]. Everything else in the constitution stays as-is. Confirm before I apply this?
+> Here's what I'm about to change: [sections in scope, one line each; context-map Owns rows to change, if the ownership cascade applied]. [If the complexity budget is added or changed: Afterwards I'll offer to run `pragmatic-spec-validate` on the existing specs that may exceed it.] Everything else in the constitution stays as-is. Confirm before I apply this?
 
 **STOP. Do not proceed to Step 4 until the user explicitly confirms.**
 
@@ -203,7 +207,7 @@ After updating `docs/constitution.md`, regenerate the rules from the updated sec
 Extract only **concrete, actionable directives** — not prose. Follow the same section grouping as the original generation:
 
 - **Project Context** — a 1–2 sentence directive summarizing what the project is and its compliance context, plus the fixed bullet: "These rules take precedence over all module-specific arch rules."
-- **Global Stack Constraints**
+- **Global Stack Constraints** (including the complexity budget as a directive, e.g. "a feature adds at most 1 new infrastructure component and records its justification in the spec")
 - **Security Baseline Constraints**
 - **Cross-Module Constraints**
 - **AI Guardrails — Stop and Ask Before Deciding**

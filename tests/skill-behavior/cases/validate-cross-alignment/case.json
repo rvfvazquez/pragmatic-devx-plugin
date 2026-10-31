@@ -1,0 +1,16 @@
+{
+  "id": "validate-cross-alignment",
+  "skill": "pragmatic-spec-validate",
+  "spec": "docs/specs/case-refund.md",
+  "kind": "validation",
+  "required_patterns": [
+    "Constitution alignment[^\\n]*FAIL",
+    "MongoDB[\\s\\S]{0,400}PostgreSQL|PostgreSQL[\\s\\S]{0,400}MongoDB",
+    "OIDC|gateway",
+    "Architecture alignment[^\\n]*FAIL",
+    "InvoiceRepository|billing"
+  ],
+  "forbidden_patterns": [
+    "Notification[^\\n]*\\bFAIL\\b[^\\n]*(6\\.3|synchronous)"
+  ]
+}

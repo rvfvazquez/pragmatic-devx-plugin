@@ -1,0 +1,12 @@
+{
+  "id": "constitution-budget-update",
+  "skill": "pragmatic-project-constitution-update",
+  "spec": "docs/constitution.md",
+  "kind": "recap",
+  "required_patterns": [
+    "Complexity budget",
+    "(Section 2|Global Tech Stack)[\\s\\S]{0,400}Complexity budget|Complexity budget[\\s\\S]{0,400}(Section 2|Global Tech Stack)",
+    "pragmatic-spec-validate"
+  ],
+  "forbidden_patterns": []
+}

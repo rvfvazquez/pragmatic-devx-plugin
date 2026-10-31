@@ -110,6 +110,9 @@ Ask which technology decisions apply to ALL modules — not just one:
 - Database engine(s) — which are permitted? Are any explicitly forbidden?
   ➡️ State the engine found in Step 1 scan, or "no engine committed yet — recommend picking one now to avoid drift across modules"
 - Infrastructure constraints (cloud provider, runtime, deployment model)?
+- Complexity budget — how many new infrastructure components (a datastore engine, a queue or broker, a cache, an external service, a new deployable) may one feature add before it needs a justification recorded in its spec?
+  Options: none without justification / at most 1 / at most 2 / no limit
+  ➡️ At most 1 — [state the Step 1 finding if `docs/arch/` already lists N infrastructure components; otherwise "no signal found — pragmatic default for a project with a single stack"]
 - Project-wide library standards (ORM, HTTP client, job queue, auth library)?
 
 **Area 3 — Security Baseline** (`multiSelect: true`)
@@ -235,7 +238,10 @@ Non-negotiable technology decisions that apply to every module. No spec or imple
 |---|---|---|
 | Language | <value> | <why> |
 | Database | <value> | <why> |
+| Complexity budget | Existing stack by default. At most <N> new infrastructure component(s) per feature, each justified in the spec's Rationale. | <why> |
 | <...> | <...> | <...> |
+
+Write the budget as the row labeled exactly `Complexity budget` — `pragmatic-spec-validate` looks it up by that label. A new infrastructure component is a datastore engine, queue or broker, cache, external service or SaaS, or deployable not already listed in this stack; a new table in a listed database, or a library, is not (libraries are covered by the AI guardrails). If the user chose "no limit", write `— none defined yet —` as the value.
 
 ---
 
@@ -287,7 +293,7 @@ Extract only **concrete, actionable rules** from sections 2, 3, 4, and 5 of the 
 Group the extracted rules into sections:
 
 - **Project Context** — a 1–2 sentence directive summarizing what the project is and its compliance context, plus the fixed bullet: "These rules take precedence over all module-specific arch rules."
-- **Global Stack Constraints** — e.g.: "Only PostgreSQL is permitted as a database engine. Never suggest SQLite, MongoDB, or any other engine."
+- **Global Stack Constraints** — e.g.: "Only PostgreSQL is permitted as a database engine. Never suggest SQLite, MongoDB, or any other engine. A feature adds at most 1 new infrastructure component (datastore engine, queue, cache, external service, deployable) and records its justification in the spec."
 - **Security Baseline Constraints** — e.g.: "Authentication is the platform OIDC provider; no module implements its own credential check. Every endpoint returning a user-owned resource must verify ownership against the caller identity before responding. Secrets are never committed to the repository — read them from the injected environment. Never place PII in application logs."
 - **Cross-Module Constraints** — e.g.: "AuthModule is the single source of truth for user identity. No module may maintain its own user store or replicate identity data."
 - **AI Guardrails — Stop and Ask Before Deciding** — e.g.: "Never add a third-party dependency without listing: package name, purpose, license, and why an existing dependency does not cover it. Present this and wait for confirmation — do not modify package.json before approval."

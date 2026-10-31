@@ -60,7 +60,7 @@ pragmatic-arch-spec-create  →  pragmatic-arch-spec-validate  →  pragmatic-ar
 
 When a problem is too large for a single feature spec — several related but independently shippable capabilities — `pragmatic-initiative-create` charts the path first: it decomposes the problem into a dependency-ordered list of features, decides whether architecture work is needed before any of them, and records an autonomy setting for delivery. It creates no feature spec, arch spec, or code itself.
 
-`pragmatic-initiative-deliver` then walks that breakdown end-to-end, dispatching `pragmatic-arch-spec-create` (if named) and, per feature in dependency order, `pragmatic-spec-create` (Lean mode) → `pragmatic-spec-validate` → `pragmatic-spec-build` → `pragmatic-spec-check` — using `pragmatic-initiative-status` (internal use only) to decide readiness at each step and updating the initiative document as the running record.
+`pragmatic-initiative-deliver` then walks that breakdown end-to-end, dispatching `pragmatic-arch-spec-create` (if named) and, per feature in dependency order, `pragmatic-spec-create` (Lean mode) → `pragmatic-spec-validate` → `pragmatic-spec-build` → `pragmatic-spec-check` — using `pragmatic-initiative-status` (internal use only) to decide readiness at each step and updating the initiative document as the running record. Independent features can be delivered in parallel by running `pragmatic-initiative-deliver` in several sessions: each claims a feature whose dependencies are all checked, via the table's `Claimed by` column.
 
 ```
 pragmatic-initiative-create  →  pragmatic-initiative-deliver

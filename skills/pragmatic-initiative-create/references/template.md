@@ -27,10 +27,12 @@ autonomous execution: yes | no
 
 Ordered by dependency — a feature never appears above one it depends on.
 
-| # | Feature | Context | Depends on | Spec | Status | Build |
-|---|---|---|---|---|---|---|
-| 1 | <name> | <context> | — | not created yet | Not started | Not started |
-| 2 | <name> | <context> | #1 | not created yet | Not started | Not started |
+| # | Feature | Context | Depends on | Spec | Status | Build | Claimed by |
+|---|---|---|---|---|---|---|---|
+| 1 | <name> | <context> | — | not created yet | Not started | Not started | — |
+| 2 | <name> | <context> | #1 | not created yet | Not started | Not started | — |
+
+`Claimed by` is set by `pragmatic-initiative-deliver` to a session label while that session works the row, and reset to `—` when it finishes, so several sessions can deliver independent features without picking the same one. The authoritative claim is a file under the git directory shared by all worktrees of the clone (`pragmatic-devx/claims/<slug>/feature-<n>`); this column mirrors it for readers.
 
 The table is an index. Detail for each feature lives below, one subsection per row.
 

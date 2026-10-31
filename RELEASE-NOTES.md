@@ -1,5 +1,15 @@
 # Pragmatic DevX — Release Notes
 
+## v0.18.0 (2026-10-31)
+
+### OpenCode Adapter
+
+The plugin now installs on OpenCode, alongside Claude Code, Codex, Gemini CLI, Cursor and Antigravity; no new top-level skills.
+
+- **OpenCode plugin (`.opencode/plugins/pragmatic-devx.js`, `index.js`)**: one plugin for OpenCode 1.x and 2.x registers the `skills/` directory with OpenCode's native `skill` tool and injects `pragmatic-howto`, with an OpenCode tool mapping, at session start. `index.js` re-exports it because OpenCode 2.0.4+ loads plugins from a directory, not a file path.
+- **Subagents are not installed**: `tdd-implementer`, `task-reviewer` and `fact-finder` are Claude Code definitions, so `pragmatic-spec-build` and the discovery interviews take their no-subagent fallbacks and work in the main session.
+- **Verified on OpenCode 2.0.26 with a local path only**: skills appear with the plugin and not without it, and the bootstrap is quoted back by the model. The git install form and OpenCode 1.x are untested.
+
 ## v0.17.0 (2026-10-31)
 
 ### Vertical Slices, Initiative Fog, Parallel Delivery by Claims, and a Smell Baseline

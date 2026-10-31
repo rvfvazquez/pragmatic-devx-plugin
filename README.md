@@ -114,6 +114,23 @@ agy plugin install https://github.com/rvfvazquez/pragmatic-devx-plugin
 
 Antigravity reads `package.json` → `"pi"` section, loads `.pi/extensions/pragmatic-devx.ts`, and registers the `skills/` directory for skill discovery. At session start, the extension injects `pragmatic-howto` as bootstrap context so the agent knows the full skill map without an explicit prompt.
 
+---
+
+### OpenCode
+
+Add the plugin to your `opencode.json` (project or `~/.config/opencode/`):
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": ["pragmatic-devx-plugin@git+https://github.com/rvfvazquez/pragmatic-devx-plugin.git"]
+}
+```
+
+On OpenCode 1.x the key is `plugin` instead of `plugins`. For a local clone, point the entry at the repository directory (OpenCode 2.0.4+ rejects paths to a single `.js` file, which is why the repo root has an `index.js` shim). Restart OpenCode afterwards.
+
+The plugin (`.opencode/plugins/pragmatic-devx.js`) works on both OpenCode generations: it registers the `skills/` directory with OpenCode's native `skill` tool, and injects `pragmatic-howto` plus an OpenCode tool mapping into the first message of each session. The three subagents under `agents/` are Claude Code definitions and are not installed in OpenCode, so `pragmatic-spec-build` and the discovery interviews take their no-subagent fallbacks and do that work in the main session.
+
 ## Skill Lifecycle
 
 The plugin organizes its skills into three core layers, plus an optional initiative layer above them for problems too large for a single feature. Each layer builds on the one above it — but you can start at any layer that matches your current need.

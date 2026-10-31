@@ -171,6 +171,7 @@ Use `TodoWrite` to create one task per acceptance criterion from section 7 of th
 Also create tasks for:
 - Setting up any external dependency integrations listed in spec section 8 that are not already present in the codebase
 - Scaffolding the component structure (directory, entry files) if it does not already exist
+- A **prefactoring task**, only when the codebase scan shows that a behavior-preserving restructuring of existing code would make one or more criteria much easier to implement ("make the change easy, then make the easy change"). Its Sources cite the criterion(s) it eases, it lists no new behavior, existing tests must stay green, and the criteria it eases list it under Depends On. If the spec's own change is a wide mechanical refactor (one change that breaks many call sites at once), do not make it a single task: sequence it as expand (add the new form beside the old) → migrate in batches by package or directory → contract (remove the old form), each its own task with Depends On
 
 **Record task provenance in both directions before implementation.** Give every task **Sources**: document path + section/criterion/invariant identifier, not just a generic "spec" label. AC tasks retain the AC column; scaffold/integration tasks may use `—` for AC but must cite the component/interface or dependency requiring them. Never invent a requirement to justify a task.
 

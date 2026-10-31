@@ -191,7 +191,7 @@ If no contradiction is found, skip straight to the recap below.
 
 Once clear, present a short recap and require explicit confirmation before writing:
 
-> Here's what I'm about to change: [sections in scope, one line each; glossary terms added, redefined, or renamed]. Everything else in the spec stays as-is. Confirm before I apply this?
+> Here's what I'm about to change: [sections in scope, one line each; glossary terms added, redefined, or renamed]. I'll also record these decisions under `## Clarifications`: [each question → answer, tagged `accepted recommendation: <source>` or `user decision`]. Everything else in the spec stays as-is. Confirm before I apply this?
 
 **STOP. Do not proceed to Step 4 until the user explicitly confirms.**
 
@@ -207,7 +207,18 @@ When modifying the spec:
    - Minor bump (`1.0.0` → `1.1.0`) for significant new requirements or design changes
 5. **Deprecate** removed content with `~~strikethrough~~` rather than deleting it, unless it is clearly obsolete noise
 6. **Update the glossary** if the domain language cascade applied: apply **§3 Write the Glossary** of `pragmatic-domain-language` (a resolved ambiguity links this spec). Then replace every use of an avoided or renamed term in this spec, including untouched sections — terminology is not "preserved content". §3's list of other documents still using an old name goes into Step 6
-7. **Append** a changelog entry at the **end of the file**, after section 9 (Open Questions):
+7. **Record the decisions** asked in Steps 3, 3.5 and 3.6 under a `## Clarifications` section placed right after section 9 (before the Changelog and any Build Log). Add a `### Session <YYYY-MM-DD>` subheading for this update, with one line per decision:
+
+```markdown
+## Clarifications
+
+### Session <YYYY-MM-DD>
+- Q: <the question as asked> → A: <the answer> (accepted recommendation: <constitution | related spec | codebase | pragmatic default>)
+- Q: <the question as asked> → A: <the answer> (user decision)
+```
+
+   Record only decisions the user was asked (not the language, scope or recap confirmations). Tag `accepted recommendation: <source>` when the user took the `➡️` answer, naming where it came from (constitution, related spec, codebase or pragmatic default); tag `user decision` when they chose differently or there was no recommendation. A decision left open stays a `[TODO]` and is not recorded here. The answer still goes into its own section — this is the record of how it was decided, not a replacement. If `## Clarifications` already exists, add a new session; never edit or reorder earlier sessions. The Changelog says *what changed*; Clarifications says *how each decision was reached*.
+8. **Append** a changelog entry at the **end of the file**, after section 9 (Open Questions):
 
 ```markdown
 ---
@@ -231,7 +242,7 @@ After applying changes, verify:
 
 Report:
 1. A concise summary of what was changed
-2. Any remaining `[TODO: ...]` items still present in the document
+2. The decisions recorded under `## Clarifications`, and any remaining `[TODO: ...]` items still present in the document
 3. Sections that may need human review due to the changes
 4. Glossary changes (terms added, redefined, or renamed), and every other spec or arch spec that still uses an old term — those need their own `pragmatic-spec-update` / `pragmatic-arch-spec-update`
 

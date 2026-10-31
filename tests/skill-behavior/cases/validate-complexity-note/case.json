@@ -1,0 +1,12 @@
+{
+  "id": "validate-complexity-note",
+  "skill": "pragmatic-spec-validate",
+  "spec": "docs/specs/export-job.md",
+  "kind": "validation",
+  "required_patterns": [
+    "Complexity alignment[^\\n]*N/A",
+    "No complexity budget",
+    "pragmatic-project-constitution-update"
+  ],
+  "forbidden_patterns": []
+}

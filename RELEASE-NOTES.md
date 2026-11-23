@@ -1,5 +1,12 @@
 # Pragmatic DevX — Release Notes
 
+## v0.20.0 (2026-11-22)
+
+### PR Review and Debugging Companion
+
+- The README and `pragmatic-howto` explain where GitHub PR review and bug diagnosis fit alongside spec and architecture conformance.
+- The separately installed **Pragmatic Workflows 0.1.0** package provides `pragmatic-pr-review` and `pragmatic-debug` for Codex and Claude Code. The PR workflow includes engineering and security review. Debug starts from a free-text symptom or existing evidence and reports how to verify a correction.
+
 ## v0.19.0 (2026-10-31)
 
 ### Convergence Loop, Cross-Artifact Validation, Decision Trail, and Complexity Budget

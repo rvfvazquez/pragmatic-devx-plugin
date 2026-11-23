@@ -34,6 +34,19 @@ Claude Code plugin focused on Developer Experience — structured specs, archite
 | [`pragmatic-reverse-engineer`](#pragmatic-reverse-engineer) | Generate a spec/arch spec from existing undocumented code |
 | [`pragmatic-domain-language`](#pragmatic-domain-language) | Change or sync the glossary and context map; shared domain-language procedures for the other skills |
 
+## PR Review and Debugging
+
+**Pragmatic Workflows** is a separately installed companion for Codex and Claude Code. It can run in projects with or without Pragmatic DevX specs or ADRs.
+
+| Skill | Example request | What you get |
+|---|---|---|
+| `pragmatic-pr-review` | “Review PR #42 and tell me what blocks the merge.” | A review tied to the PR revision, with engineering findings, CI and security scan status, and conformance evidence when requirements are available. |
+| `pragmatic-debug` | “CSV exports are sometimes empty when I filter by date. Investigate.” | A reproduction attempt, tested hypotheses, the evidence for the diagnosis, and a way to verify a correction. A plain-language report is enough to start. |
+
+Extract the **Pragmatic Workflows** archive and follow the `README.md` inside it for installation. After installing, open a project session and ask in plain language or select the skill by name. The companion includes its own engineering and security review guidance. Its PR workflow uses GitHub read access and the project's available checks and scanners. It prepares feedback in chat by default and publishes to GitHub only on explicit request.
+
+`pragmatic-spec-check` and `pragmatic-arch-spec-check` remain the entry points for checking implementation against a specific Pragmatic DevX document. A diagnosis can point to one of those documents or identify a decision to record with `pragmatic-spec-update` or `pragmatic-arch-spec-update`.
+
 ## Installation
 
 ### Claude Code

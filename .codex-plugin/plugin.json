@@ -1,7 +1,7 @@
 {
   "name": "pragmatic-devx-plugin",
-  "version": "0.19.0",
-  "description": "Structured specs, architecture documentation, and pragmatic engineering patterns for developer experience.",
+  "version": "0.20.0",
+  "description": "AI-SDLC workflows for planning, specs, implementation, pull request review, and software diagnosis.",
   "author": {
     "name": "rvfvazquez",
     "url": "https://github.com/rvfvazquez"
@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Pragmatic DevX",
-    "shortDescription": "Structured spec and architecture workflows for engineering teams",
-    "longDescription": "Use Pragmatic DevX to guide teams through feature specification, architecture documentation, project constitution, and spec-driven implementation — from first draft to conformance check.",
+    "shortDescription": "AI-SDLC workflows for engineering teams",
+    "longDescription": "Use Pragmatic DevX to plan and specify changes, implement approved specs, review GitHub pull requests, and diagnose software failures.",
     "developerName": "rvfvazquez",
     "category": "Coding",
     "capabilities": [

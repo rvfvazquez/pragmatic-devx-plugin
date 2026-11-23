@@ -1,0 +1,1 @@
+Can you review GitHub PR #42 in the current repository? Check whether the tests and security scans cover the current commit and tell me what would block the merge.

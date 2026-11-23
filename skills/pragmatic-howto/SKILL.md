@@ -5,7 +5,7 @@ description: This skill should be used when the user asks "what pragmatic skills
 
 # Pragmatic DevX — How-To Guide
 
-Pragmatic DevX provides two parallel skill lifecycles for engineering documentation: **Feature Specs** and **Architecture Specs**, anchored by a single **Project Constitution** that governs both.
+Pragmatic DevX supports AI-SDLC workflows for planning, documentation, implementation, review, and diagnosis. A single project constitution governs the feature and architecture spec lifecycles.
 
 ## Document Hierarchy
 
@@ -105,7 +105,7 @@ The constitution is not a spec — it has no acceptance criteria and is not vali
 
 ## Security Across the Lifecycle
 
-Security is not a separate skill — it runs through the existing ones:
+Within the Pragmatic DevX documentation lifecycle, security runs through the existing skills.
 
 | Stage | Where security shows up |
 |---|---|
@@ -118,7 +118,16 @@ Security is not a separate skill — it runs through the existing ones:
 | `pragmatic-spec-check` / `pragmatic-arch-spec-check` | Verify security controls exist in the code — ownership checks, input validation, no hardcoded secrets, guarded trust boundaries. |
 | `pragmatic-reverse-engineer` | Flags **SECURITY-GAP** findings in legacy code (missing ownership check, hardcoded secret) for the user to confirm as intentional or record as a `[TODO]`. |
 
-A standalone security code-review tool belongs in a process plugin, not here — this plugin's job is that security decisions are captured in the documents and verified against the code.
+## Pull Request Review and Debugging
+
+The standard Pragmatic DevX installation includes both workflows. Start from an existing PR or an observed symptom. Use project specs and ADRs as evidence when available.
+
+| User goal | Skill | Input and result |
+|---|---|---|
+| Review or re-review a GitHub pull request | `pragmatic-pr-review` | A PR URL or number. Returns a review linked to the revision, including engineering findings, CI checks, and security scan evidence when available. |
+| Investigate a bug, failing test, or regression | `pragmatic-debug` | A plain-language symptom, issue, log, or failing command. Returns reproduction evidence, cause or open hypotheses, and how to verify a correction. |
+
+For a request explicitly about whether code satisfies a feature spec or architecture spec, use `pragmatic-spec-check` or `pragmatic-arch-spec-check`. If a diagnosis reveals an undefined behavior or architectural decision, route the documentation change to `pragmatic-spec-update` or `pragmatic-arch-spec-update`. PR review and debug also work in projects with no Pragmatic DevX documents.
 
 ## Rule: Check Constitution Before Any Spec Work
 
@@ -146,6 +155,8 @@ Before creating or updating any spec or arch spec, check whether `docs/constitut
 | "this is too big for one spec, break it down" / "plan this initiative" | `pragmatic-initiative-create` |
 | "deliver this initiative" / "build out all the features in X" | `pragmatic-initiative-deliver` |
 | "rename a term in the glossary" / "add a term" / "update the context map" / "who owns X" / "sync the glossary with the code" | `pragmatic-domain-language` |
+| "review this GitHub PR" / "is PR #42 ready to merge?" | `pragmatic-pr-review` |
+| "reports sometimes come back empty, investigate" / "diagnose this failing test" | `pragmatic-debug` |
 
 ## Skill Invocation Rule
 

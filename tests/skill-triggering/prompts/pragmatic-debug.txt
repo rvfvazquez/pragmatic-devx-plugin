@@ -1,0 +1,1 @@
+CSV exports sometimes come back empty when I filter by date. It started after a recent update. Please investigate what triggers the failure and explain how we could verify a correction.

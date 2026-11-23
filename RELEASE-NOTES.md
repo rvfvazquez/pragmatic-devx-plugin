@@ -1,5 +1,12 @@
 # Pragmatic DevX — Release Notes
 
+## v0.20.0 (2026-11-22)
+
+### AI-SDLC Workflows for Pull Request Review and Debugging
+
+- The plugin now covers AI-SDLC workflows beyond spec-driven delivery. The README, `pragmatic-howto`, and skill map include the new entry points and how they connect to spec and architecture conformance.
+- [`pragmatic-pr-review`](skills/pragmatic-pr-review/SKILL.md) reviews the current GitHub PR revision, engineering design, security evidence, and required checks. [`pragmatic-debug`](skills/pragmatic-debug/SKILL.md) starts from a free-text symptom or existing evidence and reports how to verify a correction. Both ship in the standard installation and carry their own instructions.
+
 ## v0.19.0 (2026-10-31)
 
 ### Convergence Loop, Cross-Artifact Validation, Decision Trail, and Complexity Budget

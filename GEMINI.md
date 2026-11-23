@@ -15,3 +15,5 @@
 @./skills/pragmatic-initiative-create/SKILL.md
 @./skills/pragmatic-initiative-deliver/SKILL.md
 @./skills/pragmatic-initiative-status/SKILL.md
+@./skills/pragmatic-pr-review/SKILL.md
+@./skills/pragmatic-debug/SKILL.md

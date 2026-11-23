@@ -4,16 +4,16 @@ Complete reference for all skills in the pragmatic-devx plugin: purpose, outputs
 
 ---
 
-## Companion Workflows
+## Pull Request Review and Debugging
 
-Pragmatic Workflows is installed separately for Codex or Claude Code. Its skills can use project specs and ADRs as evidence when available.
+These skills ship with Pragmatic DevX and use project specs and ADRs as evidence when available.
 
 | Skill | Entry point | Output |
 |---|---|---|
 | `pragmatic-pr-review` | GitHub PR URL or number | Findings with evidence at the reviewed revision, engineering and security review, and CI and scan coverage |
 | `pragmatic-debug` | Free-text symptom, issue, logs, or failing command | Reproduction attempt, diagnosis with confidence, and a way to verify a correction |
 
-For checking implementation against a named spec, see `pragmatic-spec-check` or `pragmatic-arch-spec-check` below. For installation instructions, see the companion package's README.
+For checking implementation against a named spec, see `pragmatic-spec-check` or `pragmatic-arch-spec-check` below.
 
 ## Governance
 

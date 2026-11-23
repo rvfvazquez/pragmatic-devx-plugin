@@ -3,10 +3,10 @@
 <div align="center">
   <img src="pragmatic_devx_plugin.png" width="450px" alt="GitHub Readme Stats" />
   <h1 style="font-size: 28px; margin: 10px 0;">Pragmatic Devx Plugin</h1>
-  <p>Spec Driven Development!</p>
+  <p>AI-assisted software development lifecycle</p>
 </div>
 
-Claude Code plugin focused on Developer Experience — structured specs, architecture documentation, and pragmatic engineering patterns.
+Pragmatic DevX is an AI-SDLC plugin for planning, specs and architecture, spec-driven implementation, GitHub PR review, and software diagnosis.
 
 > **See it in action:** [pragmatic-devx-showcase](https://github.com/rvfvazquez/pragmatic-devx-showcase)
 > shows the plugin's skills applied end-to-end — `constitution → arch spec → feature spec →
@@ -31,19 +31,21 @@ Claude Code plugin focused on Developer Experience — structured specs, archite
 | [`pragmatic-spec-update`](#pragmatic-spec-update) | Apply targeted changes to an existing spec |
 | [`pragmatic-spec-build`](#pragmatic-spec-build) | Implement an approved spec, guided by arch rules and constitution |
 | [`pragmatic-spec-check`](#pragmatic-spec-check) | Verify the implementation matches the spec's acceptance criteria |
+| [`pragmatic-pr-review`](#pr-review-and-debugging) | Review a GitHub PR against engineering, security, and repository merge criteria |
+| [`pragmatic-debug`](#pr-review-and-debugging) | Diagnose a failure or regression and explain how to verify a correction |
 | [`pragmatic-reverse-engineer`](#pragmatic-reverse-engineer) | Generate a spec/arch spec from existing undocumented code |
 | [`pragmatic-domain-language`](#pragmatic-domain-language) | Change or sync the glossary and context map; shared domain-language procedures for the other skills |
 
 ## PR Review and Debugging
 
-**Pragmatic Workflows** is a separately installed companion for Codex and Claude Code. It can run in projects with or without Pragmatic DevX specs or ADRs.
+The standard Pragmatic DevX installation includes both skills. They work in projects with or without Pragmatic DevX specs or ADRs.
 
 | Skill | Example request | What you get |
 |---|---|---|
 | `pragmatic-pr-review` | “Review PR #42 and tell me what blocks the merge.” | A review tied to the PR revision, with engineering findings, CI and security scan status, and conformance evidence when requirements are available. |
 | `pragmatic-debug` | “CSV exports are sometimes empty when I filter by date. Investigate.” | A reproduction attempt, tested hypotheses, the evidence for the diagnosis, and a way to verify a correction. A plain-language report is enough to start. |
 
-Extract the **Pragmatic Workflows** archive and follow the `README.md` inside it for installation. After installing, open a project session and ask in plain language or select the skill by name. The companion includes its own engineering and security review guidance. Its PR workflow uses GitHub read access and the project's available checks and scanners. It prepares feedback in chat by default and publishes to GitHub only on explicit request.
+Open a project session and ask in plain language or select a skill by name. PR review uses GitHub read access and the project's available checks and scanners. It prepares feedback in chat by default and publishes to GitHub only on explicit request.
 
 `pragmatic-spec-check` and `pragmatic-arch-spec-check` remain the entry points for checking implementation against a specific Pragmatic DevX document. A diagnosis can point to one of those documents or identify a decision to record with `pragmatic-spec-update` or `pragmatic-arch-spec-update`.
 
@@ -99,7 +101,7 @@ git clone https://github.com/rvfvazquez/pragmatic-devx-plugin.git ~/pragmatic-de
 gemini extension install ~/pragmatic-devx-plugin
 ```
 
-The extension is registered via `gemini-extension.json`. At session start, Gemini loads `GEMINI.md` which references all 16 skill files — no further configuration needed.
+The extension is registered via `gemini-extension.json`. At session start, Gemini loads `GEMINI.md`, which references the included skills.
 
 ---
 
@@ -733,7 +735,7 @@ pragmatic-devx-plugin/
 ├── .pi/
 │   └── extensions/
 │       └── pragmatic-devx.ts      # Antigravity (agy) Pi extension
-├── GEMINI.md                      # Gemini skill index (16 @./skills/ references)
+├── GEMINI.md                      # Gemini skill index
 ├── gemini-extension.json          # Gemini extension manifest
 ├── hooks/
 │   ├── hooks.json                 # SessionStart hook definition
@@ -741,6 +743,8 @@ pragmatic-devx-plugin/
 │   ├── run-hook.cmd               # Cross-platform hook runner (Windows/Unix)
 │   └── session-start              # Hook script — injects project context
 ├── skills/
+│   ├── pragmatic-pr-review/       # GitHub PR review and specialist guidance
+│   ├── pragmatic-debug/           # Failure reproduction and diagnosis
 │   ├── pragmatic-howto/
 │   │   ├── SKILL.md               # Bootstrap skill — maps all skills and lifecycle
 │   │   └── references/

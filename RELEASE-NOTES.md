@@ -2,10 +2,10 @@
 
 ## v0.20.0 (2026-11-22)
 
-### PR Review and Debugging Companion
+### AI-SDLC Workflows for Pull Request Review and Debugging
 
-- The README and `pragmatic-howto` explain where GitHub PR review and bug diagnosis fit alongside spec and architecture conformance.
-- The separately installed **Pragmatic Workflows 0.1.0** package provides `pragmatic-pr-review` and `pragmatic-debug` for Codex and Claude Code. The PR workflow includes engineering and security review. Debug starts from a free-text symptom or existing evidence and reports how to verify a correction.
+- The plugin now covers AI-SDLC workflows beyond spec-driven delivery. The README, `pragmatic-howto`, and skill map include the new entry points and how they connect to spec and architecture conformance.
+- [`pragmatic-pr-review`](skills/pragmatic-pr-review/SKILL.md) reviews the current GitHub PR revision, engineering design, security evidence, and required checks. [`pragmatic-debug`](skills/pragmatic-debug/SKILL.md) starts from a free-text symptom or existing evidence and reports how to verify a correction. Both ship in the standard installation and carry their own instructions.
 
 ## v0.19.0 (2026-10-31)
 

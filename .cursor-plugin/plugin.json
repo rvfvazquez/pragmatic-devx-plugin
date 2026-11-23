@@ -1,7 +1,7 @@
 {
   "name": "pragmatic-devx-plugin",
   "displayName": "Pragmatic DevX",
-  "description": "Structured specs, architecture documentation, and pragmatic engineering patterns.",
+  "description": "AI-SDLC workflows for planning, specs, implementation, pull request review, and software diagnosis.",
   "version": "0.20.0",
   "author": {
     "name": "rvfvazquez"
